@@ -23,6 +23,8 @@ Mock.mock('http://1.json', 'get', {
     'address': '@county(true)',
     //属性 date 是一个yyyy-MM-dd 的随机日期
     'date': '@date("yyyy-MM-dd")',
+    //属性 date 是一个yyyy-MM-dd 的随机日期
+    'month': '',
     //属性 time 是一个 size, background, text 的随机时间
     'time': '@time("HH:mm:ss")',
     //属性 url 是一个随机的url

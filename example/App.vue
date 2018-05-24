@@ -26,7 +26,8 @@
                         title: '序号',
                         key: 'sid',
                         fixed: true,
-                        type: 'number'
+                        type: 'number',
+                        // format: false
                     },
                     {
                         title: '日期',
@@ -57,8 +58,9 @@
                     },
 
                     {
-                        title: '时间',
-                        key: 'time'
+                        title: '月份',
+                        key: 'month',
+                        type: 'month'
                     },
                     {
                         title: '地址',
@@ -106,7 +108,6 @@
         methods: {
             init() {
                 axios.get('http://1.json').then(res => {
-                    console.log(res);
                     this.data = res.data.list;
                 }).catch(err => {
 

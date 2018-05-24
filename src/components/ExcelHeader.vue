@@ -25,7 +25,10 @@
                         class="cell-content" 
                         :style="{width: `${columnsWidth[index] - 20}px`}" 
                         :class="{active: isActive(th)}"
-                        v-else>{{ th.title }}</p>
+                        v-else>
+                        <span class="icon" :class="iconClass(th.type)"></span>
+                        <span class="content">{{ th.title }}</span>
+                    </p>
                     <div class="dropdown" v-if="th.type != 'selection'" :class="{active: dropdownIndex == index}">
                         <i @click.stop="openDropdown(index)"></i>
                     </div>
@@ -118,6 +121,28 @@
                 } else {
                     return false;
                 }
+            },
+            iconClass(type) {
+                let className;
+                switch (type) {
+                    case 'number':
+                        className = 'number';
+                        break;
+                    case 'date':
+                        className = 'date';
+                        break;
+                    case 'month':
+                        className = 'date';
+                        break;
+                    case 'select':
+                        className = 'select';
+                        break;
+                    default:
+                        className = 'text';
+                }
+                return {
+                    [className]: true
+                }
             }
         }
     }
@@ -140,7 +165,7 @@
       }
       .dropdown {
         position: absolute;
-        top: 8px;
+        top: 10px;
         right: 10px;
         z-index: 1;
         display: flex;
@@ -184,5 +209,31 @@
 
     .active {
       color: #2d8cf0;
+    }
+
+    .content {
+      vertical-align: middle;
+    }
+
+    .icon {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: contain;
+      vertical-align: middle;
+      &.text {
+        background-image: url("../assets/text.png");
+      }
+      &.select {
+        background-image: url("../assets/select.png");
+      }
+      &.date {
+        background-image: url("../assets/date.png");
+      }
+      &.number {
+        background-image: url("../assets/number.png");
+      }
     }
 </style>

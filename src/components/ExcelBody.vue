@@ -18,7 +18,9 @@
                         selected: xIndex <= selectedXArr[1] && xIndex >=selectedXArr[0] && yIndex <= selectedYArr[1] && yIndex >= selectedYArr[0],
                         autofill: xIndex <= selectedXArr[1] && xIndex >=selectedXArr[0]&&yIndex<=autofillYArr[1] && yIndex >= autofillYArr[0],
                         disabled: th.type == 'disabled',
-                        error: th.type == 'date' && !verifyDate(tr[th.key], yIndex, th.key) || th.type == 'select' && !verifySelect(tr[th.key], th.options, yIndex, th.key) || th.type == 'number' && !verifyNumber(tr[th.key], yIndex, th.key)
+                        error: th.type == 'date' && !verifyDate(tr[th.key], yIndex, th.key) || 
+                               th.type == 'month' && !verifyMonth(tr[th.key], yIndex, th.key) || 
+                               th.type == 'select' && !verifySelect(tr[th.key], th.options, yIndex, th.key) || th.type == 'number' && !verifyNumber(tr[th.key], yIndex, th.key)
                     }" 
                     :data-key="th.key" 
                     @mouseenter="multiSelect($event, xIndex, yIndex, th.type)" 
@@ -31,7 +33,7 @@
                     <div 
                         class="cell-content" 
                         :style="{'max-width':  `${columnsWidth[xIndex]}px`}"
-                        v-else>{{ format(tr[th.key], th.type) }}</div>
+                        v-else>{{ format(tr[th.key], th.type, th.format) }}</div>
                 </td>
             </tr>
         </tbody>
@@ -122,6 +124,25 @@
                     return false;
                 }
             },
+            verifyMonth(month, index, key) {
+                if (!month) {
+                    this.$parent.setErrors(index, key, true);
+                    return true;
+                }
+                let result = month.match(/^(\d{1,4})(-|\/)(\d{1,2})$/);
+                if (result == null) {
+                    this.$parent.setErrors(index, key, false);
+                    return false;
+                }
+                let d = new Date(result[1], result[3] - 1);
+                if (d.getFullYear() == result[1] && d.getMonth() + 1 == result[3]) {
+                    this.$parent.setErrors(index, key, true);
+                    return true;
+                } else {
+                    this.$parent.setErrors(index, key, false);
+                    return false;
+                }
+            },
             verifySelect(value, options, index, key) {
                 if (!value) {
                     this.$parent.setErrors(index, key, true);
@@ -145,7 +166,8 @@
                     return true;
                 }
             },
-            format(value, type) {
+            format(value, type, format = true) {
+                if (!format) return value;
                 if (!value) return;
                 if (type == 'number') {
                     if (!parseInt(value)) {

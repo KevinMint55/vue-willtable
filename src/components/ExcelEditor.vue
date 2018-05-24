@@ -24,6 +24,15 @@
                     @blur="resetEditor"
                     v-else-if="editType == 'date'" 
                     ref="date"></el-date-picker>
+                <el-date-picker 
+                    size="mini" 
+                    v-model="editContent" 
+                    value-format="yyyy-MM" 
+                    type="month" 
+                    :style="{width:`${curEditorWidth > 140 ? curEditorWidth : 140}px`}" 
+                    @blur="resetEditor"
+                    v-else-if="editType == 'month'" 
+                    ref="month"></el-date-picker>
                 <el-select 
                     size="mini" 
                     :automatic-dropdown="true" 
