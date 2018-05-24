@@ -1,0 +1,78 @@
+body,
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+form,
+fieldset,
+table,
+td,
+img,
+div,
+dl,
+dt,
+dd,
+input,
+p,
+a,
+section,
+figure,
+figcaption,
+hgroup,
+pre,
+i,
+header {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  word-break: break-all;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: 'PingFang SC, Microsoft Yahei';
+  color: #333;
+  font-size: 12px;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: normal;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+  text-decoration: none !important;
+}
+
+input,
+button,
+textarea {
+  border: none;
+  outline: none;
+  font-size: 12px;
+  font-family: 'PingFang SC, Microsoft Yahei';
+}
+
+button {
+  user-select: none;
+}
+
+i {
+  font-style: normal;
+}

@@ -1,0 +1,13 @@
+//淡入淡出过渡
+.fade-enter-active {
+    transition: all .3s linear;
+}
+
+.fade-leave-active {
+    opacity: 0;
+    transition: all .3s linear;
+}
+
+.fade-enter {
+    opacity: 0;
+}
