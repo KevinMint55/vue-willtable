@@ -457,8 +457,15 @@
                     return;
                 }
                 e.preventDefault();
-                switch (e.keyCode) {
-                    case 37:
+                const isImportability = (k) => {
+                    if ((k >= 65 && k <= 90) || (k >= 48 && k <= 57) || (k >= 96 && k <= 107) || (k >= 109 && k <= 111) || k == 32 || (k >= 186 && k <= 222)) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+                switch (true) {
+                    case e.keyCode == 37:
                         // 左
                         if (this.editorXIndex == this.editorRange.minX) {
                             this.editorXIndex = this.editorRange.minX;
@@ -467,7 +474,7 @@
                         }
                         this.adjustPosition();
                         break;
-                    case 38:
+                    case e.keyCode == 38:
                         // 上
                         if (this.editorYIndex == this.editorRange.minY) {
                             this.editorYIndex = this.editorRange.minY;
@@ -476,7 +483,7 @@
                         }
                         this.adjustPosition();
                         break;
-                    case 39:
+                    case e.keyCode == 39:
                         // 右
                         if (this.editorXIndex == this.editorRange.maxX) {
                             this.editorXIndex = this.editorRange.maxX;
@@ -485,7 +492,7 @@
                         }
                         this.adjustPosition();
                         break;
-                    case 40:
+                    case e.keyCode == 40:
                         // 下
                         if (this.editorYIndex == this.editorRange.maxY) {
                             this.editorYIndex = this.editorRange.maxY;
@@ -494,13 +501,18 @@
                         }
                         this.adjustPosition();
                         break;
-                    case 8:
+                    case e.keyCode == 8:
                         // 删除
                         this.clearSelected();
                         break;
-                    default:
-                        this.setEditing(e);
+                    case e.keyCode == 13:
+                        this.setEditing();
+                        break;
+                    case isImportability(e.keyCode) || e.key == 'Process' || e.key == 'Unidentified':
+                        this.setEditing(e.key);
+                        break;
                 }
+                console.log(e);
             },
             getContentToclipboard() {
                 let content = '';
@@ -557,13 +569,25 @@
                 }
             },
             // 设置启用编辑
-            setEditing(e) {
+            setEditing(key) {
                 if (this.columns[this.editorXIndex].type == 'disabled') {
                     return;
                 }
                 this.editType = this.columns[this.editorXIndex].type ? this.columns[this.editorXIndex].type : 'text';
                 this.curEditorWidth = this.columnsWidth[this.editorXIndex];
-                this.$refs.editor.editContent = this.showData[this.editorYIndex][this.columns[this.editorXIndex].key];
+                if (key && (this.editType == 'text' || this.editType == 'number')) {
+                    if (key == 'Process' || key == 'Unidentified') {
+                        if (key.match(/\d/)) {
+                            this.$refs.editor.editContent = key.match(/\d/)[0];
+                        } else {
+                            this.$refs.editor.editContent = '';
+                        }
+                    } else {
+                        this.$refs.editor.editContent = key;
+                    }
+                } else {
+                    this.$refs.editor.editContent = this.showData[this.editorYIndex][this.columns[this.editorXIndex].key];
+                }
                 this.editing = true;
                 if (this.editType == 'select') {
                     this.options = this.columns[this.editorXIndex].options;
