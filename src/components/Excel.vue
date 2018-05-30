@@ -436,11 +436,11 @@
                 window.addEventListener('mouseup', this.selectUp);
             },
             keySubmit(e) {
-                if (e.ctrlKey && e.keyCode == 90) {
-                    this.operation('undo');
+                if ((e.ctrlKey && e.keyCode == 90) || (e.metaKey && e.keyCode == 90)) {
+                    return this.operation('undo');
                 }
-                if (e.ctrlKey && e.keyCode == 89) {
-                    this.operation('recovery');
+                if ((e.ctrlKey && e.keyCode == 89) || (e.metaKey && e.keyCode == 89)) {
+                    return this.operation('recovery');
                 }
                 if (this.editing && e.keyCode == 13) {
                     this.editing = false;
@@ -450,10 +450,10 @@
                 if (this.editing || !this.editorShow) {
                     return;
                 }
-                if (e.ctrlKey && e.keyCode == 67) {
-                    this.getContentToclipboard();
+                if ((e.ctrlKey && e.keyCode == 67) || (e.metaKey && e.keyCode == 67)) {
+                    return this.getContentToclipboard();
                 }
-                if (e.ctrlKey) {
+                if (e.ctrlKey || e.metaKey) {
                     return;
                 }
                 e.preventDefault();
