@@ -512,7 +512,6 @@
                         this.setEditing(e.key);
                         break;
                 }
-                console.log(e);
             },
             getContentToclipboard() {
                 let content = '';

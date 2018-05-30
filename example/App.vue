@@ -1,6 +1,7 @@
 <template>
 	<div class="main">
-		<excel :columns-data="columns" v-model="data" style="width: 100%;" maxHeight="800"></excel>
+		<excel :columns-data="columns" v-model="data1" style="width: 100%;" maxHeight="800"></excel>
+        <!-- <excel :columns-data="columns" v-model="data2" style="width: 100%;" maxHeight="800"></excel> -->
 	</div>
 </template>
 
@@ -99,7 +100,8 @@
                         width: 200,
                     },
                 ],
-                data: [],
+                data1: [],
+                data2: [],
             }
         },
         created() {
@@ -108,7 +110,8 @@
         methods: {
             init() {
                 axios.get('http://1.json').then(res => {
-                    this.data = res.data.list;
+                    this.data1 = JSON.parse(JSON.stringify(res.data.list));
+                    this.data2 = JSON.parse(JSON.stringify(res.data.list));
                 }).catch(err => {
 
                 });
