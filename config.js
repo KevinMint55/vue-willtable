@@ -45,7 +45,7 @@ module.exports = {
     // Paths
     assetsRoot: path.resolve(__dirname, './demo'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: '/',
+    assetsPublicPath: '/kmExcel/',
     /**
      * Source Maps
      */

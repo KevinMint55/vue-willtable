@@ -109,7 +109,7 @@
         },
         methods: {
             init() {
-                axios.get('http://1.json').then(res => {
+                axios.get('https://demo.kevinmint.com/1.json').then(res => {
                     this.data1 = JSON.parse(JSON.stringify(res.data.list));
                     this.data2 = JSON.parse(JSON.stringify(res.data.list));
                 }).catch(err => {
