@@ -1,22 +1,43 @@
 <template>
 	<div class="main">
-		<excel :columns-data="columns" v-model="data1" style="width: 100%;" maxHeight="800"></excel>
+		<excel :columns-data="columns" v-model="data1" style="width: 100%;" maxHeight="800" v-if="!loading"></excel>
         <!-- <excel :columns-data="columns" v-model="data2" style="width: 100%;" maxHeight="800"></excel> -->
 	</div>
 </template>
 
 <script>
-    import Excel from 'Excel';
-    import axios from 'axios';
+import Excel from 'Excel';
+import axios from 'axios';
 
-    export default {
-        name: 'App',
-        components: {
-            Excel
-        },
-        data() {
-            return {
-                columns: [
+export default {
+    name: 'App',
+    components: {
+        Excel
+    },
+    data() {
+        return {
+            columns: [
+                {
+                    key: 'selection',
+                    type: 'selection',
+                    width: 40,
+                    fixed: true
+                },
+            ],
+            data1: [],
+            data2: [],
+
+            loading: false,
+        }
+    },
+    created() {
+        this.init();
+    },
+    methods: {
+        init() {
+            this.loading = true;
+            axios.get('https://demo.kevinmint.com/1.json').then(res => {
+                this.columns = [
                     {
                         key: 'selection',
                         type: 'selection',
@@ -99,29 +120,21 @@
                         type: 'disabled',
                         width: 200,
                     },
-                ],
-                data1: [],
-                data2: [],
-            }
-        },
-        created() {
-            this.init();
-        },
-        methods: {
-            init() {
-                axios.get('https://demo.kevinmint.com/1.json').then(res => {
-                    this.data1 = JSON.parse(JSON.stringify(res.data.list));
-                    this.data2 = JSON.parse(JSON.stringify(res.data.list));
-                }).catch(err => {
+                ]
+                this.data1 = JSON.parse(JSON.stringify(res.data.list));
+                this.data2 = JSON.parse(JSON.stringify(res.data.list));
+            }).catch(err => {
 
-                });
-            }
+            }).finally(() => {
+                this.loading = false;
+            });
         }
     }
+}
 </script>
 
 <style>
-    .main {
-      padding: 100px;
-    }
+.main {
+  padding: 100px;
+}
 </style>

@@ -221,6 +221,7 @@
         },
         methods: {
             init() {
+                this.data = this.value;
                 this.$refs.tbody.addEventListener('scroll', () => {
                     this.$refs.theader.scrollLeft = this.$refs.tbody.scrollLeft;
                     this.$refs.fixedTbody.scrollTop = this.$refs.tbody.scrollTop;
