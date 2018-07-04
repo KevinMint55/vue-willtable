@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="km-table-wrapper" ref="wrapper" :class="{scrollX: tableWidth > wrapperWidth}" :style="{maxWidth: `${tableWidth}px`}" v-clickoutside="clickoutside">
+        <div class="km-table-wrapper" ref="wrapper" :class="{scrollX: tableWidth > wrapperWidth}" :style="{maxWidth: `${tableWidth}px`}" v-clickoutside="clickoutside" v-if="columns.length > 0">
             <div class="km-table-header" ref="theader">
                 <table-header 
                     :columns="columns" 
@@ -73,6 +73,15 @@
                         ref="fixedTbodyContent"></table-body>
                 </div>
             </div>
+        </div>
+        <div class="empty-columns" ref="wrapper" v-else>
+            <div ref="theader">
+                <div ref="theaderContent"></div>
+            </div>
+            <div ref="tbody">
+                <div ref="tbodyContent"></div>
+            </div>
+            暂无表头
         </div>
         <dropdown
             :dropdownIndex="dropdownIndex"
@@ -251,6 +260,7 @@ export default {
                 minY: 0,
                 maxY: this.showData.length - 1
             }
+
             this.wrapperWidth = this.$refs.wrapper.offsetWidth;
 
             this.$nextTick(() => {
@@ -258,6 +268,7 @@ export default {
                 let surplusColumns = this.columns.filter(item => !item.width);
                 let surplusColumnAvg;
 
+                if (!this.$refs.tbodyContent.$el) return;
                 if (surplusColumns.length > 0) {
                     let surplusWidth = this.wrapperWidth - this.columns.filter(item => item.width).reduce((total, item) => {
                         return total + item.width;
@@ -321,6 +332,7 @@ export default {
                         this.tableWidth = this.wrapperWidth;
                     }
                 }
+                
                 this.$refs.theaderContent.$el.style.width = `${this.tableWidth}px`;
                 this.$refs.tbodyContent.$el.style.width = `${this.tableWidth}px`;
 
@@ -1000,6 +1012,13 @@ ul {
   border-right: 1px solid #d6dfe4;
   border-left: 1px solid #d6dfe4;
   color: #909399;
+}
+
+.empty-columns {
+    text-align: center;
+    border: 1px solid #DCDFE6;
+    padding: 10px 20px;
+    color: #909399;
 }
 
 .el-checkbox {
