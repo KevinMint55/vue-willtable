@@ -1,6 +1,6 @@
 <template>
 	<div class="main">
-		<excel :columns-data="columns" v-model="data1" style="width: 100%;" maxHeight="800" v-if="!loading"></excel>
+		<excel :columns-data="columns" v-model="data1" style="width: 100%;" maxHeight="800"></excel>
         <!-- <excel :columns-data="columns" v-model="data2" style="width: 100%;" maxHeight="800"></excel> -->
 	</div>
 </template>
@@ -16,14 +16,7 @@ export default {
     },
     data() {
         return {
-            columns: [
-                {
-                    key: 'selection',
-                    type: 'selection',
-                    width: 40,
-                    fixed: true
-                },
-            ],
+            columns: [],
             data1: [],
             data2: [],
 
