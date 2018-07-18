@@ -891,7 +891,7 @@ export default {
             }
             if (correct) {
                 if (this.dataStatusList[index].errors.includes(key)) {
-                    this.dataStatusList[index].errors.splice(this.daaaStatusList[index].errors.indexOf(key), 1);
+                    this.dataStatusList[index].errors.splice(this.dataStatusList[index].errors.indexOf(key), 1);
                 }
             } else {
                 if (!this.dataStatusList[index].errors.includes(key)) {
