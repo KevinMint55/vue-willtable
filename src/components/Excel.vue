@@ -17,6 +17,7 @@
                 <table-body 
                     :columns="columns" 
                     :data="showData" 
+                    :dataStatusList="dataStatusList"
                     :columnsWidth="columnsWidth" 
                     :editorShow="editorShow" 
                     :editorYIndex="editorYIndex" 
@@ -64,6 +65,7 @@
                     <table-body 
                         :columns="columns" 
                         :data="showData" 
+                        :dataStatusList="dataStatusList"
                         :columnsWidth="columnsWidth" 
                         :editorShow="editorShow" 
                         :editorYIndex="editorYIndex" 
@@ -142,9 +144,11 @@ export default {
             columnsWidth: [],
 
             data: [],
-            initData: null,
+            initialData: null,
             showData: [],
             changeData: [],
+            columnsStatusList: [],
+            dataStatusList: [],
 
             tableScrollLeft: 0,
             tableScrollTop: 0,
@@ -208,9 +212,8 @@ export default {
                     this.curHisory++;
                 }
                 this.$emit('input', val);
-                if (!this.initData) {
-                    this.showData = val;
-                    this.initData = JSON.parse(JSON.stringify(val));
+                if (!this.initialData) {
+                    this.initData();
                 }
                 this.handleResize();
                 this.handleFilters();
@@ -251,6 +254,23 @@ export default {
             let unFixedArr = this.columnsData.filter(item => !item.fixed);
             this.columns = fixedArr.concat(unFixedArr);
             this.columnsWidth = this.columns.map(item => item.width);
+        },
+        initData() {
+            this.showData = this.data;
+            this.dataStatusList = this.data.map(item => {
+                return {
+                    checked: false,
+                    errors: [],
+                }
+            });
+            this.initialData = JSON.parse(JSON.stringify(this.data));
+            this.historyData = [JSON.stringify(this.data)];
+            this.curHisory = 1;
+            this.$refs.theaderContent.checkedAll = false;
+            this.$refs.fixedTheaderContent.checkedAll = false;
+            this.handleResize();
+            this.handleFilters();
+            this.handleChangeData();
         },
         handleResize() {
             // 获取编辑框可移动范围, X是横轴, Y是竖轴 
@@ -403,19 +423,11 @@ export default {
             })
         },
         handleChangeData() {
-            let data = JSON.parse(JSON.stringify(this.data)).map(item => {
-                delete item.checked;
-                delete item.errors;
-                return item;
-            });
-            let initData = JSON.parse(JSON.stringify(this.initData)).map(item => {
-                delete item.checked;
-                delete item.errors;
-                return item;
-            });
+            let data = JSON.parse(JSON.stringify(this.data));
+            let initialData = JSON.parse(JSON.stringify(this.initialData));
             this.changeData = data.filter((item, index) => {
-                return JSON.stringify(item) !== JSON.stringify(initData[index])
-            })
+                return JSON.stringify(item) !== JSON.stringify(initialData[index])
+            });
         },
         clickoutside() {
             if (this.isSelected || this.isAutofill) return;
@@ -770,9 +782,9 @@ export default {
         },
         // 行选择
         selectionChange() {
-            let selection = this.showData.filter(item => item.checked);
+            let selection = this.showData.filter((item, index) => this.dataStatusList[index].checked);
             this.$emit('selection-change', selection);
-            if (this.showData.every(item => item.checked)) {
+            if (this.dataStatusList.every(item => item.checked)) {
                 this.$refs.theaderContent.checkedAll = true;
                 this.$refs.fixedTheaderContent.checkedAll = true;
             } else {
@@ -781,10 +793,10 @@ export default {
             }
         },
         selectAll() {
-            const checkedAll = this.showData.every(item => item.checked);
-            this.showData.forEach((item, index) => {
-                this.$set(this.showData[index], 'checked', !checkedAll)
-            })
+            const checkedAll = this.dataStatusList.every(item => item.checked);
+            this.dataStatusList.forEach((item, index) => {
+                this.$set(this.dataStatusList[index], 'checked', !checkedAll)
+            });
             this.selectionChange();
         },
         operation(type) {
@@ -874,16 +886,16 @@ export default {
             this.handleResize();
         },
         setErrors(index, key, correct) {
-            if (!this.showData[index].errors) {
-                this.showData[index].errors = []
+            if (!this.dataStatusList[index].errors) {
+                this.dataStatusList[index].errors = []
             }
             if (correct) {
-                if (this.showData[index].errors.includes(key)) {
-                    this.showData[index].errors.splice(this.showData[index].errors.indexOf(key), 1);
+                if (this.dataStatusList[index].errors.includes(key)) {
+                    this.dataStatusList[index].errors.splice(this.daaaStatusList[index].errors.indexOf(key), 1);
                 }
             } else {
-                if (!this.showData[index].errors.includes(key)) {
-                    this.showData[index].errors.push(key);
+                if (!this.dataStatusList[index].errors.includes(key)) {
+                    this.dataStatusList[index].errors.push(key);
                 }
             }
         }

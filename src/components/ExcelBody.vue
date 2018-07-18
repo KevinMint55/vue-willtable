@@ -15,19 +15,29 @@
                     :title="tr[th.key]" 
                     :style="{width: `${columnsWidth[xIndex]}px`, 'text-align': th.align}" 
                     :class="{
-                        selected: xIndex <= selectedXArr[1] && xIndex >=selectedXArr[0] && yIndex <= selectedYArr[1] && yIndex >= selectedYArr[0],
-                        autofill: xIndex <= selectedXArr[1] && xIndex >=selectedXArr[0]&&yIndex<=autofillYArr[1] && yIndex >= autofillYArr[0],
+                        selected: 
+                            xIndex <= selectedXArr[1] && 
+                            xIndex >=selectedXArr[0] && 
+                            yIndex <= selectedYArr[1] && 
+                            yIndex >= selectedYArr[0],
+                        autofill: 
+                            xIndex <= selectedXArr[1] && 
+                            xIndex >=selectedXArr[0] && 
+                            yIndex<=autofillYArr[1] && 
+                            yIndex >= autofillYArr[0],
                         disabled: th.type == 'disabled',
-                        error: th.type == 'date' && !verifyDate(tr[th.key], yIndex, th.key) || 
-                               th.type == 'month' && !verifyMonth(tr[th.key], yIndex, th.key) || 
-                               th.type == 'select' && !verifySelect(tr[th.key], th.options, yIndex, th.key) || th.type == 'number' && !verifyNumber(tr[th.key], yIndex, th.key)
+                        error: 
+                            th.type == 'date' && !verifyDate(tr[th.key], yIndex, th.key) || 
+                            th.type == 'month' && !verifyMonth(tr[th.key], yIndex, th.key) || 
+                            th.type == 'select' && !verifySelect(tr[th.key], th.options, yIndex, th.key) || 
+                            th.type == 'number' && !verifyNumber(tr[th.key], yIndex, th.key)
                     }" 
                     :data-key="th.key" 
                     @mouseenter="multiSelect($event, xIndex, yIndex, th.type)" 
                     @mousedown="selectCell($event, xIndex, yIndex, th.type)" v-show="th.fixed || allShow">
                     <el-checkbox 
                         size="mini" 
-                        v-model="tr.checked" 
+                        v-model="dataStatusList[yIndex].checked" 
                         @change="selectionChange" 
                         v-if="th.type == 'selection'"></el-checkbox>
                     <div 
@@ -56,6 +66,12 @@
                 }
             },
             data: {
+                type: Array,
+                default: () => {
+                    return []
+                }
+            },
+            dataStatusList: {
                 type: Array,
                 default: () => {
                     return []
