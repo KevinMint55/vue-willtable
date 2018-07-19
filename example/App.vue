@@ -39,7 +39,7 @@ export default {
                     key: 'date',
                     type: 'date',
                     fixed: true,
-                    width: 100
+                    width: '100'
                 },
                 {
                     title: '邮箱地址',

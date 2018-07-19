@@ -24,7 +24,7 @@
                     <p 
                         class="cell-content" 
                         :style="{width: `${columnsWidth[index] - 20}px`}" 
-                        :class="{active: isActive(th)}"
+                        :class="{active: isActive(columnsStatusList[index])}"
                         v-else>
                         <span class="icon" :class="iconClass(th.type)"></span>
                         <span class="content">{{ th.title }}</span>
@@ -57,6 +57,12 @@
                 }
             },
             columnsWidth: {
+                type: Array,
+                default: () => {
+                    return []
+                }
+            },
+            columnsStatusList: {
                 type: Array,
                 default: () => {
                     return []

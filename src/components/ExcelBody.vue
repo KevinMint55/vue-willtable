@@ -217,6 +217,9 @@
     }
     .selected {
       background-color: rgba(74, 149, 235, 0.2) !important;
+      &.error {
+          background-color: #f1c4c4 !important;
+      }
     }
     .autofill {
       background-color: rgba(127, 127, 127, 0.2) !important;

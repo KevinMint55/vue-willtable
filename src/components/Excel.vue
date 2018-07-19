@@ -5,6 +5,7 @@
                 <table-header 
                     :columns="columns" 
                     :columnsWidth="columnsWidth" 
+                    :columnsStatusList="columnsStatusList"
                     :tableScrollLeft="tableScrollLeft"
                     :fixedCount="fixedCount"
                     :all-show="true"
@@ -55,6 +56,7 @@
                     <table-header 
                         :columns="columns" 
                         :columnsWidth="columnsWidth" 
+                        :columnsStatusList="columnsStatusList"
                         :fixedCount="fixedCount"
                         :tableScrollLeft="tableScrollLeft"
                         :dropdownIndex="dropdownIndex"
@@ -252,8 +254,22 @@ export default {
         initColumns() {
             let fixedArr = this.columnsData.filter(item => item.fixed);
             let unFixedArr = this.columnsData.filter(item => !item.fixed);
-            this.columns = fixedArr.concat(unFixedArr);
+            this.columns = fixedArr.concat(unFixedArr).map(item => {
+                if (item.width) {
+                    item.width = parseInt(item.width);
+                }
+                return item;
+            });
             this.columnsWidth = this.columns.map(item => item.width);
+            this.columnsStatusList = this.columns.map(item => {
+                return {
+                    key: item.key,
+                    type: item.type,
+                    filters: {},
+                    sort: '',
+                };
+            });
+            this.filters = {};
         },
         initData() {
             this.showData = this.data;
@@ -268,6 +284,7 @@ export default {
             this.curHisory = 1;
             this.$refs.theaderContent.checkedAll = false;
             this.$refs.fixedTheaderContent.checkedAll = false;
+            this.initColumns();
             this.handleResize();
             this.handleFilters();
             this.handleChangeData();
@@ -396,7 +413,7 @@ export default {
             })
         },
         handleFilters() {
-            this.columns.forEach(th => {
+            this.columnsStatusList.forEach(th => {
                 if (th.type == 'selection') return;
                 if (th.filters) {
                     Object.keys(th.filters).forEach(item => {
@@ -835,43 +852,43 @@ export default {
                     this.dropdownIndex = null;
                 } else {
                     this.dropdownIndex = i;
-                    this.dropdownColumn = JSON.parse(JSON.stringify(this.columns[this.dropdownIndex]));
+                    this.dropdownColumn = JSON.parse(JSON.stringify(this.columnsStatusList[this.dropdownIndex]));
                 }
             } else {
                 this.dropdownIndex = null;
             }
         },
         sort(type) {
-            this.columns.forEach(item => {
+            this.columnsStatusList.forEach(item => {
                 item.sort = '';
             })
-            this.columns[this.dropdownIndex].sort = type;
+            this.columnsStatusList[this.dropdownIndex].sort = type;
             if (type == 'ascending') {
                 this.showData.sort((x, y) => {
-                    return x[this.columns[this.dropdownIndex].key] > y[this.columns[this.dropdownIndex].key] ? 1 : -1;
+                    return x[this.columnsStatusList[this.dropdownIndex].key] > y[this.columnsStatusList[this.dropdownIndex].key] ? 1 : -1;
                 })
             } else {
                 this.showData.sort((x, y) => {
-                    return x[this.columns[this.dropdownIndex].key] > y[this.columns[this.dropdownIndex].key] ? -1 : 1;
+                    return x[this.columnsStatusList[this.dropdownIndex].key] > y[this.columnsStatusList[this.dropdownIndex].key] ? -1 : 1;
                 })
             }
             this.dropdownIndex = null;
         },
         handleFilter(dropdownColumn) {
-            this.columns[this.dropdownIndex] = dropdownColumn;
+            this.columnsStatusList[this.dropdownIndex] = dropdownColumn;
             let arr = [];
             for (const key in dropdownColumn.filters) {
                 if (dropdownColumn.filters[key].checked) {
                     arr.push(key);
                 }
             }
-            this.filters[this.columns[this.dropdownIndex].key] = arr;
+            this.filters[this.columnsStatusList[this.dropdownIndex].key] = arr;
             this.filterData();
         },
         resetFilter() {
-            delete this.filters[this.columns[this.dropdownIndex].key];
-            for (const key in this.columns[this.dropdownIndex].filters) {
-                this.columns[this.dropdownIndex].filters[key].checked = false;
+            delete this.filters[this.columnsStatusList[this.dropdownIndex].key];
+            for (const key in this.columnsStatusList[this.dropdownIndex].filters) {
+                this.columnsStatusList[this.dropdownIndex].filters[key].checked = false;
             }
             this.filterData();
         },
