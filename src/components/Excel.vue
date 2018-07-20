@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div ref="excel">
         <div class="km-table-wrapper" ref="wrapper" :class="{scrollX: tableWidth > wrapperWidth}" :style="{maxWidth: `${tableWidth}px`}" v-clickoutside="clickoutside" v-if="columns.length > 0">
             <div class="km-table-header" ref="theader">
                 <table-header 
@@ -202,6 +202,7 @@ export default {
             dropdownColumn: {},
 
             filters: {},
+            pos: {},
         }
     },
     watch: {
@@ -298,6 +299,7 @@ export default {
             this.handleChangeData();
         },
         handleResize() {
+            this.pos = this.$refs.excel.getBoundingClientRect();
             // 获取编辑框可移动范围, X是横轴, Y是竖轴 
             this.editorRange = {
                 minX: this.columns.filter(item => item.type == 'selection').length,
@@ -753,10 +755,10 @@ export default {
                 if (this.selectedYArr[0] == this.selectedYArr[1] && this.selectedXArr[0] == this.selectedXArr[1]) {
                     return;
                 }
-                let sTop = this.$refs.wrapper.offsetTop + 30;
-                let sLeft = this.$refs.wrapper.offsetLeft + this.fixedWidth;
-                let sBottom = this.$refs.wrapper.offsetTop + this.$refs.wrapper.offsetHeight - 10;
-                let sRight = this.$refs.wrapper.offsetLeft + this.$refs.wrapper.offsetWidth - 10;
+                let sTop = this.$refs.excel.offsetTop + 30;
+                let sLeft = this.pos.left+ this.fixedWidth;
+                let sBottom = this.$refs.excel.offsetTop + this.$refs.excel.offsetHeight - 10;
+                let sRight = this.pos.left+ this.$refs.excel.offsetWidth - 10;
                 if (this.mouseY < sTop) {
                     this.$refs.tbody.scrollTop -= 20;
                     this.$refs.fixedTbody.scrollTop -= 20;
@@ -856,7 +858,7 @@ export default {
             this.handleResize();
         },
         openDropdown(i) {
-            if (i) {
+            if (typeof(i) === 'number') {
                 if (this.dropdownIndex == i) {
                     this.dropdownIndex = null;
                 } else {

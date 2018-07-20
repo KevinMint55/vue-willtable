@@ -3,7 +3,7 @@
         <el-button @click="getList2">getList2</el-button>
         <el-button @click="getList3">getList3</el-button>
         <el-button @click="disabled = !disabled">{{ disabled ? '启用' : '禁用'}}</el-button>
-		<excel ref="excel" :columns-data="columns" v-model="data1" style="width: 100%;margin-top: 10px;" maxHeight="800" @selection-change="selectionChange" :disabled="disabled"></excel>
+        <excel ref="excel" :columns-data="columns" v-model="data1" style="width: 100%;margin-top: 10px;" maxHeight="800" @selection-change="selectionChange" :disabled="disabled"></excel>
         <!-- <excel :columns-data="columns" v-model="data2" style="width: 100%;" maxHeight="800"></excel> -->
 	</div>
 </template>
@@ -11,13 +11,13 @@
 <script>
 import Excel from 'Excel';
 import axios from 'axios';
-import { button } from 'element-ui';
+import { button, dialog } from 'element-ui';
 
 export default {
     name: 'App',
     components: {
         Excel,
-        'el-button': button
+        'el-button': button,
     },
     data() {
         return {

@@ -102,9 +102,9 @@
                     e = e || window.event;
                     let width;
                     if (this.fixedCount >= this.adjustWidthIndex + 1) {
-                        width = e.pageX - this.$parent.$refs.wrapper.offsetLeft - this.$refs.tr.children[this.adjustWidthIndex].offsetLeft;
+                        width = e.pageX - this.$parent.pos.left - this.$refs.tr.children[this.adjustWidthIndex].offsetLeft;
                     } else {
-                        width = e.pageX + this.tableScrollLeft - this.$parent.$refs.wrapper.offsetLeft - this.$refs.tr.children[this.adjustWidthIndex].offsetLeft;
+                        width = e.pageX + this.tableScrollLeft - this.$parent.pos.left - this.$refs.tr.children[this.adjustWidthIndex].offsetLeft;
                     }
                     if (width >= 80) {
                         this.$parent.adjustWidth(this.adjustWidthIndex, width);
