@@ -22,16 +22,16 @@ export default {
     data() {
         return {
             columns: [
-                {
-                    // key: 'selection',
-                    type: 'selection',
-                    width: 40,
-                    fixed: true
-                },
+                // {
+                //     // key: 'selection',
+                //     type: 'selection',
+                //     width: 40,
+                //     fixed: true
+                // },
                 {
                     title: '序号',
                     key: 'sid',
-                    fixed: true,
+                    // fixed: true,
                     type: 'number',
                     // format: false
                 },
@@ -39,7 +39,7 @@ export default {
                     title: '日期',
                     key: 'date',
                     type: 'date',
-                    fixed: true,
+                    // fixed: true,
                     width: '100'
                 },
                 {

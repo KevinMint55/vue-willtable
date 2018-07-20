@@ -286,8 +286,12 @@ export default {
             this.initialData = JSON.parse(JSON.stringify(this.data));
             this.historyData = [JSON.stringify(this.data)];
             this.curHisory = 1;
-            this.$refs.theaderContent.checkedAll = false;
-            this.$refs.fixedTheaderContent.checkedAll = false;
+            if (this.$refs.theaderContent) {
+                this.$refs.theaderContent.checkedAll = false;
+            }
+            if (this.$refs.fixedTheaderContent) {
+                this.$refs.fixedTheaderContent.checkedAll = false;
+            }
             this.initColumns();
             this.handleResize();
             this.handleFilters();
