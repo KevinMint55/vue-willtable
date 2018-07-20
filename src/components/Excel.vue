@@ -134,6 +134,10 @@ export default {
         },
         maxHeight: {
             type: [String, Number]
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
         }
     },
     data() {
@@ -457,6 +461,7 @@ export default {
         },
         // 选择单元格
         selectCell(e, x, y, type) {
+            if (this.disabled) return;
             if (e.button != 0) return;
             window.addEventListener("keydown", this.keySubmit);
             window.addEventListener("mousemove", this.multiSelectAdjustPostion);

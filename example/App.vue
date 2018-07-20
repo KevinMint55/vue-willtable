@@ -1,9 +1,10 @@
 <template>
 	<div class="main">
-		<excel ref="excel" :columns-data="columns" v-model="data1" style="width: 100%;" maxHeight="800" @selection-change="selectionChange"></excel>
-        <!-- <excel :columns-data="columns" v-model="data2" style="width: 100%;" maxHeight="800"></excel> -->
         <el-button @click="getList2">getList2</el-button>
         <el-button @click="getList3">getList3</el-button>
+        <el-button @click="disabled = !disabled">{{ disabled ? '启用' : '禁用'}}</el-button>
+		<excel ref="excel" :columns-data="columns" v-model="data1" style="width: 100%;margin-top: 10px;" maxHeight="800" @selection-change="selectionChange" :disabled="disabled"></excel>
+        <!-- <excel :columns-data="columns" v-model="data2" style="width: 100%;" maxHeight="800"></excel> -->
 	</div>
 </template>
 
@@ -64,7 +65,8 @@ export default {
                 {
                     title: '月份',
                     key: 'month',
-                    type: 'month'
+                    type: 'month',
+                    width: 100
                 },
                 {
                     title: '地址',
@@ -105,6 +107,7 @@ export default {
             ],
             data1: [],
             data2: [],
+            disabled: false,
         }
     },
     mounted() {
@@ -148,6 +151,6 @@ export default {
 
 <style>
 .main {
-  padding: 100px;
+  padding: 20px;
 }
 </style>
