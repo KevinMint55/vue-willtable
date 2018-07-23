@@ -102,6 +102,8 @@
 <script>
 import '../style/reset.scss';
 import clickoutside from '../mixins/clickoutside.js';
+import methods from '../mixins/methods.js';
+import events from '../mixins/events.js';
 import TableHeader from './ExcelHeader.vue';
 import TableBody from './ExcelBody.vue';
 import Editor from './ExcelEditor.vue';
@@ -245,6 +247,7 @@ export default {
     mounted() {
         this.init();
     },
+    mixins: [methods, events],
     methods: {
         init() {
             this.$refs.tbody.addEventListener('scroll', () => {
@@ -807,18 +810,6 @@ export default {
                 this.autofillYArr = [];
                 this.isAutofill = false;
             }, 0)
-        },
-        // 行选择
-        selectionChange() {
-            let selection = this.showData.filter((item, index) => this.dataStatusList[index].checked);
-            this.$emit('selection-change', selection);
-            if (this.dataStatusList.every(item => item.checked)) {
-                this.$refs.theaderContent.checkedAll = true;
-                this.$refs.fixedTheaderContent.checkedAll = true;
-            } else {
-                this.$refs.theaderContent.checkedAll = false;
-                this.$refs.fixedTheaderContent.checkedAll = false;
-            }
         },
         selectAll() {
             const checkedAll = this.dataStatusList.every(item => item.checked);

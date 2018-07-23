@@ -3,6 +3,7 @@
         <el-button @click="getList2">getList2</el-button>
         <el-button @click="getList3">getList3</el-button>
         <el-button @click="disabled = !disabled">{{ disabled ? '启用' : '禁用'}}</el-button>
+        <el-button @click="getChangeData">getChangeData</el-button>
         <excel ref="excel" :columns-data="columns" v-model="data1" style="width: 100%;margin-top: 10px;" maxHeight="800" @selection-change="selectionChange" :disabled="disabled"></excel>
         <!-- <excel :columns-data="columns" v-model="data2" style="width: 100%;" maxHeight="800"></excel> -->
 	</div>
@@ -22,12 +23,12 @@ export default {
     data() {
         return {
             columns: [
-                // {
-                //     // key: 'selection',
-                //     type: 'selection',
-                //     width: 40,
-                //     fixed: true
-                // },
+                {
+                    // key: 'selection',
+                    type: 'selection',
+                    width: 40,
+                    fixed: true
+                },
                 {
                     title: '序号',
                     key: 'sid',
@@ -144,6 +145,9 @@ export default {
         },
         selectionChange(selection) {
             console.log(selection);
+        },
+        getChangeData() {
+            console.log(this.$refs.excel.getChangeData());
         }
     }
 }
