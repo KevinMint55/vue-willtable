@@ -3,6 +3,7 @@
         <div class="km-table-wrapper" ref="wrapper" :class="{scrollX: tableWidth > wrapperWidth}" :style="{maxWidth: `${tableWidth}px`}" v-clickoutside="clickoutside" v-if="columns.length > 0">
             <div class="km-table-header" ref="theader">
                 <table-header 
+                    :showIcon="showIcon"
                     :columns="columns" 
                     :columnsWidth="columnsWidth" 
                     :columnsStatusList="columnsStatusList"
@@ -54,6 +55,7 @@
             <div class="km-table-fixed" ref="fixedWrapper" :style="{width: `${fixedWidth}px`}">
                 <div class="km-table-fixed-header" ref="fixedTheader">
                     <table-header 
+                        :showIcon="showIcon"
                         :columns="columns" 
                         :columnsWidth="columnsWidth" 
                         :columnsStatusList="columnsStatusList"
@@ -140,7 +142,11 @@ export default {
         disabled: {
             type: Boolean,
             default: false,
-        }
+        },
+        showIcon: {
+            type: Boolean,
+            default: true
+        },
     },
     data() {
         return {

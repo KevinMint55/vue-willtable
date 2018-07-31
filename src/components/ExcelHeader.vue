@@ -26,11 +26,11 @@
                         :style="{width: `${columnsWidth[index] - 20}px`}" 
                         :class="{active: isActive(columnsStatusList[index])}"
                         v-else>
-                        <span class="icon" :class="iconClass(th.type)"></span>
+                        <span class="icon" :class="iconClass(th.type)" v-if="showIcon"></span>
                         <span class="content">{{ th.title }}</span>
                     </p>
                     <div class="dropdown" v-if="th.type != 'selection'" :class="{active: dropdownIndex == index}">
-                        <i @click.stop="openDropdown(index)"></i>
+                        <i @click.stop="openDropdown(index)" v-if="th.action"></i>
                     </div>
                     <div class="handler" @mousedown="handlerDown(index)" v-if="th.type != 'selection'"></div>
                 </th>
@@ -49,6 +49,10 @@
             'el-checkbox': checkbox
         },
         props: {
+            showIcon: {
+                type: Boolean,
+                default: true
+            },
             allShow: Boolean,
             columns: {
                 type: Array,
