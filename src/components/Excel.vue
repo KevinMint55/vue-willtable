@@ -1,934 +1,793 @@
 <template>
-    <div ref="excel">
-        <div class="km-table-wrapper" ref="wrapper" :class="{scrollX: tableWidth > wrapperWidth}" :style="{maxWidth: `${tableWidth}px`}" v-clickoutside="clickoutside" v-if="columns.length > 0">
-            <div class="km-table-header" ref="theader">
-                <table-header 
-                    :showIcon="showIcon"
-                    :columns="columns" 
-                    :columnsWidth="columnsWidth" 
-                    :columnsStatusList="columnsStatusList"
-                    :tableScrollLeft="tableScrollLeft"
-                    :fixedCount="fixedCount"
-                    :all-show="true"
-                    :dropdownIndex="dropdownIndex"
-                    :filters="filters"
-                    ref="theaderContent">
-                </table-header>
-            </div>
-            <div class="km-table-body" ref="tbody" :style="{maxHeight: `${maxHeight}px`}">
-                <table-body 
-                    :columns="columns" 
-                    :data="showData" 
-                    :dataStatusList="dataStatusList"
-                    :columnsWidth="columnsWidth" 
-                    :editorShow="editorShow" 
-                    :editorYIndex="editorYIndex" 
-                    :selectedXArr="selectedXArr" 
-                    :selectedYArr="selectedYArr" 
-                    :autofillYArr="autofillYArr" 
-                    :all-show="true"
-                    ref="tbodyContent">
-                    <!-- 编辑器 -->
-                    <editor 
-                        :editType="editType" 
-                        :editing="editing" 
-                        :editorShow="editorShow" 
-                        :editorIsFixed="editorIsFixed" 
-                        :options="options" 
-                        :curEditorWidth="curEditorWidth" :tableScrollLeft="tableScrollLeft" 
-                        :columns="columns" 
-                        :columnsWidth="columnsWidth" 
-                        :editorXIndex="editorXIndex" 
-                        :editorYIndex="editorYIndex" 
-                        :curEditorCoverValue="curEditorCoverValue"
-                        :selectedYArr="selectedYArr" 
-                        :autofillXIndex="autofillXIndex" 
-                        :autofillYIndex="autofillYIndex" 
-                        :fixedCount="fixedCount"
-                        ref="editor"></editor>
-                </table-body>
-                <div class="empty-block" v-if="showData.length == 0" :style="{width: `${tableWidth}px`}">
-                    暂无数据
-                </div>
-            </div>
-            <!-- 左侧固定- -->
-            <div class="km-table-fixed" ref="fixedWrapper" :style="{width: `${fixedWidth}px`}">
-                <div class="km-table-fixed-header" ref="fixedTheader">
-                    <table-header 
-                        :showIcon="showIcon"
-                        :columns="columns" 
-                        :columnsWidth="columnsWidth" 
-                        :columnsStatusList="columnsStatusList"
-                        :fixedCount="fixedCount"
-                        :tableScrollLeft="tableScrollLeft"
-                        :dropdownIndex="dropdownIndex"
-                        :filters="filters"
-                        ref="fixedTheaderContent"></table-header>
-                </div>
-                <div class="km-table-fixed-body" ref="fixedTbody">
-                    <table-body 
-                        :columns="columns" 
-                        :data="showData" 
-                        :dataStatusList="dataStatusList"
-                        :columnsWidth="columnsWidth" 
-                        :editorShow="editorShow" 
-                        :editorYIndex="editorYIndex" 
-                        :selectedXArr="selectedXArr" 
-                        :selectedYArr="selectedYArr" 
-                        :autofillYArr="autofillYArr"
-                        ref="fixedTbodyContent"></table-body>
-                </div>
-            </div>
-        </div>
-        <div class="empty-columns" ref="wrapper" v-else>
-            <div ref="theader">
-                <div ref="theaderContent"></div>
-            </div>
-            <div ref="tbody">
-                <div ref="tbodyContent"></div>
-            </div>
-            暂无表头
-        </div>
-        <dropdown
-            :dropdownIndex="dropdownIndex"
+  <div ref="excel">
+    <div
+      v-if="columns.length > 0"
+      ref="wrapper"
+      class="km-table-wrapper"
+      :class="{ scrollX: tableWidth > wrapperWidth }"
+      :style="{ maxWidth: `${tableWidth}px` }"
+      v-clickoutside="clickoutside">
+      <div class="km-table-header" ref="theader">
+        <table-header
+          ref="theaderContent"
+          :showIcon="showIcon"
+          :columnsWidth="columnsWidth"
+          :columnsStatusList="columnsStatusList"
+          :tableScrollLeft="tableScrollLeft"
+          :fixedCount="fixedCount"
+          :all-show="true" />
+      </div>
+      <div class="km-table-body" ref="tbody" :style="{maxHeight: `${maxHeight}px`}">
+        <table-body
+          ref="tbodyContent"
+          :dataStatusList="dataStatusList"
+          :columnsWidth="columnsWidth"
+          :all-show="true">
+          <!-- 编辑器 -->
+          <editor
+            ref="editor"
             :tableScrollLeft="tableScrollLeft"
-            :tableScrollTop="tableScrollTop"
             :columnsWidth="columnsWidth"
+            :fixedCount="fixedCount" />
+        </table-body>
+        <div class="empty-block" v-if="showData.length == 0" :style="{width: `${tableWidth}px`}">
+            暂无数据
+        </div>
+      </div>
+      <!-- 左侧固定- -->
+      <div class="km-table-fixed" ref="fixedWrapper" :style="{width: `${fixedWidth}px`}">
+        <div class="km-table-fixed-header" ref="fixedTheader">
+          <table-header
+            ref="fixedTheaderContent"
+            :showIcon="showIcon"
+            :columnsWidth="columnsWidth"
+            :columnsStatusList="columnsStatusList"
             :fixedCount="fixedCount"
-            :data="data"
-            v-model="dropdownColumn"
-        ></dropdown>
+            :tableScrollLeft="tableScrollLeft" />
+        </div>
+        <div class="km-table-fixed-body" ref="fixedTbody">
+          <table-body
+            :dataStatusList="dataStatusList"
+            :columnsWidth="columnsWidth"
+            ref="fixedTbodyContent" />
+        </div>
+      </div>
     </div>
+    <div class="empty-columns" ref="wrapper" v-else>
+      <div ref="theader">
+        <div ref="theaderContent"></div>
+      </div>
+      <div ref="tbody">
+        <div ref="tbodyContent"></div>
+      </div>
+      暂无表头
+    </div>
+    <dropdown
+      :tableScrollLeft="tableScrollLeft"
+      :tableScrollTop="tableScrollTop"
+      :columnsWidth="columnsWidth"
+      :fixedCount="fixedCount"
+    ></dropdown>
+  </div>
 </template>
 
 <script>
+import store from '../store';
 import '../style/reset.scss';
-import clickoutside from '../mixins/clickoutside.js';
-import methods from '../mixins/methods.js';
-import events from '../mixins/events.js';
+import clickoutside from '../directives/clickoutside';
+import methods from '../mixins/methods';
+import events from '../mixins/events';
 import TableHeader from './ExcelHeader.vue';
 import TableBody from './ExcelBody.vue';
 import Editor from './ExcelEditor.vue';
 import Dropdown from './ExcelDropdown.vue';
-import { checkbox } from 'element-ui';
 
 const scrollBarWidth = 10;
 
 export default {
-    directives: { clickoutside },
-    components: {
-        TableHeader,
-        TableBody,
-        Editor,
-        Dropdown,
-        'el-checkbox': checkbox
+  name: 'km-excel',
+  directives: { clickoutside },
+  components: {
+    TableHeader,
+    TableBody,
+    Editor,
+    Dropdown,
+  },
+  props: {
+    columnsData: {
+      type: Array,
+      default: () => [],
     },
-    props: {
-        columnsData: {
-            type: Array,
-            default: () => {
-                return []
-            }
-        },
-        value: {
-            type: Array,
-            default: () => {
-                return []
-            }
-        },
-        maxHeight: {
-            type: [String, Number]
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
-        showIcon: {
-            type: Boolean,
-            default: true
-        },
+    value: {
+      type: Array,
+      default: () => [],
     },
-    data() {
-        return {
-            columns: [],
+    maxHeight: {
+      type: [String, Number],
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    showIcon: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  data() {
+    return {
+      // columns: [],
 
-            wrapperWidth: null,
-            tableWidth: null,
-            theaderHeight: null,
-            columnsWidth: [],
+      wrapperWidth: null,
+      tableWidth: null,
+      theaderHeight: null,
+      columnsWidth: [],
 
-            data: [],
-            initialData: null,
-            showData: [],
-            changeData: [],
-            columnsStatusList: [],
-            dataStatusList: [],
+      data: [],
+      initialData: null,
+      // showData: [],
+      changeData: [],
+      columnsStatusList: [],
+      dataStatusList: [],
 
-            tableScrollLeft: 0,
-            tableScrollTop: 0,
-            scrollLeftArr: [],
-            scrollTopArr: [],
-            fixedCount: 0,
-            fixedWidth: 0,
+      tableScrollLeft: 0,
+      tableScrollTop: 0,
+      scrollLeftArr: [],
+      scrollTopArr: [],
+      fixedCount: 0,
+      fixedWidth: 0,
 
-            editorRange: {},
-            editorXIndex: 0,
-            editorYIndex: 0,
-            curEditorCoverValue: '',
-            editorShow: false,
-            editorIsFixed: false,
+      // 鼠标
+      mouseX: 0,
+      mouseY: 0,
+      timer: null,
 
-            editing: false,
-            editType: 'text',
+      // 历史记录
+      historyData: [],
+      curHisory: 0,
+      isOperation: false,
 
-            options: [],
-            curEditorWidth: 80,
-
-            // 自动填充
-            autofillXIndex: 0,
-            autofillYIndex: 0,
-            isAutofill: false,
-            autofillYArr: [],
-
-            // 选择区域
-            isSelected: false,
-            selectedXIndex: 0,
-            selectedYIndex: 0,
-            selectedXArr: [],
-            selectedYArr: [],
-
-            // 鼠标
-            mouseX: 0,
-            mouseY: 0,
-            timer: null,
-
-            historyData: [],
-            curHisory: 0,
-            isOperation: false,
-
-            dropdownIndex: null,
-            dropdownColumn: {},
-
-            filters: {},
-            pos: {},
+      excelPos: {},
+    };
+  },
+  computed: {
+    ...store.mapState(['columns', 'showData']),
+  },
+  watch: {
+    value(val) {
+      this.data = val;
+    },
+    data: {
+      handler(val) {
+        if (!this.isOperation) {
+          if (this.historyData.length !== this.curHisory) {
+            this.historyData = this.historyData.slice(0, this.curHisory);
+          }
+          this.historyData.push(JSON.stringify(val));
+          this.curHisory += 1;
         }
-    },
-    watch: {
-        value(val) {
-            this.data = val;
-        },
-        data: {
-            handler(val) {
-                if (!this.isOperation) {
-                    if (this.historyData.length != this.curHisory) {
-                        this.historyData = this.historyData.slice(0, this.curHisory)
-                    }
-                    this.historyData.push(JSON.stringify(val));
-                    this.curHisory++;
-                }
-                this.$emit('input', val);
-                if (!this.initialData) {
-                    this.initData();
-                }
-                this.handleResize();
-                this.handleFilters();
-                this.handleChangeData();
-            },
-            deep: true
-        },
-        tableScrollLeft() {
-            this.dropdownIndex = null;
-        },
-        tableScrollTop() {
-            this.dropdownIndex = null;
-        },
-        columnsData: {
-            handler(val) {
-                this.initColumns();
-                this.handleResize();
-            },
-            deep: true,
-        },
-    },
-    mounted() {
-        this.init();
-    },
-    mixins: [methods, events],
-    methods: {
-        init() {
-            if (this.value.length > 0) {
-                this.data = this.value;
-            }
-            this.$refs.tbody.addEventListener('scroll', () => {
-                this.$refs.theader.scrollLeft = this.$refs.tbody.scrollLeft;
-                this.$refs.fixedTbody.scrollTop = this.$refs.tbody.scrollTop;
-                this.tableScrollLeft = this.$refs.tbody.scrollLeft;
-                this.tableScrollTop = this.$refs.tbody.scrollTop;
-            })
-            this.initColumns();
-            this.handleResize();
-        },
-        initColumns() {
-            let fixedArr = this.columnsData.filter(item => item.fixed);
-            let unFixedArr = this.columnsData.filter(item => !item.fixed);
-            this.columns = fixedArr.concat(unFixedArr).map(item => {
-                if (item.width) {
-                    item.width = parseInt(item.width);
-                }
-                return item;
-            });
-            this.columnsWidth = this.columns.map(item => item.width);
-            this.columnsStatusList = this.columns.map(item => {
-                return {
-                    key: item.key,
-                    type: item.type,
-                    filters: {},
-                    sort: '',
-                };
-            });
-            this.filters = {};
-        },
-        initData() {
-            this.showData = this.data;
-            this.dataStatusList = this.data.map(item => {
-                return {
-                    checked: false,
-                    errors: [],
-                }
-            });
-            this.initialData = JSON.parse(JSON.stringify(this.data));
-            this.historyData = [JSON.stringify(this.data)];
-            this.curHisory = 1;
-            if (this.$refs.theaderContent) {
-                this.$refs.theaderContent.checkedAll = false;
-            }
-            if (this.$refs.fixedTheaderContent) {
-                this.$refs.fixedTheaderContent.checkedAll = false;
-            }
-            this.initColumns();
-            this.handleResize();
-            this.handleFilters();
-            this.handleChangeData();
-        },
-        handleResize() {
-            this.pos = this.$refs.excel.getBoundingClientRect();
-            // 获取编辑框可移动范围, X是横轴, Y是竖轴 
-            this.editorRange = {
-                minX: this.columns.filter(item => item.type == 'selection').length,
-                maxX: this.columns.length - 1,
-                minY: 0,
-                maxY: this.showData.length - 1
-            }
-
-            this.wrapperWidth = this.$refs.wrapper.offsetWidth;
-
-            this.$nextTick(() => {
-                // 计算剩余列宽度
-                let surplusColumns = this.columns.filter(item => !item.width);
-                let surplusColumnAvg;
-
-                if (!this.$refs.tbodyContent.$el) return;
-                if (surplusColumns.length > 0) {
-                    let surplusWidth = this.wrapperWidth - this.columns.filter(item => item.width).reduce((total, item) => {
-                        return total + item.width;
-                    }, 0);
-                    if (surplusWidth > 0) {
-                        if (this.$refs.tbodyContent.$el.offsetHeight > this.maxHeight) {
-                            surplusColumnAvg = (surplusWidth - 1 - scrollBarWidth) / surplusColumns.length;
-                        } else {
-                            surplusColumnAvg = (surplusWidth - 1) / surplusColumns.length;
-                        }
-                    }
-                }
-
-                // 设置单元格宽度
-                this.columns.forEach((column, index) => {
-                    if (column.width) {
-                        this.$set(this.columnsWidth, index, column.width)
-                    } else {
-                        // 设置单元格最小宽度
-                        if (surplusColumnAvg > 80) {
-                            this.$set(this.columnsWidth, index, surplusColumnAvg);
-                        } else {
-                            this.$set(this.columnsWidth, index, 80);
-                        }
-                    }
-                });
-
-                this.scrollLeftArr = this.columnsWidth.map((item, index) => {
-                    let sum = this.columnsWidth.reduce((total, item, curIndex) => {
-                        if (curIndex <= index) {
-                            return total + item;
-                        } else {
-                            return total
-                        }
-                    }, 0)
-                    return sum
-                })
-
-                this.scrollTopArr = this.showData.map((item, index) => {
-                    let sum = this.showData.reduce((total, item, curIndex) => {
-                        if (curIndex <= index) {
-                            return total + 28
-                        } else {
-                            return total
-                        }
-                    }, 0)
-                    return sum
-                })
-                this.scrollTopArr.unshift(0);
-
-                this.fixedCount = this.columns.filter(item => item.fixed).length;
-                this.fixedWidth = this.scrollLeftArr[this.fixedCount - 1] || 0;
-
-                // 如果每列均设置了宽度
-                const allWidth = this.columns.every(cell => cell.width);
-                if (allWidth) {
-                    this.tableWidth = this.columns.map(cell => cell.width).reduce((a, b) => a + b, 0);
-                } else {
-                    this.tableWidth = this.columnsWidth.reduce((total, cur) => total + cur, 0);
-                    if (this.tableWidth < this.wrapperWidth) {
-                        this.tableWidth = this.wrapperWidth;
-                    }
-                }
-                
-                this.$refs.theaderContent.$el.style.width = `${this.tableWidth}px`;
-                this.$refs.tbodyContent.$el.style.width = `${this.tableWidth}px`;
-
-                // 设置左侧theader高度与tbody距离顶部距离
-                this.theaderHeight = this.$refs.theaderContent.$el.offsetHeight;
-                
-                // 设置左侧定位高度
-                if (this.tableWidth > this.wrapperWidth) {
-                    this.$refs.fixedWrapper.style.height = `${this.$refs.wrapper.offsetHeight - scrollBarWidth}px`;
-                    this.$refs.fixedTbody.style.height = `${this.$refs.wrapper.offsetHeight - scrollBarWidth - this.theaderHeight}px`;
-                } else {
-                    this.$refs.fixedWrapper.style.height = `${this.$refs.wrapper.offsetHeight}px`;
-                    this.$refs.fixedTbody.style.height = `${this.$refs.wrapper.offsetHeight - this.theaderHeight}px`;
-                }
-                // 当出现竖向滚动条时处理滚动条
-                if (this.$refs.tbodyContent.$el.offsetHeight > this.maxHeight) {
-                    this.$refs.tbody.style.overflowY = 'auto';
-                    this.$nextTick(() => {
-                        let colgroup = this.$refs.theaderContent.$el.querySelector('colgroup');
-                        let tr = this.$refs.theaderContent.$el.querySelector('tr');
-
-                        // 如果已存在Col，删除组中重新在末尾添加
-                        for (let i = 0; i < colgroup.children.length; i++) {
-                            if (colgroup.children[i].width == scrollBarWidth) {
-                                colgroup.removeChild(colgroup.children[i]);
-                                tr.removeChild(tr.children[i]);
-                            }
-                        }
-                        let col = document.createElement('col');
-                        col.width = scrollBarWidth;
-                        colgroup.appendChild(col);
-
-                        let th = document.createElement('th');
-                        th.style.width = `${scrollBarWidth}px`;
-                        th.style.borderTop = '1px solid #d6dfe4';
-                        tr.appendChild(th);
-
-                        this.$refs.tbodyContent.$el.style.width = `${this.tableWidth - scrollBarWidth - 1}px`;
-                    })
-                }
-            })
-        },
-        handleFilters() {
-            this.columnsStatusList.forEach(th => {
-                if (th.type == 'selection') return;
-                if (th.filters) {
-                    Object.keys(th.filters).forEach(item => {
-                        th.filters[item].count = 0;
-                    })
-                } else {
-                    th.filters = {};
-                }
-                this.data.forEach(td => {
-                    if (td[th.key]) {
-                        if (th.filters[td[th.key]]) {
-                            th.filters[td[th.key]].count += 1;
-                        } else {
-                            th.filters[td[th.key]] = {};
-                            th.filters[td[th.key]].count = 1;
-                        }
-                    }
-                })
-                Object.keys(th.filters).forEach(item => {
-                    if (th.filters[item].count == 0) {
-                        delete th.filters[item]
-                    }
-                })
-            })
-        },
-        handleChangeData() {
-            let data = JSON.parse(JSON.stringify(this.data));
-            let initialData = JSON.parse(JSON.stringify(this.initialData));
-            this.changeData = data.filter((item, index) => {
-                return JSON.stringify(item) !== JSON.stringify(initialData[index])
-            });
-        },
-        clickoutside() {
-            if (this.isSelected || this.isAutofill) return;
-            this.editing = false;
-            this.editorShow = false;
-            this.selectedXArr = [];
-            this.selectedYArr = [];
-            window.removeEventListener("keydown", this.keySubmit);
-            window.removeEventListener("mousemove", this.multiSelectAdjustPostion);
-        },
-        // 选择单元格
-        selectCell(e, x, y, type) {
-            if (this.disabled) return;
-            if (e.button != 0) return;
-            window.addEventListener("keydown", this.keySubmit);
-            window.addEventListener("mousemove", this.multiSelectAdjustPostion);
-            if (type == 'selection') return;
-            this.editing = false;
-            this.editType = 'text';
-
-            this.autofillXIndex = x;
-            this.autofillYIndex = y;
-            this.editorShow = true;
-
-            this.selectedXIndex = x;
-            this.selectedYIndex = y;
-            this.selectedXArr = [x, x];
-            this.selectedYArr = [y, y];
-            this.$nextTick(() => {
-                this.editorXIndex = x;
-                this.editorYIndex = y;
-                this.curEditorCoverValue = this.showData[this.editorYIndex][this.columns[this.editorXIndex].key];
-                this.$nextTick(() => {
-                    this.adjustPosition();
-                    this.$refs.editor.$refs.clipboard.focus();
-                })
-            })
-
-            this.isSelected = true;
-            this.timer = setInterval(this.multiSelectAdjustPostion, 10);
-            window.addEventListener('mouseup', this.selectUp);
-        },
-        keySubmit(e) {
-            if ((e.ctrlKey && e.keyCode == 90) || (e.metaKey && e.keyCode == 90)) {
-                return this.operation('undo');
-            }
-            if ((e.ctrlKey && e.keyCode == 89) || (e.metaKey && e.keyCode == 89)) {
-                return this.operation('recovery');
-            }
-            if (this.editing && e.keyCode == 13) {
-                this.editing = false;
-                this.editType = 'text';
-                return;
-            }
-            if (this.editing || !this.editorShow) {
-                return;
-            }
-            if ((e.ctrlKey && e.keyCode == 67) || (e.metaKey && e.keyCode == 67)) {
-                return this.getContentToclipboard();
-            }
-            if (e.ctrlKey || e.metaKey) {
-                return;
-            }
-            e.preventDefault();
-            const isImportability = (k) => {
-                if ((k >= 65 && k <= 90) || (k >= 48 && k <= 57) || (k >= 96 && k <= 107) || (k >= 109 && k <= 111) || k == 32 || (k >= 186 && k <= 222)) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            switch (true) {
-                case e.keyCode == 37:
-                    // 左
-                    if (this.editorXIndex == this.editorRange.minX) {
-                        this.editorXIndex = this.editorRange.minX;
-                    } else {
-                        this.editorXIndex = this.editorXIndex - 1;
-                    }
-                    this.adjustPosition();
-                    break;
-                case e.keyCode == 38:
-                    // 上
-                    if (this.editorYIndex == this.editorRange.minY) {
-                        this.editorYIndex = this.editorRange.minY;
-                    } else {
-                        this.editorYIndex = this.editorYIndex - 1;
-                    }
-                    this.adjustPosition();
-                    break;
-                case e.keyCode == 39:
-                    // 右
-                    if (this.editorXIndex == this.editorRange.maxX) {
-                        this.editorXIndex = this.editorRange.maxX;
-                    } else {
-                        this.editorXIndex = this.editorXIndex + 1;
-                    }
-                    this.adjustPosition();
-                    break;
-                case e.keyCode == 40:
-                    // 下
-                    if (this.editorYIndex == this.editorRange.maxY) {
-                        this.editorYIndex = this.editorRange.maxY;
-                    } else {
-                        this.editorYIndex = this.editorYIndex + 1;
-                    }
-                    this.adjustPosition();
-                    break;
-                case e.keyCode == 8:
-                    // 删除
-                    this.clearSelected();
-                    break;
-                case e.keyCode == 13:
-                    this.setEditing();
-                    break;
-                case isImportability(e.keyCode) || e.key == 'Process' || e.key == 'Unidentified':
-                    this.setEditing(e.key);
-                    break;
-            }
-        },
-        getContentToclipboard() {
-            let content = '';
-            for (let i = 0; i <= this.selectedYArr[1] - this.selectedYArr[0]; i++) {
-                for (let j = 0; j <= this.selectedXArr[1] - this.selectedXArr[0]; j++) {
-                    if (this.selectedXArr[1] - this.selectedXArr[0] == 0) {
-                        content += (this.showData[i + this.selectedYArr[0]][this.columns[j + this.selectedXArr[0]].key] || '') + '\n';
-                    } else if (j == 0) {
-                        content += (this.showData[i + this.selectedYArr[0]][this.columns[j + this.selectedXArr[0]].key] || '');
-                    } else if (j == this.selectedXArr[1] - this.selectedXArr[0]) {
-                        content += '\t' + (this.showData[i + this.selectedYArr[0]][this.columns[j + this.selectedXArr[0]].key] || '') + '\n';
-                    } else {
-                        content += '\t' + (this.showData[i + this.selectedYArr[0]][this.columns[j + this.selectedXArr[0]].key] || '');
-                    }
-                }
-            }
-            let textArea = document.createElement("textarea");
-            textArea.value = content;
-            document.body.appendChild(textArea);
-            textArea.select();
-            try {
-                let successful = document.execCommand('copy');
-            } catch (err) {
-            }
-            document.body.removeChild(textArea);
-        },
-        clipboardToContent(e) {
-            this.$nextTick(() => {
-                let arr = [];
-                e.target.value.split('\n').forEach((item, index, curArr) => {
-                    if (index < curArr.length - 1) {
-                        arr.push(item.split('\t'))
-                    }
-                });
-                for (let i = 0; i <= arr.length - 1; i++) {
-                    for (let j = 0; j <= arr[i].length - 1; j++) {
-                        if (this.showData[i + this.selectedYArr[0]] && this.columns[j + this.selectedXArr[0]]) {
-                            if (this.columns[j + this.selectedXArr[0]].type != 'disabled') {
-                                this.showData[i + this.selectedYArr[0]][this.columns[j + this.selectedXArr[0]].key] = arr[i][j];
-                            }
-                        }
-                    }
-                }
-                this.$refs.editor.$refs.clipboard.value = '';
-            })
-        },
-        clearSelected() {
-            for (let i = 0; i <= this.selectedYArr[1] - this.selectedYArr[0]; i++) {
-                for (let j = 0; j <= this.selectedXArr[1] - this.selectedXArr[0]; j++) {
-                    if (this.columns[j + this.selectedXArr[0]].type != 'disabled') {
-                        this.showData[i + this.selectedYArr[0]][this.columns[j + this.selectedXArr[0]].key] = '';
-                    }
-                }
-            }
-        },
-        // 设置启用编辑
-        setEditing(key) {
-            if (this.columns[this.editorXIndex].type == 'disabled') {
-                return;
-            }
-            this.editType = this.columns[this.editorXIndex].type ? this.columns[this.editorXIndex].type : 'text';
-            this.curEditorWidth = this.columnsWidth[this.editorXIndex];
-            if (key && (this.editType == 'text' || this.editType == 'number')) {
-                if (key == 'Process' || key == 'Unidentified') {
-                    if (key.match(/\d/)) {
-                        this.$refs.editor.editContent = key.match(/\d/)[0];
-                    } else {
-                        this.$refs.editor.editContent = '';
-                    }
-                } else {
-                    this.$refs.editor.editContent = key;
-                }
-            } else {
-                this.$refs.editor.editContent = this.showData[this.editorYIndex][this.columns[this.editorXIndex].key];
-            }
-            this.editing = true;
-            if (this.editType == 'select') {
-                this.options = this.columns[this.editorXIndex].options;
-            }
-            this.$nextTick(() => {
-                this.$refs.editor.$refs[this.editType].focus();
-            })
-        },
-        selectUp() {
-            clearInterval(this.timer);
-            setTimeout(() => {
-                this.isSelected = false;
-            }, 0)
-        },
-        adjustPosition() {
-            if (this.editorXIndex < this.fixedCount) {
-                this.editorIsFixed = true;
-            } else {
-                this.editorIsFixed = false;
-            }
-            this.autofillXIndex = this.editorXIndex;
-            this.autofillYIndex = this.editorYIndex;
-            this.selectedXArr = [this.editorXIndex, this.editorXIndex];
-            this.selectedYArr = [this.editorYIndex, this.editorYIndex];
-            // 左右调整
-            let curLeftShould, curRightShould;
-            if (this.fixedCount > 0) {
-                let unFixedLeftArr = this.scrollLeftArr.slice(this.fixedCount - 1, -1).map(item => {
-                    return item - this.fixedWidth;
-                })
-                let unFixedRightArr = this.scrollLeftArr.slice(this.fixedCount).map(item => {
-                    return item - this.fixedWidth;
-                })
-                curLeftShould = unFixedLeftArr[this.editorXIndex - this.fixedCount];
-                curRightShould = unFixedRightArr[this.editorXIndex - this.fixedCount] + this.fixedWidth - this.wrapperWidth + scrollBarWidth + 2;
-            } else {
-                let scrollLeftArr = [0, ...this.scrollLeftArr];
-                curLeftShould = scrollLeftArr[this.editorXIndex];
-                curRightShould = scrollLeftArr[this.editorXIndex + 1] - this.wrapperWidth + scrollBarWidth + 2;
-            }
-            if (this.tableWidth > this.wrapperWidth) {
-                if (this.tableScrollLeft > curLeftShould) {
-                    this.$refs.theader.scrollLeft = curLeftShould;
-                    this.$refs.tbody.scrollLeft = curLeftShould;
-                }
-                if (this.tableScrollLeft < curRightShould) {
-                    this.$refs.theader.scrollLeft = curRightShould + 2;
-                    this.$refs.tbody.scrollLeft = curRightShould + 2;
-                }
-            }
-            // 上下调整
-            if (this.maxHeight) {
-                let curTopShould = this.scrollTopArr[this.editorYIndex];
-                if (this.tableScrollTop > curTopShould) {
-                    this.$refs.tbody.scrollTop = curTopShould;
-                    this.$refs.fixedTbody.scrollTop = curTopShould;
-                }
-                let curBottomShould = this.scrollTopArr[this.editorYIndex + 1] - this.maxHeight + scrollBarWidth + 2;
-                if (this.tableScrollTop < curBottomShould) {
-                    this.$refs.tbody.scrollTop = curBottomShould;
-                    this.$refs.fixedTbody.scrollTop = curBottomShould;
-                }
-            }
-        },
-        multiSelect(e, x, y, columnType) {
-            if (columnType == 'selection') return;
-            if (this.isSelected) {
-                this.autofillXIndex = x > this.editorXIndex ? x : this.editorXIndex;
-                this.autofillYIndex = y > this.editorYIndex ? y : this.editorYIndex;
-                this.selectedXIndex = x;
-                this.selectedYIndex = y;
-                if (this.selectedXIndex > this.editorXIndex) {
-                    this.selectedXArr.splice(0, 1, this.editorXIndex);
-                    this.selectedXArr.splice(1, 1, this.selectedXIndex);
-                } else {
-                    this.selectedXArr.splice(0, 1, this.selectedXIndex);
-                    this.selectedXArr.splice(1, 1, this.editorXIndex);
-                }
-                if (this.selectedYIndex > this.editorYIndex) {
-                    this.selectedYArr.splice(0, 1, this.editorYIndex);
-                    this.selectedYArr.splice(1, 1, this.selectedYIndex);
-                } else {
-                    this.selectedYArr.splice(0, 1, this.selectedYIndex);
-                    this.selectedYArr.splice(1, 1, this.editorYIndex);
-                }
-            }
-            if (this.isAutofill) {
-                if (y > this.selectedYArr[1]) {
-                    this.autofillYArr = [this.selectedYArr[1] + 1, y]
-                } else if (y < this.selectedYArr[0]) {
-                    this.autofillYArr = [y, this.selectedYArr[0] - 1];
-                } else {
-                    this.autofillYArr = [];
-                }
-            }
-        },
-        multiSelectAdjustPostion(e) {
-            if (this.isSelected) {
-                if (e) {
-                    e = e || window.event;
-                    this.mouseX = e.pageX;
-                    this.mouseY = e.pageY;
-                }
-                if (this.selectedYArr[0] == this.selectedYArr[1] && this.selectedXArr[0] == this.selectedXArr[1]) {
-                    return;
-                }
-                let sTop = this.$refs.excel.offsetTop + 30;
-                let sLeft = this.pos.left+ this.fixedWidth;
-                let sBottom = this.$refs.excel.offsetTop + this.$refs.excel.offsetHeight - 10;
-                let sRight = this.pos.left+ this.$refs.excel.offsetWidth - 10;
-                if (this.mouseY < sTop) {
-                    this.$refs.tbody.scrollTop -= 20;
-                    this.$refs.fixedTbody.scrollTop -= 20;
-                }
-                if (this.mouseY > sBottom) {
-                    this.$refs.tbody.scrollTop += 20;
-                    this.$refs.fixedTbody.scrollTop += 20;
-                }
-                if (this.mouseX < sLeft) {
-                    this.$refs.theader.scrollLeft -= 20;
-                    this.$refs.tbody.scrollLeft -= 20;
-                }
-                if (this.mouseX > sRight) {
-                    this.$refs.theader.scrollLeft += 20;
-                    this.$refs.tbody.scrollLeft += 20;
-                }
-            }
-        },
-        autofill() {
-            this.isAutofill = true;
-            window.addEventListener('mouseup', this.autofillUp);
-        },
-        autofillUp() {
-            if (this.autofillYArr[1] > this.selectedYArr[1]) {
-                for (let i = 0; i <= this.autofillYArr[1] - this.autofillYArr[0]; i++) {
-                    for (let j = 0; j <= this.selectedXArr[1] - this.selectedXArr[0]; j++) {
-                        if (this.columns[j + this.selectedXArr[0]].type != 'disabled') {
-                            this.showData[i + this.autofillYArr[0]][this.columns[j + this.selectedXArr[0]].key] = this.showData[this.selectedYArr[1]][this.columns[j + this.selectedXArr[0]].key]
-                        }
-                    }
-                }
-                this.selectedYArr.splice(1, 1, this.autofillYArr[1]);
-                this.autofillYIndex = this.autofillYArr[1];
-            }
-            if (this.autofillYArr[0] < this.selectedYArr[0]) {
-                for (let i = 0; i <= this.autofillYArr[1] - this.autofillYArr[0]; i++) {
-                    for (let j = 0; j <= this.selectedXArr[1] - this.selectedXArr[0]; j++) {
-                        if (this.columns[j + this.selectedXArr[0]].type != 'disabled') {
-                            this.showData[i + this.autofillYArr[0]][this.columns[j + this.selectedXArr[0]].key] = this.showData[this.selectedYArr[0]][this.columns[j + this.selectedXArr[0]].key]
-                        }
-                    }
-                }
-                this.selectedYArr.splice(0, 1, this.autofillYArr[0]);
-            }
-            setTimeout(() => {
-                this.autofillYArr = [];
-                this.isAutofill = false;
-            }, 0)
-        },
-        selectAll() {
-            const checkedAll = this.dataStatusList.every(item => item.checked);
-            this.dataStatusList.forEach((item, index) => {
-                this.$set(this.dataStatusList[index], 'checked', !checkedAll)
-            });
-            this.selectionChange();
-        },
-        operation(type) {
-            if (!this.editing) {
-                if (type == 'undo' && this.curHisory > 1) {
-                    this.curHisory--;
-                }
-                if (type == 'recovery' && this.curHisory < this.historyData.length) {
-                    this.curHisory++;
-                }
-                this.isOperation = true;
-                this.data.forEach((i, index) => {
-                    Object.keys(i).forEach(j => {
-                        i[j] = JSON.parse(this.historyData[this.curHisory - 1])[index][j];
-                    })
-                })
-                this.$nextTick(() => {
-                    this.isOperation = false;
-                })
-            }
-        },
-        getEditorContent(editContent) {
-            this.showData[this.editorYIndex][this.columns[this.editorXIndex].key] = editContent;
-        },
-        resetEditor() {
-            this.editing = false;
-            this.editType = 'text';
-        },
-        adjustWidth(index, width) {
-            this.columns[index].width = width;
-            this.handleResize();
-        },
-        openDropdown(i) {
-            if (typeof(i) === 'number') {
-                if (this.dropdownIndex == i) {
-                    this.dropdownIndex = null;
-                } else {
-                    this.dropdownIndex = i;
-                    this.dropdownColumn = JSON.parse(JSON.stringify(this.columnsStatusList[this.dropdownIndex]));
-                }
-            } else {
-                this.dropdownIndex = null;
-            }
-        },
-        sort(type) {
-            this.columnsStatusList.forEach(item => {
-                item.sort = '';
-            })
-            this.columnsStatusList[this.dropdownIndex].sort = type;
-            if (type == 'ascending') {
-                this.showData.sort((x, y) => {
-                    return x[this.columnsStatusList[this.dropdownIndex].key] > y[this.columnsStatusList[this.dropdownIndex].key] ? 1 : -1;
-                })
-            } else {
-                this.showData.sort((x, y) => {
-                    return x[this.columnsStatusList[this.dropdownIndex].key] > y[this.columnsStatusList[this.dropdownIndex].key] ? -1 : 1;
-                })
-            }
-            this.dropdownIndex = null;
-        },
-        handleFilter(dropdownColumn) {
-            this.columnsStatusList[this.dropdownIndex] = dropdownColumn;
-            let arr = [];
-            for (const key in dropdownColumn.filters) {
-                if (dropdownColumn.filters[key].checked) {
-                    arr.push(key);
-                }
-            }
-            this.filters[this.columnsStatusList[this.dropdownIndex].key] = arr;
-            this.filterData();
-        },
-        resetFilter() {
-            delete this.filters[this.columnsStatusList[this.dropdownIndex].key];
-            for (const key in this.columnsStatusList[this.dropdownIndex].filters) {
-                this.columnsStatusList[this.dropdownIndex].filters[key].checked = false;
-            }
-            this.filterData();
-        },
-        filterData() {
-            this.showData = this.data;
-            for (const key in this.filters) {
-                this.showData = this.showData.filter(item => {
-                    return this.filters[key].includes(item[key].toString())
-                })
-            }
-            this.dropdownIndex = null;
-            this.handleResize();
-        },
-        setErrors(index, key, correct) {
-            if (!this.dataStatusList[index].errors) {
-                this.dataStatusList[index].errors = []
-            }
-            if (correct) {
-                if (this.dataStatusList[index].errors.includes(key)) {
-                    this.dataStatusList[index].errors.splice(this.dataStatusList[index].errors.indexOf(key), 1);
-                }
-            } else {
-                if (!this.dataStatusList[index].errors.includes(key)) {
-                    this.dataStatusList[index].errors.push(key);
-                }
-            }
+        this.$emit('input', val);
+        if (!this.initialData) {
+          this.initData();
         }
-    }
-}
+        this.handleResize();
+        this.handleFilters();
+        this.handleChangeData();
+      },
+      deep: true,
+    },
+    tableScrollLeft() {
+      store.dropdown.index = null;
+    },
+    tableScrollTop() {
+      store.dropdown.index = null;
+    },
+    columnsData: {
+      handler() {
+        this.initColumns();
+        this.handleResize();
+      },
+      deep: true,
+    },
+  },
+  mounted() {
+    this.init();
+  },
+  mixins: [methods, events],
+  methods: {
+    init() {
+      if (this.value.length > 0) {
+        this.data = this.value;
+      }
+      this.$refs.tbody.addEventListener('scroll', () => {
+        this.$refs.theader.scrollLeft = this.$refs.tbody.scrollLeft;
+        this.$refs.fixedTbody.scrollTop = this.$refs.tbody.scrollTop;
+        this.tableScrollLeft = this.$refs.tbody.scrollLeft;
+        this.tableScrollTop = this.$refs.tbody.scrollTop;
+      });
+      this.initColumns();
+      this.handleResize();
+    },
+    initColumns() {
+      const fixedArr = this.columnsData.filter(item => item.fixed);
+      const unFixedArr = this.columnsData.filter(item => !item.fixed);
+      store.columns = fixedArr.concat(unFixedArr).map((item) => {
+        if (item.width) {
+          item.width = parseInt(item.width, 10);
+        }
+        return item;
+      });
+      this.columnsWidth = store.columns.map(item => item.width);
+      this.columnsStatusList = store.columns.map(item => ({
+        key: item.key,
+        type: item.type,
+        list: {},
+        sort: '',
+      }));
+      store.filters = {};
+    },
+    initData() {
+      store.showData = this.data;
+      this.dataStatusList = this.data.map(() => ({
+        checked: false,
+        errors: [],
+      }));
+      this.initialData = JSON.parse(JSON.stringify(this.data));
+      this.historyData = [JSON.stringify(this.data)];
+      this.curHisory = 1;
+      if (this.$refs.theaderContent) {
+        this.$refs.theaderContent.checkedAll = false;
+      }
+      if (this.$refs.fixedTheaderContent) {
+        this.$refs.fixedTheaderContent.checkedAll = false;
+      }
+      this.initColumns();
+      this.handleResize();
+      this.handleFilters();
+      this.handleChangeData();
+    },
+    handleResize() {
+      this.excelPos = this.$refs.excel.getBoundingClientRect();
+      // 获取编辑框可移动范围, X是横轴, Y是竖轴
+      store.editor.editorRange = {
+        minX: store.columns.filter(item => item.type === 'selection').length,
+        maxX: store.columns.length - 1,
+        minY: 0,
+        maxY: store.showData.length - 1,
+      };
+
+      this.wrapperWidth = this.$refs.wrapper.offsetWidth;
+
+      this.$nextTick(() => {
+        // 计算剩余列宽度
+        const surplusColumns = store.columns.filter(item => !item.width);
+        let surplusColumnAvg;
+
+        if (!this.$refs.tbodyContent.$el) return;
+        if (surplusColumns.length > 0) {
+          const surplusWidth = this.wrapperWidth - store.columns.filter(item => item.width).reduce((total, item) => total + item.width, 0);
+          if (surplusWidth > 0) {
+            if (this.$refs.tbodyContent.$el.offsetHeight > this.maxHeight) {
+              surplusColumnAvg = (surplusWidth - 1 - scrollBarWidth) / surplusColumns.length;
+            } else {
+              surplusColumnAvg = (surplusWidth - 1) / surplusColumns.length;
+            }
+          }
+        }
+
+        // 设置单元格宽度
+        store.columns.forEach((column, index) => {
+          if (column.width) {
+            this.$set(this.columnsWidth, index, column.width);
+          } else {
+            // 设置单元格最小宽度
+            if (surplusColumnAvg > 80) {
+              this.$set(this.columnsWidth, index, surplusColumnAvg);
+            } else {
+              this.$set(this.columnsWidth, index, 80);
+            }
+          }
+        });
+
+        this.scrollLeftArr = this.columnsWidth.map((item, index) => {
+          const sum = this.columnsWidth.reduce((total, curVal, curIndex) => {
+            if (curIndex <= index) {
+              return total + curVal;
+            }
+            return total;
+          }, 0);
+          return sum;
+        });
+
+        this.scrollTopArr = store.showData.map((item, index) => {
+          const sum = store.showData.reduce((total, curVal, curIndex) => {
+            if (curIndex <= index) {
+              return total + 28;
+            }
+            return total;
+          }, 0);
+          return sum;
+        });
+        this.scrollTopArr.unshift(0);
+
+        this.fixedCount = store.columns.filter(item => item.fixed).length;
+        this.fixedWidth = this.scrollLeftArr[this.fixedCount - 1] || 0;
+
+        // 如果每列均设置了宽度
+        const allWidth = store.columns.every(cell => cell.width);
+        if (allWidth) {
+          this.tableWidth = store.columns.map(cell => cell.width).reduce((a, b) => a + b, 0);
+        } else {
+          this.tableWidth = this.columnsWidth.reduce((total, cur) => total + cur, 0);
+          if (this.tableWidth < this.wrapperWidth) {
+            this.tableWidth = this.wrapperWidth;
+          }
+        }
+
+        this.$refs.theaderContent.$el.style.width = `${this.tableWidth}px`;
+        this.$refs.tbodyContent.$el.style.width = `${this.tableWidth}px`;
+
+        // 设置左侧theader高度与tbody距离顶部距离
+        this.theaderHeight = this.$refs.theaderContent.$el.offsetHeight;
+
+        // 设置左侧定位高度
+        if (this.tableWidth > this.wrapperWidth) {
+          this.$refs.fixedWrapper.style.height = `${this.$refs.wrapper.offsetHeight - scrollBarWidth}px`;
+          this.$refs.fixedTbody.style.height = `${this.$refs.wrapper.offsetHeight - scrollBarWidth - this.theaderHeight}px`;
+        } else {
+          this.$refs.fixedWrapper.style.height = `${this.$refs.wrapper.offsetHeight}px`;
+          this.$refs.fixedTbody.style.height = `${this.$refs.wrapper.offsetHeight - this.theaderHeight}px`;
+        }
+        // 当出现竖向滚动条时处理滚动条
+        if (this.$refs.tbodyContent.$el.offsetHeight > this.maxHeight) {
+          this.$refs.tbody.style.overflowY = 'auto';
+          this.$nextTick(() => {
+            const colgroup = this.$refs.theaderContent.$el.querySelector('colgroup');
+            const tr = this.$refs.theaderContent.$el.querySelector('tr');
+
+            // 如果已存在Col，删除组中重新在末尾添加
+            for (let i = 0; i < colgroup.children.length; i += 1) {
+              if (colgroup.children[i].width === scrollBarWidth) {
+                colgroup.removeChild(colgroup.children[i]);
+                tr.removeChild(tr.children[i]);
+              }
+            }
+            const col = document.createElement('col');
+            col.width = scrollBarWidth;
+            colgroup.appendChild(col);
+
+            const th = document.createElement('th');
+            th.style.width = `${scrollBarWidth}px`;
+            th.style.borderTop = '1px solid #d6dfe4';
+            tr.appendChild(th);
+
+            this.$refs.tbodyContent.$el.style.width = `${this.tableWidth - scrollBarWidth - 1}px`;
+          });
+        }
+      });
+    },
+    handleFilters() {
+      this.columnsStatusList.forEach((th) => {
+        if (th.type === 'selection') return;
+        if (th.list) {
+          Object.keys(th.list).forEach((item) => {
+            th.list[item].count = 0;
+          });
+        } else {
+          th.list = {};
+        }
+        this.data.forEach((td) => {
+          if (td[th.key]) {
+            if (th.list[td[th.key]]) {
+              th.list[td[th.key]].count += 1;
+            } else {
+              th.list[td[th.key]] = {};
+              th.list[td[th.key]].count = 1;
+            }
+          }
+        });
+        Object.keys(th.list).forEach((item) => {
+          if (th.list[item].count === 0) {
+            delete th.list[item];
+          }
+        });
+      });
+    },
+    handleChangeData() {
+      const data = JSON.parse(JSON.stringify(this.data));
+      const initialData = JSON.parse(JSON.stringify(this.initialData));
+      this.changeData = data.filter((item, index) => JSON.stringify(item) !== JSON.stringify(initialData[index]));
+    },
+    clickoutside() {
+      if (store.selector.isSelected || store.autofill.isAutofill) return;
+      store.editor.editing = false;
+      store.editor.editorShow = false;
+      store.selector.selectedXArr = [];
+      store.selector.selectedYArr = [];
+      window.removeEventListener('keydown', this.keySubmit);
+      window.removeEventListener('mousemove', this.multiSelectAdjustPostion);
+    },
+    // 选择单元格
+    selectCell(e, x, y, type) {
+      if (this.disabled) return;
+      if (e.button !== 0) return;
+      window.addEventListener('keydown', this.keySubmit);
+      window.addEventListener('mousemove', this.multiSelectAdjustPostion);
+      if (type === 'selection') return;
+      store.editor.editing = false;
+      store.editor.editType = 'text';
+
+      store.autofill.autofillXIndex = x;
+      store.autofill.autofillYIndex = y;
+      store.editor.editorShow = true;
+
+      store.selector.selectedXIndex = x;
+      store.selector.selectedYIndex = y;
+      store.selector.selectedXArr = [x, x];
+      store.selector.selectedYArr = [y, y];
+      this.$nextTick(() => {
+        store.editor.editorXIndex = x;
+        store.editor.editorYIndex = y;
+        store.editor.curEditorCoverValue = store.showData[store.editor.editorYIndex][store.columns[store.editor.editorXIndex].key];
+        this.$nextTick(() => {
+          this.adjustPosition();
+          this.$refs.editor.$refs.clipboard.focus();
+        });
+      });
+
+      store.selector.isSelected = true;
+      this.timer = setInterval(this.multiSelectAdjustPostion, 10);
+      window.addEventListener('mouseup', this.selectUp);
+    },
+    keySubmit(e) {
+      if ((e.ctrlKey && e.keyCode === 90) || (e.metaKey && e.keyCode === 90)) {
+        return this.operation('undo');
+      }
+      if ((e.ctrlKey && e.keyCode === 89) || (e.metaKey && e.keyCode === 89)) {
+        return this.operation('recovery');
+      }
+      if (store.editor.editing && e.keyCode === 13) {
+        store.editor.editing = false;
+        store.editor.editType = 'text';
+        return;
+      }
+      if (store.editor.editing || !store.editor.editorShow) {
+        return;
+      }
+      if ((e.ctrlKey && e.keyCode === 67) || (e.metaKey && e.keyCode === 67)) {
+        return this.getContentToclipboard();
+      }
+      if (e.ctrlKey || e.metaKey) {
+        return;
+      }
+      e.preventDefault();
+      const isImportability = (k) => {
+        if ((k >= 65 && k <= 90) || (k >= 48 && k <= 57) || (k >= 96 && k <= 107) || (k >= 109 && k <= 111) || k === 32 || (k >= 186 && k <= 222)) {
+          return true;
+        }
+        return false;
+      };
+      switch (true) {
+        case e.keyCode === 37:
+          // 左
+          if (store.editor.editorXIndex === store.editor.editorRange.minX) {
+            store.editor.editorXIndex = store.editor.editorRange.minX;
+          } else {
+            store.editor.editorXIndex -= 1;
+          }
+          this.adjustPosition();
+          break;
+        case e.keyCode === 38:
+          // 上
+          if (store.editor.editorYIndex === store.editor.editorRange.minY) {
+            store.editor.editorYIndex = store.editor.editorRange.minY;
+          } else {
+            store.editor.editorYIndex -= 1;
+          }
+          this.adjustPosition();
+          break;
+        case e.keyCode === 39:
+          // 右
+          if (store.editor.editorXIndex === store.editor.editorRange.maxX) {
+            store.editor.editorXIndex = store.editor.editorRange.maxX;
+          } else {
+            store.editor.editorXIndex += 1;
+          }
+          this.adjustPosition();
+          break;
+        case e.keyCode === 40:
+          // 下
+          if (store.editor.editorYIndex === store.editor.editorRange.maxY) {
+            store.editor.editorYIndex = store.editor.editorRange.maxY;
+          } else {
+            store.editor.editorYIndex += 1;
+          }
+          this.adjustPosition();
+          break;
+        case e.keyCode === 8:
+          // 删除
+          this.clearSelected();
+          break;
+        case e.keyCode === 13:
+          this.setEditing();
+          break;
+        case isImportability(e.keyCode) || e.key === 'Process' || e.key === 'Unidentified':
+          this.setEditing(e.key);
+          break;
+      }
+    },
+    getContentToclipboard() {
+      let content = '';
+      for (let i = 0; i <= store.selector.selectedYArr[1] - store.selector.selectedYArr[0]; i += 1) {
+        for (let j = 0; j <= store.selector.selectedXArr[1] - store.selector.selectedXArr[0]; j += 1) {
+          if (store.selector.selectedXArr[1] - store.selector.selectedXArr[0] === 0) {
+            content += `${store.showData[i + store.selector.selectedYArr[0]][store.columns[j + store.selector.selectedXArr[0]].key] || ''}\n`;
+          } else if (j === 0) {
+            content += (store.showData[i + store.selector.selectedYArr[0]][store.columns[j + store.selector.selectedXArr[0]].key] || '');
+          } else if (j === store.selector.selectedXArr[1] - store.selector.selectedXArr[0]) {
+            content += `\t${store.showData[i + store.selector.selectedYArr[0]][store.columns[j + store.selector.selectedXArr[0]].key] || ''}\n`;
+          } else {
+            content += `\t${store.showData[i + store.selector.selectedYArr[0]][store.columns[j + store.selector.selectedXArr[0]].key] || ''}`;
+          }
+        }
+      }
+      const textArea = document.createElement('textarea');
+      textArea.value = content;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        const successful = document.execCommand('copy');
+        console.log(successful);
+      } catch (err) {
+        console.log(err);
+      }
+      document.body.removeChild(textArea);
+    },
+    clipboardToContent(e) {
+      this.$nextTick(() => {
+        const arr = [];
+        e.target.value.split('\n').forEach((item, index, curArr) => {
+          if (index < curArr.length - 1) {
+            arr.push(item.split('\t'));
+          }
+        });
+        for (let i = 0; i <= arr.length - 1; i += 1) {
+          for (let j = 0; j <= arr[i].length - 1; j += 1) {
+            if (store.showData[i + store.selector.selectedYArr[0]] && store.columns[j + store.selector.selectedXArr[0]]) {
+              if (store.columns[j + store.selector.selectedXArr[0]].type !== 'disabled') {
+                store.showData[i + store.selector.selectedYArr[0]][store.columns[j + store.selector.selectedXArr[0]].key] = arr[i][j];
+              }
+            }
+          }
+        }
+        this.$refs.editor.$refs.clipboard.value = '';
+      });
+    },
+    clearSelected() {
+      for (let i = 0; i <= store.selector.selectedYArr[1] - store.selector.selectedYArr[0]; i += 1) {
+        for (let j = 0; j <= store.selector.selectedXArr[1] - store.selector.selectedXArr[0]; j += 1) {
+          if (store.columns[j + store.selector.selectedXArr[0]].type !== 'disabled') {
+            store.showData[i + store.selector.selectedYArr[0]][store.columns[j + store.selector.selectedXArr[0]].key] = '';
+          }
+        }
+      }
+    },
+    // 设置启用编辑
+    setEditing(key) {
+      if (store.columns[store.editor.editorXIndex].type === 'disabled') {
+        return;
+      }
+      store.editor.editType = store.columns[store.editor.editorXIndex].type ? store.columns[store.editor.editorXIndex].type : 'text';
+      store.editor.curEditorWidth = this.columnsWidth[store.editor.editorXIndex];
+      if (key && (store.editor.editType === 'text' || store.editor.editType === 'number')) {
+        if (key === 'Process' || key === 'Unidentified') {
+          if (key.match(/\d/)) {
+            [this.$refs.editor.editContent] = key.match(/\d/);
+          } else {
+            this.$refs.editor.editContent = '';
+          }
+        } else {
+          this.$refs.editor.editContent = key;
+        }
+      } else {
+        this.$refs.editor.editContent = store.showData[store.editor.editorYIndex][store.columns[store.editor.editorXIndex].key];
+      }
+      store.editor.editing = true;
+      if (store.editor.editType === 'select') {
+        store.editor.options = store.columns[store.editor.editorXIndex].options;
+      }
+      this.$nextTick(() => {
+        this.$refs.editor.$refs[store.editor.editType].focus();
+      });
+    },
+    selectUp() {
+      clearInterval(this.timer);
+      setTimeout(() => {
+        store.selector.isSelected = false;
+      }, 0);
+    },
+    adjustPosition() {
+      if (store.editor.editorXIndex < this.fixedCount) {
+        store.editor.editorIsFixed = true;
+      } else {
+        store.editor.editorIsFixed = false;
+      }
+      store.autofill.autofillXIndex = store.editor.editorXIndex;
+      store.autofill.autofillYIndex = store.editor.editorYIndex;
+      store.selector.selectedXArr = [store.editor.editorXIndex, store.editor.editorXIndex];
+      store.selector.selectedYArr = [store.editor.editorYIndex, store.editor.editorYIndex];
+      // 左右调整
+      let curLeftShould; let
+        curRightShould;
+      if (this.fixedCount > 0) {
+        const unFixedLeftArr = this.scrollLeftArr.slice(this.fixedCount - 1, -1).map(item => item - this.fixedWidth);
+        const unFixedRightArr = this.scrollLeftArr.slice(this.fixedCount).map(item => item - this.fixedWidth);
+        curLeftShould = unFixedLeftArr[store.editor.editorXIndex - this.fixedCount];
+        curRightShould = unFixedRightArr[store.editor.editorXIndex - this.fixedCount] + this.fixedWidth - this.wrapperWidth + scrollBarWidth + 2;
+      } else {
+        const scrollLeftArr = [0, ...this.scrollLeftArr];
+        curLeftShould = scrollLeftArr[store.editor.editorXIndex];
+        curRightShould = scrollLeftArr[store.editor.editorXIndex + 1] - this.wrapperWidth + scrollBarWidth + 2;
+      }
+      if (this.tableWidth > this.wrapperWidth) {
+        if (this.tableScrollLeft > curLeftShould) {
+          this.$refs.theader.scrollLeft = curLeftShould;
+          this.$refs.tbody.scrollLeft = curLeftShould;
+        }
+        if (this.tableScrollLeft < curRightShould) {
+          this.$refs.theader.scrollLeft = curRightShould + 2;
+          this.$refs.tbody.scrollLeft = curRightShould + 2;
+        }
+      }
+      // 上下调整
+      if (this.maxHeight) {
+        const curTopShould = this.scrollTopArr[store.editor.editorYIndex];
+        if (this.tableScrollTop > curTopShould) {
+          this.$refs.tbody.scrollTop = curTopShould;
+          this.$refs.fixedTbody.scrollTop = curTopShould;
+        }
+        const curBottomShould = this.scrollTopArr[store.editor.editorYIndex + 1] - this.maxHeight + scrollBarWidth + 2;
+        if (this.tableScrollTop < curBottomShould) {
+          this.$refs.tbody.scrollTop = curBottomShould;
+          this.$refs.fixedTbody.scrollTop = curBottomShould;
+        }
+      }
+    },
+    multiSelectAdjustPostion(e) {
+      if (store.selector.isSelected) {
+        if (e) {
+          e = e || window.event;
+          this.mouseX = e.pageX;
+          this.mouseY = e.pageY;
+        }
+        if (store.selector.selectedYArr[0] === store.selector.selectedYArr[1] && store.selector.selectedXArr[0] === store.selector.selectedXArr[1]) {
+          return;
+        }
+        const sTop = this.$refs.excel.offsetTop + 30;
+        const sLeft = this.excelPos.left + this.fixedWidth;
+        const sBottom = this.$refs.excel.offsetTop + this.$refs.excel.offsetHeight - 10;
+        const sRight = this.excelPos.left + this.$refs.excel.offsetWidth - 10;
+        if (this.mouseY < sTop) {
+          this.$refs.tbody.scrollTop -= 20;
+          this.$refs.fixedTbody.scrollTop -= 20;
+        }
+        if (this.mouseY > sBottom) {
+          this.$refs.tbody.scrollTop += 20;
+          this.$refs.fixedTbody.scrollTop += 20;
+        }
+        if (this.mouseX < sLeft) {
+          this.$refs.theader.scrollLeft -= 20;
+          this.$refs.tbody.scrollLeft -= 20;
+        }
+        if (this.mouseX > sRight) {
+          this.$refs.theader.scrollLeft += 20;
+          this.$refs.tbody.scrollLeft += 20;
+        }
+      }
+    },
+    selectAll() {
+      const checkedAll = this.dataStatusList.every(item => item.checked);
+      this.dataStatusList.forEach((item, index) => {
+        this.$set(this.dataStatusList[index], 'checked', !checkedAll);
+      });
+      this.selectionChange();
+    },
+    operation(type) {
+      if (!store.editor.editing) {
+        if (type === 'undo' && this.curHisory > 1) {
+          this.curHisory -= 1;
+        }
+        if (type === 'recovery' && this.curHisory < this.historyData.length) {
+          this.curHisory += 1;
+        }
+        this.isOperation = true;
+        this.data.forEach((i, index) => {
+          Object.keys(i).forEach((j) => {
+            i[j] = JSON.parse(this.historyData[this.curHisory - 1])[index][j];
+          });
+        });
+        this.$nextTick(() => {
+          this.isOperation = false;
+        });
+      }
+    },
+    adjustWidth(index, width) {
+      store.columns[index].width = width;
+      this.handleResize();
+    },
+    openDropdown(i) {
+      if (typeof (i) === 'number') {
+        if (store.dropdown.index === i) {
+          store.dropdown.index = null;
+        } else {
+          store.dropdown.index = i;
+          store.dropdown = JSON.parse(JSON.stringify({
+            ...this.columnsStatusList[store.dropdown.index],
+            index: store.dropdown.index,
+          }));
+        }
+      } else {
+        store.dropdown.index = null;
+      }
+    },
+    sort(type) {
+      this.columnsStatusList.forEach((item) => {
+        item.sort = '';
+      });
+      this.columnsStatusList[store.dropdown.index].sort = type;
+      if (type === 'ascending') {
+        store.showData.sort((x, y) => (x[this.columnsStatusList[store.dropdown.index].key] > y[this.columnsStatusList[store.dropdown.index].key] ? 1 : -1));
+      } else {
+        store.showData.sort((x, y) => (x[this.columnsStatusList[store.dropdown.index].key] > y[this.columnsStatusList[store.dropdown.index].key] ? -1 : 1));
+      }
+      store.dropdown.index = null;
+    },
+    handleFilter() {
+      this.columnsStatusList[store.dropdown.index] = {
+        list: store.dropdown.list,
+        key: store.dropdown.key,
+        sort: store.dropdown.sort,
+      };
+      const arr = [];
+      Object.keys(store.dropdown.list).forEach((key) => {
+        if (store.dropdown.list[key].checked) {
+          arr.push(key);
+        }
+      });
+      store.filters[this.columnsStatusList[store.dropdown.index].key] = arr;
+      this.filterData();
+    },
+    resetFilter() {
+      delete store.filters[this.columnsStatusList[store.dropdown.index].key];
+      Object.keys(this.columnsStatusList[store.dropdown.index].list).forEach((key) => {
+        this.columnsStatusList[store.dropdown.index].list[key].checked = false;
+      });
+      this.filterData();
+    },
+    filterData() {
+      store.showData = this.data;
+      Object.keys(store.filters).forEach((key) => {
+        store.showData = store.showData.filter(item => store.filters[key].includes(item[key].toString()));
+      });
+      store.dropdown.index = null;
+      this.handleResize();
+    },
+    setErrors(index, key, correct) {
+      if (!this.dataStatusList[index].errors) {
+        this.dataStatusList[index].errors = [];
+      }
+      if (correct) {
+        if (this.dataStatusList[index].errors.includes(key)) {
+          this.dataStatusList[index].errors.splice(this.dataStatusList[index].errors.indexOf(key), 1);
+        }
+      } else {
+        if (!this.dataStatusList[index].errors.includes(key)) {
+          this.dataStatusList[index].errors.push(key);
+        }
+      }
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>

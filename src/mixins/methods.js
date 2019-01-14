@@ -1,7 +1,7 @@
 export default {
-    methods: {
-        getChangeData() {
-            return this.changeData;
-        },
+  methods: {
+    getChangeData() {
+      return this.changeData;
     },
-}
+  },
+};

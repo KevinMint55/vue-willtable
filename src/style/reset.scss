@@ -1,3 +1,5 @@
+@import './utils',
+'./transition';
 body,
 ul,
 ol,
@@ -34,11 +36,12 @@ header {
 }
 
 html,
-body {
+body,
+#app {
   height: 100%;
   font-family: 'PingFang SC, Microsoft Yahei';
-  color: #333;
   font-size: 12px;
+  color: #333;
   -webkit-tap-highlight-color: transparent;
   -webkit-font-smoothing: antialiased;
 }
@@ -61,12 +64,9 @@ a {
 }
 
 input,
-button,
-textarea {
+button {
   border: none;
   outline: none;
-  font-size: 12px;
-  font-family: 'PingFang SC, Microsoft Yahei';
 }
 
 button {
@@ -75,4 +75,10 @@ button {
 
 i {
   font-style: normal;
+}
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

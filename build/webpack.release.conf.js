@@ -1,25 +1,21 @@
-'use strict'
-const path = require('path')
-const utils = require('./utils')
-const webpack = require('webpack')
-const config = require('../config')
-const merge = require('webpack-merge')
-const baseWebpackConfig = require('./webpack.base.conf')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
-const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const webpack = require('webpack');
+const merge = require('webpack-merge');
+const path = require('path');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const baseWebpackConfig = require('./webpack.base.conf');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const config = require('../config');
 
-const webpackConfig = merge(baseWebpackConfig, {
-  module: {
-    rules: utils.styleLoaders({
-      sourceMap: config.release.productionSourceMap,
-      extract: true,
-      usePostCSS: true
-    })
-  },
-  devtool: config.release.productionSourceMap ? config.release.devtool : false,
+function resolve(dir) {
+  return path.join(__dirname, '..', dir)
+}
+
+const webpackConfig = {
+  mode: 'production',
   entry: {
-    app: './src/index.js'
+    app: "./src/index.js",
   },
   output: {
     path: config.release.assetsRoot,
@@ -29,32 +25,26 @@ const webpackConfig = merge(baseWebpackConfig, {
     libraryTarget: 'umd'
   },
   plugins: [
-    new webpack.DefinePlugin({
-      'process.env': config.release.env
+    new CleanWebpackPlugin(['dist/*'], {
+      root: resolve('./'),
+      verbose: false,
     }),
-    new UglifyJsPlugin({
+    new UglifyJSPlugin({
       uglifyOptions: {
         compress: {
           warnings: false
+        },
+        output: {
+          comments: false
         }
       },
       parallel: true
     }),
-    new ExtractTextPlugin({
-      filename: `${config.release.filename}.min.css`,
-      allChunks: true,
-    }),
-    new OptimizeCSSPlugin({
-      cssProcessorOptions: config.release.productionSourceMap ? {
-        safe: true,
-        map: {
-          inline: false
-        }
-      } : {
-        safe: true
-      }
+    new OptimizeCSSAssetsPlugin({}),
+    new MiniCssExtractPlugin({
+      filename: `${config.release.filename}.min.css`
     })
   ]
-})
+}
 
-module.exports = webpackConfig
+module.exports = merge(baseWebpackConfig, webpackConfig);
