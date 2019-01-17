@@ -1,7 +1,7 @@
 {
   "name": "km-excel",
-  "version": "2.0.0",
-  "description": "km-excel",
+  "version": "2.0.2",
+  "description": "在线编辑excel组件",
   "author": "kevinmint55 <943642973@qq.com>",
   "private": false,
   "main": "dist/km-excel.min.js",

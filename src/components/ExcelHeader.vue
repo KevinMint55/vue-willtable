@@ -53,7 +53,7 @@ export default {
   props: {
     showIcon: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     allShow: Boolean,
     columnsWidth: {

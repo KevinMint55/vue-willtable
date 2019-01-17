@@ -7,13 +7,12 @@
     <el-button @click="show = !show">show</el-button>
     <excel
       ref="excel"
-      :columns-data="columns"
+      :columns="columns"
       v-model="data1"
       style="width: 100%;margin-top: 10px;"
       maxHeight="800"
       @selection-change="selectionChange"
       :disabled="disabled"
-      :showIcon="true"
       v-if="show"/>
     <!-- <excel :columns-data="columns" v-model="data2" style="width: 100%;" maxHeight="800"></excel> -->
   </div>
@@ -22,9 +21,9 @@
 <script>
 import axios from 'axios';
 import { button } from 'element-ui';
-import Excel from '../src/components/Excel.vue';
-// import Excel from '../dist/km-excel.min';
-// import '../dist/km-excel.min.css';
+// import Excel from '../src/components/Excel.vue';
+import Excel from '../dist/km-excel.min';
+import '../dist/km-excel.min.css';
 
 export default {
   name: 'App',
@@ -45,7 +44,7 @@ export default {
         {
           title: '序号',
           key: 'sid',
-          // fixed: true,
+          fixed: true,
           type: 'number',
           format: false,
         },
@@ -53,7 +52,7 @@ export default {
           title: '日期',
           key: 'date',
           type: 'date',
-          // fixed: true,
+          fixed: true,
           width: '100',
         },
         {
@@ -126,7 +125,7 @@ export default {
     };
   },
   mounted() {
-    this.getList();
+    // this.getList();
   },
   methods: {
     getList() {

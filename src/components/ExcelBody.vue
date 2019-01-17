@@ -15,27 +15,8 @@
           v-for="(th, xIndex) in columns"
           :key="xIndex"
           :title="tr[th.key]"
-          :style="{
-            width: `${columnsWidth[xIndex]}px`, 'text-align': th.align
-          }"
-          :class="{
-            selected:
-              xIndex <= selector.selectedXArr[1] &&
-              xIndex >= selector.selectedXArr[0] &&
-              yIndex <= selector.selectedYArr[1] &&
-              yIndex >= selector.selectedYArr[0],
-            autofill:
-              xIndex <= selector.selectedXArr[1] &&
-              xIndex >= selector.selectedXArr[0] &&
-              yIndex <= autofill.autofillYArr[1] &&
-              yIndex >= autofill.autofillYArr[0],
-            disabled: th.type == 'disabled',
-            error:
-              th.type == 'date' && !verifyDate(tr[th.key], yIndex, th.key) ||
-              th.type == 'month' && !verifyMonth(tr[th.key], yIndex, th.key) ||
-              th.type == 'select' && !verifySelect(tr[th.key], th.options, yIndex, th.key) ||
-              th.type == 'number' && !verifyNumber(tr[th.key], yIndex, th.key)
-          }"
+          :style="styleObj(tr, th, yIndex, xIndex, columnsWidth)"
+          :class="classObj(tr, th, yIndex, xIndex)"
           :data-key="th.key"
           @mouseenter="multiSelect($event, xIndex, yIndex, th.type)"
           @mousedown="selectCell($event, xIndex, yIndex, th.type)" v-show="th.fixed || allShow">
@@ -72,6 +53,14 @@ export default {
       type: Array,
       default: () => [],
     },
+    cellStyle: {
+      type: [Object, Function],
+      default: () => () => {},
+    },
+    cellClassName: {
+      type: [Object, Function],
+      default: () => () => {},
+    },
   },
   components: {
     'el-checkbox': checkbox,
@@ -93,63 +82,6 @@ export default {
     selectCell(e, x, y, type) {
       this.$parent.selectCell(e, x, y, type);
     },
-    verifyDate(date, index, key) {
-      if (!date) {
-        this.$parent.setErrors(index, key, true);
-        return true;
-      }
-      const result = date.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/);
-      if (result == null) {
-        this.$parent.setErrors(index, key, false);
-        return false;
-      }
-      const d = new Date(result[1], result[3] - 1, result[4]);
-      if (d.getFullYear() === Number(result[1]) && d.getMonth() + 1 === Number(result[3]) && d.getDate() === Number(result[4])) {
-        this.$parent.setErrors(index, key, true);
-        return true;
-      }
-      this.$parent.setErrors(index, key, false);
-      return false;
-    },
-    verifyMonth(month, index, key) {
-      if (!month) {
-        this.$parent.setErrors(index, key, true);
-        return true;
-      }
-      const result = month.match(/^(\d{1,4})(-|\/)(\d{1,2})$/);
-      if (result == null) {
-        this.$parent.setErrors(index, key, false);
-        return false;
-      }
-      const d = new Date(result[1], result[3] - 1);
-      if (d.getFullYear() === Number(result[1]) && d.getMonth() + 1 === Number(result[3])) {
-        this.$parent.setErrors(index, key, true);
-        return true;
-      }
-      this.$parent.setErrors(index, key, false);
-      return false;
-    },
-    verifySelect(value, options, index, key) {
-      if (!value) {
-        this.$parent.setErrors(index, key, true);
-        return true;
-      }
-      const arr = options.map(item => item.value);
-      if (arr.includes(value)) {
-        this.$parent.setErrors(index, key, true);
-        return true;
-      }
-      this.$parent.setErrors(index, key, false);
-      return false;
-    },
-    verifyNumber(value, index, key) {
-      if (isNaN(value)) {
-        this.$parent.setErrors(index, key, false);
-        return false;
-      }
-      this.$parent.setErrors(index, key, true);
-      return true;
-    },
     format(value, type, format = true) {
       if (!format) return value;
       if (!value) return;
@@ -160,6 +92,94 @@ export default {
         return parseInt(value, 10).toLocaleString();
       }
       return value;
+    },
+    styleObj(row, column, rowIndex, columnIndex, columnsWidth) {
+      return {
+        width: `${columnsWidth[columnIndex]}px`,
+        textAlign: column.align,
+        ...this.cellStyle({
+          row, column, rowIndex, columnIndex,
+        }),
+      };
+    },
+    classObj(row, column, rowIndex, columnIndex) {
+      return {
+        selected:
+          columnIndex <= this.selector.selectedXArr[1]
+          && columnIndex >= this.selector.selectedXArr[0]
+          && rowIndex <= this.selector.selectedYArr[1]
+          && rowIndex >= this.selector.selectedYArr[0],
+        autofill:
+          columnIndex <= this.selector.selectedXArr[1]
+          && columnIndex >= this.selector.selectedXArr[0]
+          && rowIndex <= this.autofill.autofillYArr[1]
+          && rowIndex >= this.autofill.autofillYArr[0],
+        disabled: column.type === 'disabled',
+        error: !this.verify(column, row[column.key], rowIndex),
+        ...this.cellClassName({
+          row, column, rowIndex, columnIndex,
+        }),
+      };
+    },
+    verify(column, value, index) {
+      if (!value) {
+        this.$parent.setErrors(index, column.key, true);
+        return true;
+      }
+      let correct;
+      switch (column.type) {
+        case 'date':
+          correct = this.verifyDate(value);
+          break;
+        case 'month':
+          correct = this.verifyMonth(value);
+          break;
+        case 'select':
+          correct = this.verifySelect(value, column.options);
+          break;
+        case 'number':
+          correct = this.verifyNumber(value);
+          break;
+        default:
+          correct = true;
+      }
+      this.$parent.setErrors(index, column.key, correct);
+      return correct;
+    },
+    verifyDate(value) {
+      const result = value.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/);
+      if (result == null) {
+        return false;
+      }
+      const d = new Date(result[1], result[3] - 1, result[4]);
+      if (d.getFullYear() === Number(result[1]) && d.getMonth() + 1 === Number(result[3]) && d.getDate() === Number(result[4])) {
+        return true;
+      }
+      return false;
+    },
+    verifyMonth(value) {
+      const result = value.match(/^(\d{1,4})(-|\/)(\d{1,2})$/);
+      if (result == null) {
+        return false;
+      }
+      const d = new Date(result[1], result[3] - 1);
+      if (d.getFullYear() === Number(result[1]) && d.getMonth() + 1 === Number(result[3])) {
+        return true;
+      }
+      return false;
+    },
+    verifySelect(value, options) {
+      const arr = options.map(item => item.value);
+      if (arr.includes(value)) {
+        return true;
+      }
+      return false;
+    },
+    verifyNumber(value) {
+      if (isNaN(value)) {
+        return false;
+      }
+      return true;
     },
   },
 };

@@ -17,12 +17,14 @@
           :fixedCount="fixedCount"
           :all-show="true" />
       </div>
-      <div class="km-table-body" ref="tbody" :style="{maxHeight: `${maxHeight}px`}">
+      <div ref="tbody" class="km-table-body" :style="{maxHeight: `${maxHeight}px`}">
         <table-body
           ref="tbodyContent"
           :dataStatusList="dataStatusList"
           :columnsWidth="columnsWidth"
-          :all-show="true">
+          :all-show="true"
+          :cellStyle="cellStyle"
+          :cellClassName="cellClassName">
           <!-- 编辑器 -->
           <editor
             ref="editor"
@@ -30,12 +32,12 @@
             :columnsWidth="columnsWidth"
             :fixedCount="fixedCount" />
         </table-body>
-        <div class="empty-block" v-if="showData.length == 0" :style="{width: `${tableWidth}px`}">
+        <div v-if="showData.length == 0" class="empty-block" :style="{width: `${tableWidth}px`}">
             暂无数据
         </div>
       </div>
       <!-- 左侧固定- -->
-      <div class="km-table-fixed" ref="fixedWrapper" :style="{width: `${fixedWidth}px`}">
+      <div ref="fixedWrapper" class="km-table-fixed" :style="{width: `${fixedWidth}px`}">
         <div class="km-table-fixed-header" ref="fixedTheader">
           <table-header
             ref="fixedTheaderContent"
@@ -45,15 +47,17 @@
             :fixedCount="fixedCount"
             :tableScrollLeft="tableScrollLeft" />
         </div>
-        <div class="km-table-fixed-body" ref="fixedTbody">
+        <div ref="fixedTbody" class="km-table-fixed-body">
           <table-body
+            ref="fixedTbodyContent"
             :dataStatusList="dataStatusList"
             :columnsWidth="columnsWidth"
-            ref="fixedTbodyContent" />
+            :cellStyle="cellStyle"
+            :cellClassName="cellClassName" />
         </div>
       </div>
     </div>
-    <div class="empty-columns" ref="wrapper" v-else>
+    <div ref="wrapper" class="empty-columns" v-else>
       <div ref="theader">
         <div ref="theaderContent"></div>
       </div>
@@ -94,7 +98,7 @@ export default {
     Dropdown,
   },
   props: {
-    columnsData: {
+    columns: {
       type: Array,
       default: () => [],
     },
@@ -111,13 +115,19 @@ export default {
     },
     showIcon: {
       type: Boolean,
-      default: true,
+      default: false,
+    },
+    cellStyle: {
+      type: [Object, Function],
+      default: () => () => {},
+    },
+    cellClassName: {
+      type: [Object, Function],
+      default: () => () => {},
     },
   },
   data() {
     return {
-      // columns: [],
-
       wrapperWidth: null,
       tableWidth: null,
       theaderHeight: null,
@@ -125,7 +135,6 @@ export default {
 
       data: [],
       initialData: null,
-      // showData: [],
       changeData: [],
       columnsStatusList: [],
       dataStatusList: [],
@@ -151,7 +160,7 @@ export default {
     };
   },
   computed: {
-    ...store.mapState(['columns', 'showData']),
+    ...store.mapState(['showData']),
   },
   watch: {
     value(val) {
@@ -182,7 +191,7 @@ export default {
     tableScrollTop() {
       store.dropdown.index = null;
     },
-    columnsData: {
+    columns: {
       handler() {
         this.initColumns();
         this.handleResize();
@@ -209,8 +218,8 @@ export default {
       this.handleResize();
     },
     initColumns() {
-      const fixedArr = this.columnsData.filter(item => item.fixed);
-      const unFixedArr = this.columnsData.filter(item => !item.fixed);
+      const fixedArr = this.columns.filter(item => item.fixed);
+      const unFixedArr = this.columns.filter(item => !item.fixed);
       store.columns = fixedArr.concat(unFixedArr).map((item) => {
         if (item.width) {
           item.width = parseInt(item.width, 10);
