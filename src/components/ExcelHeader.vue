@@ -8,7 +8,7 @@
     <thead class="km-thead">
       <tr ref="tr">
         <th
-          v-for="(th, index) in columns"
+          v-for="(th, index) in store.columns"
           :key="index"
           :style="{
               width: `${columnsWidth[index]}px`,
@@ -30,7 +30,7 @@
             <span class="icon" :class="iconClass(th.type)" v-if="showIcon"></span>
             <span class="content">{{ th.title }}</span>
           </p>
-          <div class="dropdown" v-if="th.type != 'selection'" :class="{active: dropdown.index === index}">
+          <div class="dropdown" v-if="th.type != 'selection'" :class="{active: store.dropdown.index === index}">
             <i @click.stop="openDropdown(index)" v-if="th.action"></i>
           </div>
           <div class="handler" @mousedown="handlerDown(index)" v-if="th.type != 'selection'"></div>
@@ -42,11 +42,11 @@
 
 <script>
 import { checkbox } from 'element-ui';
-import store from '../store';
 import clickoutside from '../directives/clickoutside';
 
 export default {
   directives: { clickoutside },
+  inject: ['store'],
   components: {
     'el-checkbox': checkbox,
   },
@@ -75,9 +75,6 @@ export default {
       adjustWidthType: '',
       mouseX: 0,
     };
-  },
-  computed: {
-    ...store.mapState(['columns', 'filters', 'dropdown']),
   },
   methods: {
     selectAll() {
@@ -109,10 +106,11 @@ export default {
       window.removeEventListener('mouseup', this.handlerUp);
     },
     openDropdown(i) {
-      this.$parent.openDropdown(i);
+      this.store.openDropdown(i, this.columnsStatusList);
     },
     isActive(th) {
-      if (this.filters.hasOwnProperty(th.key)) {
+      if (!th) return false;
+      if (this.store.filters.hasOwnProperty(th.key)) {
         return true;
       } if (th.sort) {
         return true;

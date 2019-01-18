@@ -13,7 +13,7 @@
       maxHeight="800"
       @selection-change="selectionChange"
       :disabled="disabled"
-      v-if="show"/>
+      v-if="show" />
     <!-- <excel :columns-data="columns" v-model="data2" style="width: 100%;" maxHeight="800"></excel> -->
   </div>
 </template>
@@ -36,7 +36,6 @@ export default {
       show: true,
       columns: [
         {
-          // key: 'selection',
           type: 'selection',
           width: 40,
           fixed: true,
@@ -125,7 +124,7 @@ export default {
     };
   },
   mounted() {
-    // this.getList();
+    this.getList();
   },
   methods: {
     getList() {

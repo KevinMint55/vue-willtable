@@ -4,26 +4,26 @@
       class="cell-editor"
       :style="cellEditorStyle"
       :class="{
-        'else': editor.editType != 'text' && editor.editType != 'number'
+        'else': store.editor.editType != 'text' && store.editor.editType != 'number'
       }"
       @dblclick="setEditing"
-      :title="editContent || editor.curEditorCoverValue"
-      v-show="editor.editorShow">
+      :title="editContent || store.editor.curEditorCoverValue"
+      v-show="store.editor.editorShow">
       <textarea
         ref="clipboard"
         class="clipboard"
         @paste="clipboardToContent">
       </textarea>
-      <div style="flex:1;" v-show="editor.editing">
-        <textarea v-model="editContent" ref="text" v-if="editor.editType == 'text'"></textarea>
+      <div style="flex:1;" v-show="store.editor.editing">
+        <textarea v-model="editContent" ref="text" v-if="store.editor.editType == 'text'"></textarea>
         <el-date-picker
           size="mini"
           v-model="editContent"
           value-format="yyyy-MM-dd"
           type="date"
-          :style="{width:`${editor.curEditorWidth > 140 ? editor.curEditorWidth : 140}px`}"
+          :style="{width:`${store.editor.curEditorWidth > 140 ? store.editor.curEditorWidth : 140}px`}"
           @blur="resetEditor"
-          v-else-if="editor.editType === 'date'"
+          v-else-if="store.editor.editType === 'date'"
           ref="date">
         </el-date-picker>
         <el-date-picker
@@ -31,22 +31,22 @@
           v-model="editContent"
           value-format="yyyy-MM"
           type="month"
-          :style="{width:`${editor.curEditorWidth > 140 ? editor.curEditorWidth : 140}px`}"
+          :style="{width:`${store.editor.curEditorWidth > 140 ? store.editor.curEditorWidth : 140}px`}"
           @blur="resetEditor"
-          v-else-if="editor.editType === 'month'"
+          v-else-if="store.editor.editType === 'month'"
           ref="month">
         </el-date-picker>
         <el-select
           size="mini"
           :automatic-dropdown="true"
           v-model="editContent"
-          :style="{width:`${editor.curEditorWidth}px`}"
-          v-else-if="editor.editType === 'select'"
+          :style="{width:`${store.editor.curEditorWidth}px`}"
+          v-else-if="store.editor.editType === 'select'"
           placeholder="请选择"
           clearable
           ref="select">
           <el-option
-            v-for="item in editor.options"
+            v-for="item in store.editor.options"
             :value="item.value"
             :key="item.value"
             :label="item.label">
@@ -54,7 +54,7 @@
         </el-select>
         <textarea
           v-model="editContent"
-          v-else-if="editor.editType === 'number'"
+          v-else-if="store.editor.editType === 'number'"
           ref="number"
           @input="limitNumber(editContent)"
           @paste="limitNumber(editContent)">
@@ -65,18 +65,18 @@
       class="autofill-handler"
       :style="autofillHandlerStyle"
       @mousedown="handleAutofill"
-      v-show="!editor.editing && editor.editorShow">
+      v-show="!store.editor.editing && store.editor.editorShow">
     </div>
   </div>
 </template>
 
 <script>
 import { DatePicker, Select, Option } from 'element-ui';
-import store from '../store';
 import clickoutside from '../directives/clickoutside';
 
 export default {
   directives: { clickoutside },
+  inject: ['store'],
   props: {
     tableScrollLeft: [String, Number],
     columnsWidth: {
@@ -98,42 +98,42 @@ export default {
   computed: {
     cellEditorStyle() {
       let left;
-      if (this.editor.editorIsFixed) {
-        left = this.tableScrollLeft + this.columnsWidth.filter((item, index) => index < this.editor.editorXIndex).reduce((sum, item) => sum + item, 0);
+      if (this.store.editor.editorIsFixed) {
+        left = this.tableScrollLeft + this.columnsWidth.filter((item, index) => index < this.store.editor.editorXIndex).reduce((sum, item) => sum + item, 0);
       } else {
-        left = this.columnsWidth.filter((item, index) => index < this.editor.editorXIndex).reduce((sum, item) => sum + item, 0);
+        left = this.columnsWidth.filter((item, index) => index < this.store.editor.editorXIndex).reduce((sum, item) => sum + item, 0);
       }
       return {
-        top: `${this.editor.editorYIndex * 28}px`,
+        top: `${this.store.editor.editorYIndex * 28}px`,
         left: `${left}px`,
-        width: `${this.columnsWidth[this.editor.editorXIndex]}px`,
-        'z-index': this.editor.editorIsFixed ? 4 : 1,
+        width: `${this.columnsWidth[this.store.editor.editorXIndex]}px`,
+        'z-index': this.store.editor.editorIsFixed ? 4 : 1,
       };
     },
     autofillHandlerStyle() {
       let left;
-      if (this.editor.editorIsFixed && this.selector.selectedYArr[0] === this.selector.selectedYArr[1]) {
-        left = this.tableScrollLeft + this.columnsWidth.filter((item, index) => index < this.autofill.autofillXIndex).reduce((sum, item) => sum + item, 0);
+      if (this.store.editor.editorIsFixed && this.store.selector.selectedYArr[0] === this.store.selector.selectedYArr[1]) {
+        left = this.tableScrollLeft + this.columnsWidth.filter((item, index) => index < this.store.autofill.autofillXIndex).reduce((sum, item) => sum + item, 0);
       } else {
-        left = this.columnsWidth.filter((item, index) => index < this.autofill.autofillXIndex).reduce((sum, item) => sum + item, 0);
+        left = this.columnsWidth.filter((item, index) => index < this.store.autofill.autofillXIndex).reduce((sum, item) => sum + item, 0);
       }
-      left = left + this.columnsWidth[this.autofill.autofillXIndex] - 5;
+      left = left + this.columnsWidth[this.store.autofill.autofillXIndex] - 5;
       return {
-        top: `${this.autofill.autofillYIndex * 28 + 24}px`,
+        top: `${this.store.autofill.autofillYIndex * 28 + 24}px`,
         left: `${left}px`,
-        'z-index': this.fixedCount > this.autofill.autofillXIndex ? 4 : 1,
+        'z-index': this.fixedCount > this.store.autofill.autofillXIndex ? 4 : 1,
       };
     },
-    ...store.mapState(['columns', 'editor', 'autofill', 'selector']),
   },
   watch: {
-    'editor.editing': {
+    'store.editor.editing': {
       handler(val) {
+        console.log('editing', val);
         if (!val) {
-          if (this.columns[this.editor.editorXIndex].type === 'number') {
+          if (this.store.columns[this.store.editor.editorXIndex].type === 'number') {
             this.limitNumber(this.editContent, true);
           }
-          store.getEditorContent(this.editContent);
+          this.store.getEditorContent(this.editContent);
           this.editContent = '';
         }
       },
@@ -163,10 +163,10 @@ export default {
       this.$parent.$parent.clipboardToContent(e);
     },
     handleAutofill() {
-      store.handleAutofill();
+      this.store.handleAutofill();
     },
     resetEditor() {
-      store.resetEditor();
+      this.store.resetEditor();
     },
   },
 };

@@ -7,24 +7,25 @@
     </colgroup>
     <tbody class="km-tbody">
       <tr
-        v-for="(tr, yIndex) in showData" :key="yIndex"
+        v-for="(tr, yIndex) in store.showData" :key="yIndex"
         :class="{
-          curRow: editor.editorShow && editor.editorYIndex == yIndex
+          curRow: store.editor.editorShow && store.editor.editorYIndex == yIndex
         }">
         <td
-          v-for="(th, xIndex) in columns"
+          v-for="(th, xIndex) in store.columns"
           :key="xIndex"
           :title="tr[th.key]"
           :style="styleObj(tr, th, yIndex, xIndex, columnsWidth)"
           :class="classObj(tr, th, yIndex, xIndex)"
           :data-key="th.key"
           @mouseenter="multiSelect($event, xIndex, yIndex, th.type)"
-          @mousedown="selectCell($event, xIndex, yIndex, th.type)" v-show="th.fixed || allShow">
+          @mousedown="selectCell($event, xIndex, yIndex, th.type)"
+          v-show="th.fixed || allShow">
           <el-checkbox
             size="mini"
             v-model="dataStatusList[yIndex].checked"
             @change="selectionChange"
-            v-if="th.type == 'selection'"></el-checkbox>
+            v-if="th.type === 'selection' && dataStatusList[yIndex]"></el-checkbox>
           <div
             class="cell-content"
             :style="{'max-width':  `${columnsWidth[xIndex]}px`}"
@@ -38,11 +39,11 @@
 
 <script>
 import { checkbox } from 'element-ui';
-import store from '../store';
 import clickoutside from '../directives/clickoutside';
 
 export default {
   directives: { clickoutside },
+  inject: ['store'],
   props: {
     allShow: Boolean,
     dataStatusList: {
@@ -69,15 +70,12 @@ export default {
     return {
     };
   },
-  computed: {
-    ...store.mapState(['columns', 'showData', 'editor', 'autofill', 'selector']),
-  },
   methods: {
     selectionChange() {
       this.$parent.selectionChange();
     },
     multiSelect(e, x, y, columnType) {
-      store.multiSelect(e, x, y, columnType);
+      this.store.multiSelect(e, x, y, columnType);
     },
     selectCell(e, x, y, type) {
       this.$parent.selectCell(e, x, y, type);
@@ -105,15 +103,15 @@ export default {
     classObj(row, column, rowIndex, columnIndex) {
       return {
         selected:
-          columnIndex <= this.selector.selectedXArr[1]
-          && columnIndex >= this.selector.selectedXArr[0]
-          && rowIndex <= this.selector.selectedYArr[1]
-          && rowIndex >= this.selector.selectedYArr[0],
+          columnIndex <= this.store.selector.selectedXArr[1]
+          && columnIndex >= this.store.selector.selectedXArr[0]
+          && rowIndex <= this.store.selector.selectedYArr[1]
+          && rowIndex >= this.store.selector.selectedYArr[0],
         autofill:
-          columnIndex <= this.selector.selectedXArr[1]
-          && columnIndex >= this.selector.selectedXArr[0]
-          && rowIndex <= this.autofill.autofillYArr[1]
-          && rowIndex >= this.autofill.autofillYArr[0],
+          columnIndex <= this.store.selector.selectedXArr[1]
+          && columnIndex >= this.store.selector.selectedXArr[0]
+          && rowIndex <= this.store.autofill.autofillYArr[1]
+          && rowIndex >= this.store.autofill.autofillYArr[0],
         disabled: column.type === 'disabled',
         error: !this.verify(column, row[column.key], rowIndex),
         ...this.cellClassName({

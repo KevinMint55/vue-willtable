@@ -1,6 +1,6 @@
 <template>
   <div class="dropdown-wrapper"
-    :class="{active:parseInt(dropdown.index) >= 0}"
+    :class="{active:parseInt(store.dropdown.index) >= 0}"
     :style="{
       'top': `${$parent.$refs.wrapper.offsetTop + 30}px`,
       'left': left
@@ -8,13 +8,13 @@
     ref="dropdown"
     v-clickoutside="openDropdown">
     <div class="sort">
-      <span :class="{active: dropdown.sort == 'ascending'}" @click="sort('ascending')">升序</span>
-      <span :class="{active: dropdown.sort == 'descending'}" @click="sort('descending')">降序</span>
+      <span :class="{active: store.dropdown.sort == 'ascending'}" @click="sort('ascending')">升序</span>
+      <span :class="{active: store.dropdown.sort == 'descending'}" @click="sort('descending')">降序</span>
     </div>
     <div class="filter">
       <div class="title">名称<span>（计数）</span></div>
       <ul class="content">
-        <li v-for="(item, key) in dropdown.list" :key="key">
+        <li v-for="(item, key) in store.dropdown.list" :key="key">
           <el-checkbox
             size="mini"
             v-model="item.checked"></el-checkbox>
@@ -34,11 +34,11 @@
 
 <script>
 import { checkbox } from 'element-ui';
-import store from '../store';
 import clickoutside from '../directives/clickoutside';
 
 export default {
   directives: { clickoutside },
+  inject: ['store'],
   props: {
     tableScrollLeft: [String, Number],
     columnsWidth: {
@@ -62,8 +62,8 @@ export default {
   computed: {
     filterBtnStyle() {
       let haveChecked = false;
-      Object.keys(this.dropdown.list).forEach((key) => {
-        if (this.dropdown.list[key].checked) {
+      Object.keys(this.store.dropdown.list).forEach((key) => {
+        if (this.store.dropdown.list[key].checked) {
           haveChecked = true;
         }
       });
@@ -75,17 +75,16 @@ export default {
       }
       return {};
     },
-    ...store.mapState(['dropdown']),
   },
   watch: {
-    'dropdown.index': {
+    'store.dropdown.index': {
       handler(val) {
         if (!val) return;
         let left;
-        if (this.dropdown.index < this.fixedCount) {
-          left = this.tableScrollLeft + this.columnsWidth.filter((item, index) => index <= this.dropdown.index).reduce((sum, item) => sum + item, 0);
+        if (this.store.dropdown.index < this.fixedCount) {
+          left = this.tableScrollLeft + this.columnsWidth.filter((item, index) => index <= this.store.dropdown.index).reduce((sum, item) => sum + item, 0);
         } else {
-          left = this.columnsWidth.filter((item, index) => index <= this.dropdown.index).reduce((sum, item) => sum + item, 0);
+          left = this.columnsWidth.filter((item, index) => index <= this.store.dropdown.index).reduce((sum, item) => sum + item, 0);
         }
         this.$nextTick(() => {
           left = left - this.$refs.dropdown.offsetWidth + this.$parent.$refs.wrapper.offsetLeft - this.tableScrollLeft;
@@ -99,15 +98,15 @@ export default {
   },
   methods: {
     openDropdown() {
-      this.$parent.openDropdown();
+      this.store.openDropdown();
     },
     sort(type) {
       this.$parent.sort(type);
     },
     handleFilter() {
       let haveChecked = false;
-      Object.keys(this.dropdown.list).forEach((key) => {
-        if (this.dropdown.list[key].checked) {
+      Object.keys(this.store.dropdown.list).forEach((key) => {
+        if (this.store.dropdown.list[key].checked) {
           haveChecked = true;
         }
       });

@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-export default new Vue({
+export default () => new Vue({
   data() {
     return {
       columns: [],
@@ -47,13 +47,6 @@ export default new Vue({
     };
   },
   methods: {
-    mapState(states) {
-      const res = {};
-      states.forEach((key) => {
-        res[key] = () => this[key];
-      });
-      return res;
-    },
     // 编辑器
     getEditorContent(editContent) {
       this.showData[this.editor.editorYIndex][this.columns[this.editor.editorXIndex].key] = editContent;
@@ -126,6 +119,23 @@ export default new Vue({
         } else {
           this.autofill.autofillYArr = [];
         }
+      }
+    },
+    // 下拉
+    openDropdown(i, columnsStatusList) {
+      console.log(i, columnsStatusList);
+      if (typeof (i) === 'number') {
+        if (this.dropdown.index === i) {
+          this.dropdown.index = null;
+        } else {
+          this.dropdown.index = i;
+          this.dropdown = JSON.parse(JSON.stringify({
+            ...columnsStatusList[this.dropdown.index],
+            index: this.dropdown.index,
+          }));
+        }
+      } else {
+        this.dropdown.index = null;
       }
     },
   },
