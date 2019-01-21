@@ -1,8 +1,6 @@
-import Vue from 'vue';
-
-export default () => new Vue({
-  data() {
-    return {
+class TableStore {
+  constructor() {
+    this.states = {
       columns: [],
       showData: [],
 
@@ -38,6 +36,7 @@ export default () => new Vue({
       },
 
       filters: {},
+
       dropdown: {
         index: null,
         list: {},
@@ -45,98 +44,108 @@ export default () => new Vue({
         sort: '',
       },
     };
-  },
-  methods: {
-    // 编辑器
-    getEditorContent(editContent) {
-      this.showData[this.editor.editorYIndex][this.columns[this.editor.editorXIndex].key] = editContent;
-    },
-    resetEditor() {
-      this.editor.editing = false;
-      this.editor.editType = 'text';
-    },
-    // 自动填充
-    handleAutofill() {
-      this.autofill.isAutofill = true;
-      window.addEventListener('mouseup', this.autofillUp);
-    },
-    autofillUp() {
-      if (this.autofill.autofillYArr[1] > this.selector.selectedYArr[1]) {
-        for (let i = 0; i <= this.autofill.autofillYArr[1] - this.autofill.autofillYArr[0]; i += 1) {
-          for (let j = 0; j <= this.selector.selectedXArr[1] - this.selector.selectedXArr[0]; j += 1) {
-            if (this.columns[j + this.selector.selectedXArr[0]].type !== 'disabled') {
-              this.showData[i + this.autofill.autofillYArr[0]][this.columns[j + this.selector.selectedXArr[0]].key] = this.showData[this.selector.selectedYArr[1]][this.columns[j + this.selector.selectedXArr[0]].key];
-            }
+  }
+
+  // 编辑器
+  getEditorContent(editContent) {
+    const { states } = this;
+    states.showData[states.editor.editorYIndex][states.columns[states.editor.editorXIndex].key] = editContent;
+  }
+
+  resetEditor() {
+    const { states } = this;
+    states.editor.editing = false;
+    states.editor.editType = 'text';
+  }
+
+  // 自动填充
+  handleAutofill() {
+    const { states } = this;
+    states.autofill.isAutofill = true;
+    window.addEventListener('mouseup', states.autofillUp);
+  }
+
+  autofillUp() {
+    const { states } = this;
+    if (states.autofill.autofillYArr[1] > states.selector.selectedYArr[1]) {
+      for (let i = 0; i <= states.autofill.autofillYArr[1] - states.autofill.autofillYArr[0]; i += 1) {
+        for (let j = 0; j <= states.selector.selectedXArr[1] - states.selector.selectedXArr[0]; j += 1) {
+          if (states.columns[j + states.selector.selectedXArr[0]].type !== 'disabled') {
+            states.showData[i + states.autofill.autofillYArr[0]][states.columns[j + states.selector.selectedXArr[0]].key] = states.showData[states.selector.selectedYArr[1]][states.columns[j + states.selector.selectedXArr[0]].key];
           }
         }
-        this.selector.selectedYArr.splice(1, 1, this.autofill.autofillYArr[1]);
-        const autofillYIndex = this.autofill.autofillYArr[1];
-        this.autofill.autofillYIndex = autofillYIndex;
       }
-      if (this.autofill.autofillYArr[0] < this.selector.selectedYArr[0]) {
-        for (let i = 0; i <= this.autofill.autofillYArr[1] - this.autofill.autofillYArr[0]; i += 1) {
-          for (let j = 0; j <= this.selector.selectedXArr[1] - this.selector.selectedXArr[0]; j += 1) {
-            if (this.columns[j + this.selector.selectedXArr[0]].type !== 'disabled') {
-              this.showData[i + this.autofill.autofillYArr[0]][this.columns[j + this.selector.selectedXArr[0]].key] = this.showData[this.selector.selectedYArr[0]][this.columns[j + this.selector.selectedXArr[0]].key];
-            }
+      states.selector.selectedYArr.splice(1, 1, states.autofill.autofillYArr[1]);
+      const autofillYIndex = states.autofill.autofillYArr[1];
+      states.autofill.autofillYIndex = autofillYIndex;
+    }
+    if (states.autofill.autofillYArr[0] < states.selector.selectedYArr[0]) {
+      for (let i = 0; i <= states.autofill.autofillYArr[1] - states.autofill.autofillYArr[0]; i += 1) {
+        for (let j = 0; j <= states.selector.selectedXArr[1] - states.selector.selectedXArr[0]; j += 1) {
+          if (states.columns[j + states.selector.selectedXArr[0]].type !== 'disabled') {
+            states.showData[i + states.autofill.autofillYArr[0]][states.columns[j + states.selector.selectedXArr[0]].key] = states.showData[states.selector.selectedYArr[0]][states.columns[j + states.selector.selectedXArr[0]].key];
           }
         }
-        this.selector.selectedYArr.splice(0, 1, this.autofill.autofillYArr[0]);
       }
-      setTimeout(() => {
-        this.autofill.autofillYArr = [];
-        this.autofill.isAutofill = false;
-      }, 0);
-    },
-    // 选择器
-    multiSelect(e, x, y, columnType) {
-      if (columnType === 'selection') return;
-      if (this.selector.isSelected) {
-        this.autofill.autofillXIndex = x > this.editor.editorXIndex ? x : this.editor.editorXIndex;
-        this.autofill.autofillYIndex = y > this.editor.editorYIndex ? y : this.editor.editorYIndex;
-        this.selector.selectedXIndex = x;
-        this.selector.selectedYIndex = y;
-        if (this.selector.selectedXIndex > this.editor.editorXIndex) {
-          this.selector.selectedXArr.splice(0, 1, this.editor.editorXIndex);
-          this.selector.selectedXArr.splice(1, 1, this.selector.selectedXIndex);
-        } else {
-          this.selector.selectedXArr.splice(0, 1, this.selector.selectedXIndex);
-          this.selector.selectedXArr.splice(1, 1, this.editor.editorXIndex);
-        }
-        if (this.selector.selectedYIndex > this.editor.editorYIndex) {
-          this.selector.selectedYArr.splice(0, 1, this.editor.editorYIndex);
-          this.selector.selectedYArr.splice(1, 1, this.selector.selectedYIndex);
-        } else {
-          this.selector.selectedYArr.splice(0, 1, this.selector.selectedYIndex);
-          this.selector.selectedYArr.splice(1, 1, this.editor.editorYIndex);
-        }
-      }
-      if (this.autofill.isAutofill) {
-        if (y > this.selector.selectedYArr[1]) {
-          this.autofill.autofillYArr = [this.selector.selectedYArr[1] + 1, y];
-        } else if (y < this.selector.selectedYArr[0]) {
-          this.autofill.autofillYArr = [y, this.selector.selectedYArr[0] - 1];
-        } else {
-          this.autofill.autofillYArr = [];
-        }
-      }
-    },
-    // 下拉
-    openDropdown(i, columnsStatusList) {
-      console.log(i, columnsStatusList);
-      if (typeof (i) === 'number') {
-        if (this.dropdown.index === i) {
-          this.dropdown.index = null;
-        } else {
-          this.dropdown.index = i;
-          this.dropdown = JSON.parse(JSON.stringify({
-            ...columnsStatusList[this.dropdown.index],
-            index: this.dropdown.index,
-          }));
-        }
+      states.selector.selectedYArr.splice(0, 1, states.autofill.autofillYArr[0]);
+    }
+    setTimeout(() => {
+      states.autofill.autofillYArr = [];
+      states.autofill.isAutofill = false;
+    }, 0);
+  }
+
+  // 选择器
+  multiSelect(e, x, y, columnType) {
+    const { states } = this;
+    if (columnType === 'selection') return;
+    if (states.selector.isSelected) {
+      states.autofill.autofillXIndex = x > states.editor.editorXIndex ? x : states.editor.editorXIndex;
+      states.autofill.autofillYIndex = y > states.editor.editorYIndex ? y : states.editor.editorYIndex;
+      states.selector.selectedXIndex = x;
+      states.selector.selectedYIndex = y;
+      if (states.selector.selectedXIndex > states.editor.editorXIndex) {
+        states.selector.selectedXArr.splice(0, 1, states.editor.editorXIndex);
+        states.selector.selectedXArr.splice(1, 1, states.selector.selectedXIndex);
       } else {
-        this.dropdown.index = null;
+        states.selector.selectedXArr.splice(0, 1, states.selector.selectedXIndex);
+        states.selector.selectedXArr.splice(1, 1, states.editor.editorXIndex);
       }
-    },
-  },
-});
+      if (states.selector.selectedYIndex > states.editor.editorYIndex) {
+        states.selector.selectedYArr.splice(0, 1, states.editor.editorYIndex);
+        states.selector.selectedYArr.splice(1, 1, states.selector.selectedYIndex);
+      } else {
+        states.selector.selectedYArr.splice(0, 1, states.selector.selectedYIndex);
+        states.selector.selectedYArr.splice(1, 1, states.editor.editorYIndex);
+      }
+    }
+    if (states.autofill.isAutofill) {
+      if (y > states.selector.selectedYArr[1]) {
+        states.autofill.autofillYArr = [states.selector.selectedYArr[1] + 1, y];
+      } else if (y < states.selector.selectedYArr[0]) {
+        states.autofill.autofillYArr = [y, states.selector.selectedYArr[0] - 1];
+      } else {
+        states.autofill.autofillYArr = [];
+      }
+    }
+  }
+
+  openDropdown(i, columnsStatusList) {
+    const { states } = this;
+    if (typeof (i) === 'number') {
+      if (states.dropdown.index === i) {
+        states.dropdown.index = null;
+      } else {
+        states.dropdown.index = i;
+        states.dropdown = JSON.parse(JSON.stringify({
+          ...columnsStatusList[states.dropdown.index],
+          index: states.dropdown.index,
+        }));
+      }
+    } else {
+      states.dropdown.index = null;
+    }
+  }
+}
+
+export default TableStore;

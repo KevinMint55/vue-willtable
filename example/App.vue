@@ -13,6 +13,7 @@
       maxHeight="800"
       @selection-change="selectionChange"
       :disabled="disabled"
+      :cellStyle="cellStyle"
       v-if="show" />
     <!-- <excel :columns-data="columns" v-model="data2" style="width: 100%;" maxHeight="800"></excel> -->
   </div>
@@ -154,6 +155,18 @@ export default {
     },
     getChangeData() {
       console.log(this.$refs.excel.getChangeData());
+    },
+    cellStyle({ rowIndex, columnIndex }) {
+      if (rowIndex === 1) {
+        return {
+          color: 'red',
+        };
+      }
+      if (columnIndex === 5) {
+        return {
+          color: 'green',
+        };
+      }
     },
   },
 };

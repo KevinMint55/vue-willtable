@@ -8,7 +8,7 @@
     <thead class="km-thead">
       <tr ref="tr">
         <th
-          v-for="(th, index) in store.columns"
+          v-for="(th, index) in columns"
           :key="index"
           :style="{
               width: `${columnsWidth[index]}px`,
@@ -30,7 +30,7 @@
             <span class="icon" :class="iconClass(th.type)" v-if="showIcon"></span>
             <span class="content">{{ th.title }}</span>
           </p>
-          <div class="dropdown" v-if="th.type != 'selection'" :class="{active: store.dropdown.index === index}">
+          <div class="dropdown" v-if="th.type != 'selection'" :class="{active: dropdown.index === index}">
             <i @click.stop="openDropdown(index)" v-if="th.action"></i>
           </div>
           <div class="handler" @mousedown="handlerDown(index)" v-if="th.type != 'selection'"></div>
@@ -46,7 +46,6 @@ import clickoutside from '../directives/clickoutside';
 
 export default {
   directives: { clickoutside },
-  inject: ['store'],
   components: {
     'el-checkbox': checkbox,
   },
@@ -66,6 +65,9 @@ export default {
     },
     fixedCount: [String, Number],
     tableScrollLeft: [String, Number],
+    store: {
+      required: true,
+    },
   },
   data() {
     return {
@@ -75,6 +77,17 @@ export default {
       adjustWidthType: '',
       mouseX: 0,
     };
+  },
+  computed: {
+    columns() {
+      return this.store.states.columns;
+    },
+    dropdown() {
+      return this.store.states.dropdown;
+    },
+    filters() {
+      return this.store.states.filters;
+    },
   },
   methods: {
     selectAll() {
@@ -110,7 +123,7 @@ export default {
     },
     isActive(th) {
       if (!th) return false;
-      if (this.store.filters.hasOwnProperty(th.key)) {
+      if (this.filters.hasOwnProperty(th.key)) {
         return true;
       } if (th.sort) {
         return true;

@@ -7,12 +7,12 @@
     </colgroup>
     <tbody class="km-tbody">
       <tr
-        v-for="(tr, yIndex) in store.showData" :key="yIndex"
+        v-for="(tr, yIndex) in showData" :key="yIndex"
         :class="{
-          curRow: store.editor.editorShow && store.editor.editorYIndex == yIndex
+          curRow: editor.editorShow && editor.editorYIndex == yIndex
         }">
         <td
-          v-for="(th, xIndex) in store.columns"
+          v-for="(th, xIndex) in columns"
           :key="xIndex"
           :title="tr[th.key]"
           :style="styleObj(tr, th, yIndex, xIndex, columnsWidth)"
@@ -43,7 +43,6 @@ import clickoutside from '../directives/clickoutside';
 
 export default {
   directives: { clickoutside },
-  inject: ['store'],
   props: {
     allShow: Boolean,
     dataStatusList: {
@@ -62,6 +61,9 @@ export default {
       type: [Object, Function],
       default: () => () => {},
     },
+    store: {
+      required: true,
+    },
   },
   components: {
     'el-checkbox': checkbox,
@@ -69,6 +71,23 @@ export default {
   data() {
     return {
     };
+  },
+  computed: {
+    columns() {
+      return this.store.states.columns;
+    },
+    showData() {
+      return this.store.states.showData;
+    },
+    editor() {
+      return this.store.states.editor;
+    },
+    selector() {
+      return this.store.states.selector;
+    },
+    autofill() {
+      return this.store.states.autofill;
+    },
   },
   methods: {
     selectionChange() {
@@ -103,15 +122,15 @@ export default {
     classObj(row, column, rowIndex, columnIndex) {
       return {
         selected:
-          columnIndex <= this.store.selector.selectedXArr[1]
-          && columnIndex >= this.store.selector.selectedXArr[0]
-          && rowIndex <= this.store.selector.selectedYArr[1]
-          && rowIndex >= this.store.selector.selectedYArr[0],
+          columnIndex <= this.selector.selectedXArr[1]
+          && columnIndex >= this.selector.selectedXArr[0]
+          && rowIndex <= this.selector.selectedYArr[1]
+          && rowIndex >= this.selector.selectedYArr[0],
         autofill:
-          columnIndex <= this.store.selector.selectedXArr[1]
-          && columnIndex >= this.store.selector.selectedXArr[0]
-          && rowIndex <= this.store.autofill.autofillYArr[1]
-          && rowIndex >= this.store.autofill.autofillYArr[0],
+          columnIndex <= this.selector.selectedXArr[1]
+          && columnIndex >= this.selector.selectedXArr[0]
+          && rowIndex <= this.autofill.autofillYArr[1]
+          && rowIndex >= this.autofill.autofillYArr[0],
         disabled: column.type === 'disabled',
         error: !this.verify(column, row[column.key], rowIndex),
         ...this.cellClassName({
