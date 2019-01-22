@@ -62,7 +62,7 @@ class TableStore {
   handleAutofill() {
     const { states } = this;
     states.autofill.isAutofill = true;
-    window.addEventListener('mouseup', states.autofillUp);
+    window.addEventListener('mouseup', this.autofillUp.bind(this));
   }
 
   autofillUp() {
