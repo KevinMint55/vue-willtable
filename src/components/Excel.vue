@@ -219,6 +219,7 @@ export default {
         this.tableScrollLeft = this.$refs.tbody.scrollLeft;
         this.tableScrollTop = this.$refs.tbody.scrollTop;
       });
+      this.store.handleIsMac();
       this.initColumns();
       this.handleResize();
     },
@@ -560,8 +561,12 @@ export default {
       this.$nextTick(() => {
         const arr = [];
         e.target.value.split('\n').forEach((item, index, curArr) => {
-          if (index < curArr.length - 1) {
+          if (this.store.states.isMac) {
             arr.push(item.split('\t'));
+          } else {
+            if (index < curArr.length - 1) {
+              arr.push(item.split('\t'));
+            }
           }
         });
         for (let i = 0; i <= arr.length - 1; i += 1) {

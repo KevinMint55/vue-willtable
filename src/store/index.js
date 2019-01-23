@@ -43,7 +43,16 @@ class TableStore {
         key: '',
         sort: '',
       },
+
+      isMac: false,
     };
+  }
+
+  // 判断是否是mac
+  handleIsMac() {
+    if (/macintosh|mac os x/i.test(navigator.userAgent)) {
+      this.states.isMac = true;
+    }
   }
 
   // 编辑器
