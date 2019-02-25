@@ -1,5 +1,5 @@
 <template>
-  <div ref="excel">
+  <div class="km-excel" ref="excel">
     <div
       v-if="store.states.columns.length > 0"
       ref="wrapper"
@@ -78,6 +78,7 @@
       :fixedCount="fixedCount"
       :store="store"
     ></dropdown>
+    <div class="adjustLine" :style="{ left: `${store.states.adjustLineLeft}px` }" v-show="store.states.adjustLineShow"></div>
   </div>
 </template>
 
@@ -87,6 +88,7 @@ import '../style/reset.scss';
 import clickoutside from '../directives/clickoutside';
 import methods from '../mixins/methods';
 import events from '../mixins/events';
+import utils from '../mixins/utils';
 import TableHeader from './ExcelHeader.vue';
 import TableBody from './ExcelBody.vue';
 import Editor from './ExcelEditor.vue';
@@ -165,6 +167,9 @@ export default {
       isOperation: false,
 
       excelPos: {},
+
+      tKeydown: null,
+      tMousemove: null,
     };
   },
   watch: {
@@ -207,18 +212,19 @@ export default {
   mounted() {
     this.init();
   },
-  mixins: [methods, events],
+  mixins: [methods, events, utils],
   methods: {
     init() {
       if (this.value.length > 0) {
         this.data = this.value;
       }
-      this.$refs.tbody.addEventListener('scroll', () => {
+      const scrollSync = () => {
         this.$refs.theader.scrollLeft = this.$refs.tbody.scrollLeft;
         this.$refs.fixedTbody.scrollTop = this.$refs.tbody.scrollTop;
         this.tableScrollLeft = this.$refs.tbody.scrollLeft;
         this.tableScrollTop = this.$refs.tbody.scrollTop;
-      });
+      };
+      this.$refs.tbody.addEventListener('scroll', this.debounce(scrollSync, 50));
       this.store.handleIsMac();
       this.initColumns();
       this.handleResize();
@@ -419,15 +425,21 @@ export default {
       this.store.states.editor.editorShow = false;
       this.store.states.selector.selectedXArr = [];
       this.store.states.selector.selectedYArr = [];
-      window.removeEventListener('keydown', this.keySubmit);
-      window.removeEventListener('mousemove', this.multiSelectAdjustPostion);
+      window.removeEventListener('keydown', this.tKeydown);
+      window.removeEventListener('mousemove', this.tMousemove);
+      this.tKeydown = null;
+      this.tMousemove = null;
     },
     // 选择单元格
     selectCell(e, x, y, type) {
       if (this.disabled) return;
       if (e.button !== 0) return;
-      window.addEventListener('keydown', this.keySubmit);
-      window.addEventListener('mousemove', this.multiSelectAdjustPostion);
+      if (!this.tKeydown && !this.tMousemove) {
+        this.tKeydown = this.throttle(this.keySubmit, 16);
+        this.tMousemove = this.throttle(this.multiSelectAdjustPostion, 16, true);
+        window.addEventListener('keydown', this.tKeydown);
+        window.addEventListener('mousemove', this.tMousemove);
+      }
       if (type === 'selection') return;
       this.store.states.editor.editing = false;
       this.store.states.editor.editType = 'text';
@@ -450,7 +462,7 @@ export default {
         });
       });
       this.store.states.selector.isSelected = true;
-      this.timer = setInterval(this.multiSelectAdjustPostion, 10);
+      this.timer = setInterval(this.multiSelectAdjustPostion, 20);
       window.addEventListener('mouseup', this.selectUp);
     },
     keySubmit(e) {
@@ -732,6 +744,9 @@ export default {
     adjustWidth(index, width) {
       this.store.states.columns[index].width = width;
       this.handleResize();
+      this.$nextTick(() => {
+        this.handleFilters();
+      });
     },
     sort(type) {
       this.columnsStatusList.forEach((item) => {
@@ -795,6 +810,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.km-excel {
+  position: relative;
+}
+
 div,
 section,
 ul {
@@ -926,5 +945,15 @@ ul {
 
 .el-checkbox {
   font-size: 12px;
+}
+
+.adjustLine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 100%;
+  background-color: #d6dfe4;
+  z-index: 10;
 }
 </style>

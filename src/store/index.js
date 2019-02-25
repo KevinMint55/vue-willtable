@@ -45,6 +45,9 @@ class TableStore {
       },
 
       isMac: false,
+
+      adjustLineLeft: 0,
+      adjustLineShow: false,
     };
   }
 

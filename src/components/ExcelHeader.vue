@@ -43,6 +43,7 @@
 <script>
 import { checkbox } from 'element-ui';
 import clickoutside from '../directives/clickoutside';
+import utils from '../mixins/utils';
 
 export default {
   directives: { clickoutside },
@@ -72,10 +73,12 @@ export default {
   data() {
     return {
       checkedAll: false,
+      adjustWidthValue: 80,
       adjustWidthFlag: false,
       adjustWidthIndex: 0,
       adjustWidthType: '',
       mouseX: 0,
+      tMousemove: null,
     };
   },
   computed: {
@@ -89,6 +92,7 @@ export default {
       return this.store.states.filters;
     },
   },
+  mixins: [utils],
   methods: {
     selectAll() {
       this.$parent.selectAll();
@@ -96,7 +100,9 @@ export default {
     handlerDown(index) {
       this.adjustWidthFlag = true;
       this.adjustWidthIndex = index;
-      window.addEventListener('mousemove', this.handlerMove);
+      this.store.states.adjustLineShow = true;
+      this.tMousemove = this.throttle(this.handlerMove, 16);
+      window.addEventListener('mousemove', this.tMousemove);
       window.addEventListener('mouseup', this.handlerUp);
     },
     handlerMove(e) {
@@ -109,13 +115,16 @@ export default {
           width = e.pageX + this.tableScrollLeft - this.$parent.excelPos.left - this.$refs.tr.children[this.adjustWidthIndex].offsetLeft;
         }
         if (width >= 80) {
-          this.$parent.adjustWidth(this.adjustWidthIndex, width);
+          this.adjustWidthValue = width;
+          this.store.states.adjustLineLeft = e.pageX - this.$parent.excelPos.left;
         }
       }
     },
     handlerUp() {
+      this.$parent.adjustWidth(this.adjustWidthIndex, this.adjustWidthValue);
       this.adjustWidthFlag = false;
-      window.removeEventListener('mousemove', this.handlerMove);
+      this.store.states.adjustLineShow = false;
+      window.removeEventListener('mousemove', this.tMousemove);
       window.removeEventListener('mouseup', this.handlerUp);
     },
     openDropdown(i) {
@@ -200,18 +209,6 @@ export default {
     height: 30px;
     cursor: ew-resize;
     text-align: center;
-    &:hover {
-      &:after {
-        background-color: #b7d5ec;
-      }
-    }
-    &:after {
-      content: "";
-      display: inline-block;
-      width: 4px;
-      height: 30px;
-      transition: all 0.3s;
-    }
   }
 }
 

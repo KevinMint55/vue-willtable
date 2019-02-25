@@ -14,6 +14,7 @@
       @selection-change="selectionChange"
       :disabled="disabled"
       :cellStyle="cellStyle"
+      :showIcon="true"
       v-if="show" />
     <!-- <excel :columns-data="columns" v-model="data2" style="width: 100%;" maxHeight="800"></excel> -->
   </div>

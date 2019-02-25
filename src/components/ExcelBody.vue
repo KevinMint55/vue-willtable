@@ -40,6 +40,7 @@
 <script>
 import { checkbox } from 'element-ui';
 import clickoutside from '../directives/clickoutside';
+import utils from '../mixins/utils';
 
 export default {
   directives: { clickoutside },
@@ -89,12 +90,13 @@ export default {
       return this.store.states.autofill;
     },
   },
+  mixins: [utils],
   methods: {
     selectionChange() {
       this.$parent.selectionChange();
     },
     multiSelect(e, x, y, columnType) {
-      this.store.multiSelect(e, x, y, columnType);
+      this.throttle(this.store.multiSelect(e, x, y, columnType), 50, true);
     },
     selectCell(e, x, y, type) {
       this.$parent.selectCell(e, x, y, type);
