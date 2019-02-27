@@ -13,7 +13,6 @@
           :showIcon="showIcon"
           :columnsWidth="columnsWidth"
           :columnsStatusList="columnsStatusList"
-          :tableScrollLeft="tableScrollLeft"
           :fixedCount="fixedCount"
           :all-show="true"
           :store="store" />
@@ -30,7 +29,6 @@
           <!-- 编辑器 -->
           <editor
             ref="editor"
-            :tableScrollLeft="tableScrollLeft"
             :columnsWidth="columnsWidth"
             :fixedCount="fixedCount"
             :store="store" />
@@ -48,7 +46,6 @@
             :columnsWidth="columnsWidth"
             :columnsStatusList="columnsStatusList"
             :fixedCount="fixedCount"
-            :tableScrollLeft="tableScrollLeft"
             :store="store" />
         </div>
         <div ref="fixedTbody" class="km-table-fixed-body">
@@ -72,8 +69,6 @@
       暂无表头
     </div>
     <dropdown
-      :tableScrollLeft="tableScrollLeft"
-      :tableScrollTop="tableScrollTop"
       :columnsWidth="columnsWidth"
       :fixedCount="fixedCount"
       :store="store"
@@ -148,9 +143,6 @@ export default {
       changeData: [],
       columnsStatusList: [],
       dataStatusList: [],
-
-      tableScrollLeft: 0,
-      tableScrollTop: 0,
       scrollLeftArr: [],
       scrollTopArr: [],
       fixedCount: 0,
@@ -170,6 +162,8 @@ export default {
 
       tKeydown: null,
       tMousemove: null,
+      tableScrollLeft: 0,
+      tableScrollTop: 0,
     };
   },
   watch: {
@@ -195,12 +189,6 @@ export default {
       },
       deep: true,
     },
-    tableScrollLeft() {
-      this.store.states.dropdown.index = null;
-    },
-    tableScrollTop() {
-      this.store.states.dropdown.index = null;
-    },
     columns: {
       handler() {
         this.initColumns();
@@ -218,13 +206,13 @@ export default {
       if (this.value.length > 0) {
         this.data = this.value;
       }
-      const scrollSync = () => {
+      this.$refs.tbody.addEventListener('scroll', () => {
         this.$refs.theader.scrollLeft = this.$refs.tbody.scrollLeft;
         this.$refs.fixedTbody.scrollTop = this.$refs.tbody.scrollTop;
-        this.tableScrollLeft = this.$refs.tbody.scrollLeft;
-        this.tableScrollTop = this.$refs.tbody.scrollTop;
-      };
-      this.$refs.tbody.addEventListener('scroll', this.debounce(scrollSync, 50));
+        this.store.states.dropdown.index = null;
+        this.store.states.dropdown.index = null;
+      });
+      this.store.setTableBody(this.$refs.tbody);
       this.store.handleIsMac();
       this.initColumns();
       this.handleResize();
@@ -660,11 +648,11 @@ export default {
         curRightShould = scrollLeftArr[this.store.states.editor.editorXIndex + 1] - this.wrapperWidth + scrollBarWidth + 2;
       }
       if (this.tableWidth > this.wrapperWidth) {
-        if (this.tableScrollLeft > curLeftShould) {
+        if (this.store.states.tableBody.scrollLeft > curLeftShould) {
           this.$refs.theader.scrollLeft = curLeftShould;
           this.$refs.tbody.scrollLeft = curLeftShould;
         }
-        if (this.tableScrollLeft < curRightShould) {
+        if (this.store.states.tableBody.scrollLeft < curRightShould) {
           this.$refs.theader.scrollLeft = curRightShould + 2;
           this.$refs.tbody.scrollLeft = curRightShould + 2;
         }
@@ -672,12 +660,12 @@ export default {
       // 上下调整
       if (this.maxHeight) {
         const curTopShould = this.scrollTopArr[this.store.states.editor.editorYIndex];
-        if (this.tableScrollTop > curTopShould) {
+        if (this.store.states.tableBody.scrollTop > curTopShould) {
           this.$refs.tbody.scrollTop = curTopShould;
           this.$refs.fixedTbody.scrollTop = curTopShould;
         }
         const curBottomShould = this.scrollTopArr[this.store.states.editor.editorYIndex + 1] - this.maxHeight + scrollBarWidth + 2;
-        if (this.tableScrollTop < curBottomShould) {
+        if (this.store.states.tableBody.scrollTop < curBottomShould) {
           this.$refs.tbody.scrollTop = curBottomShould;
           this.$refs.fixedTbody.scrollTop = curBottomShould;
         }

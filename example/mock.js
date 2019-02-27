@@ -2,7 +2,7 @@ import Mock from 'mockjs';
 
 Mock.mock('https://demo.kevinmint.com/1.json', 'get', {
   // 属性 list 的值是一个数组，其中含有 1 到 3 个元素
-  'list|200': [{
+  'list|1000': [{
     // 属性 sid 是一个自增数，起始值为 1，每次增 1
     'sid|+1': 1,
     // 属性 userId 是一个5位的随机码

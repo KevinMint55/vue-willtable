@@ -39,7 +39,6 @@ import clickoutside from '../directives/clickoutside';
 export default {
   directives: { clickoutside },
   props: {
-    tableScrollLeft: [String, Number],
     columnsWidth: {
       type: Array,
       default: () => [],
@@ -87,12 +86,12 @@ export default {
         if (!val) return;
         let left;
         if (this.dropdown.index < this.fixedCount) {
-          left = this.tableScrollLeft + this.columnsWidth.filter((item, index) => index <= this.dropdown.index).reduce((sum, item) => sum + item, 0);
+          left = this.store.states.tableBody.scrollLeft + this.columnsWidth.filter((item, index) => index <= this.dropdown.index).reduce((sum, item) => sum + item, 0);
         } else {
           left = this.columnsWidth.filter((item, index) => index <= this.dropdown.index).reduce((sum, item) => sum + item, 0);
         }
         this.$nextTick(() => {
-          left = left - this.$refs.dropdown.offsetWidth + this.$parent.$refs.wrapper.offsetLeft - this.tableScrollLeft;
+          left = left - this.$refs.dropdown.offsetWidth + this.$parent.$refs.wrapper.offsetLeft - this.store.states.tableBody.scrollLeft;
           if (left < this.$parent.$refs.wrapper.offsetLeft) {
             left = this.$parent.$refs.wrapper.offsetLeft;
           }

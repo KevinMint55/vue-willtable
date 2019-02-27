@@ -1,6 +1,7 @@
 class TableStore {
   constructor() {
     this.states = {
+      tableBody: null,
       columns: [],
       showData: [],
 
@@ -49,6 +50,10 @@ class TableStore {
       adjustLineLeft: 0,
       adjustLineShow: false,
     };
+  }
+
+  setTableBody(el) {
+    this.states.tableBody = el;
   }
 
   // 判断是否是mac

@@ -1,5 +1,5 @@
 <template>
-  <table cellspacing="0" cellpadding="0">
+  <table cellspacing="0" cellpadding="0" style="position: relative;">
     <colgroup>
       <col
         v-for="(columnWidth, index) in columnsWidth" :width="columnWidth"
@@ -65,7 +65,6 @@ export default {
       default: () => [],
     },
     fixedCount: [String, Number],
-    tableScrollLeft: [String, Number],
     store: {
       required: true,
     },
@@ -112,7 +111,7 @@ export default {
         if (this.fixedCount >= this.adjustWidthIndex + 1) {
           width = e.pageX - this.$parent.excelPos.left - this.$refs.tr.children[this.adjustWidthIndex].offsetLeft;
         } else {
-          width = e.pageX + this.tableScrollLeft - this.$parent.excelPos.left - this.$refs.tr.children[this.adjustWidthIndex].offsetLeft;
+          width = e.pageX + this.store.states.tableBody.scrollLeft - this.$parent.excelPos.left - this.$refs.tr.children[this.adjustWidthIndex].offsetLeft;
         }
         if (width >= 80) {
           this.adjustWidthValue = width;

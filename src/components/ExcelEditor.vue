@@ -77,7 +77,6 @@ import clickoutside from '../directives/clickoutside';
 export default {
   directives: { clickoutside },
   props: {
-    tableScrollLeft: [String, Number],
     columnsWidth: {
       type: Array,
       default: () => [],
@@ -101,7 +100,7 @@ export default {
     cellEditorStyle() {
       let left;
       if (this.editor.editorIsFixed) {
-        left = this.tableScrollLeft + this.columnsWidth.filter((item, index) => index < this.editor.editorXIndex).reduce((sum, item) => sum + item, 0);
+        left = this.store.states.tableBody.scrollLeft + this.columnsWidth.filter((item, index) => index < this.editor.editorXIndex).reduce((sum, item) => sum + item, 0);
       } else {
         left = this.columnsWidth.filter((item, index) => index < this.editor.editorXIndex).reduce((sum, item) => sum + item, 0);
       }
@@ -115,7 +114,7 @@ export default {
     autofillHandlerStyle() {
       let left;
       if (this.editor.editorIsFixed && this.selector.selectedYArr[0] === this.selector.selectedYArr[1]) {
-        left = this.tableScrollLeft + this.columnsWidth.filter((item, index) => index < this.autofill.autofillXIndex).reduce((sum, item) => sum + item, 0);
+        left = this.store.states.tableBody.scrollLeft + this.columnsWidth.filter((item, index) => index < this.autofill.autofillXIndex).reduce((sum, item) => sum + item, 0);
       } else {
         left = this.columnsWidth.filter((item, index) => index < this.autofill.autofillXIndex).reduce((sum, item) => sum + item, 0);
       }
