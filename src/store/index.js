@@ -1,7 +1,8 @@
 class TableStore {
   constructor() {
     this.states = {
-      tableBody: null,
+      tableBodyLeft: 0,
+      tableBodyTop: 0,
       columns: [],
       showData: [],
 
@@ -52,8 +53,9 @@ class TableStore {
     };
   }
 
-  setTableBody(el) {
-    this.states.tableBody = el;
+  tableBodyScroll(el) {
+    this.states.tableBodyLeft = el.scrollLeft;
+    this.states.tableBodyTop = el.scrollTop;
   }
 
   // 判断是否是mac
@@ -117,24 +119,26 @@ class TableStore {
     const { states } = this;
     if (columnType === 'selection') return;
     if (states.selector.isSelected) {
-      states.autofill.autofillXIndex = x > states.editor.editorXIndex ? x : states.editor.editorXIndex;
-      states.autofill.autofillYIndex = y > states.editor.editorYIndex ? y : states.editor.editorYIndex;
-      states.selector.selectedXIndex = x;
-      states.selector.selectedYIndex = y;
-      if (states.selector.selectedXIndex > states.editor.editorXIndex) {
-        states.selector.selectedXArr.splice(0, 1, states.editor.editorXIndex);
-        states.selector.selectedXArr.splice(1, 1, states.selector.selectedXIndex);
-      } else {
-        states.selector.selectedXArr.splice(0, 1, states.selector.selectedXIndex);
-        states.selector.selectedXArr.splice(1, 1, states.editor.editorXIndex);
-      }
-      if (states.selector.selectedYIndex > states.editor.editorYIndex) {
-        states.selector.selectedYArr.splice(0, 1, states.editor.editorYIndex);
-        states.selector.selectedYArr.splice(1, 1, states.selector.selectedYIndex);
-      } else {
-        states.selector.selectedYArr.splice(0, 1, states.selector.selectedYIndex);
-        states.selector.selectedYArr.splice(1, 1, states.editor.editorYIndex);
-      }
+      setTimeout(() => {
+        states.autofill.autofillXIndex = x > states.editor.editorXIndex ? x : states.editor.editorXIndex;
+        states.autofill.autofillYIndex = y > states.editor.editorYIndex ? y : states.editor.editorYIndex;
+        states.selector.selectedXIndex = x;
+        states.selector.selectedYIndex = y;
+        if (states.selector.selectedXIndex > states.editor.editorXIndex) {
+          states.selector.selectedXArr.splice(0, 1, states.editor.editorXIndex);
+          states.selector.selectedXArr.splice(1, 1, states.selector.selectedXIndex);
+        } else {
+          states.selector.selectedXArr.splice(0, 1, states.selector.selectedXIndex);
+          states.selector.selectedXArr.splice(1, 1, states.editor.editorXIndex);
+        }
+        if (states.selector.selectedYIndex > states.editor.editorYIndex) {
+          states.selector.selectedYArr.splice(0, 1, states.editor.editorYIndex);
+          states.selector.selectedYArr.splice(1, 1, states.selector.selectedYIndex);
+        } else {
+          states.selector.selectedYArr.splice(0, 1, states.selector.selectedYIndex);
+          states.selector.selectedYArr.splice(1, 1, states.editor.editorYIndex);
+        }
+      }, 0);
     }
     if (states.autofill.isAutofill) {
       if (y > states.selector.selectedYArr[1]) {

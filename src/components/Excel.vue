@@ -83,7 +83,6 @@ import '../style/reset.scss';
 import clickoutside from '../directives/clickoutside';
 import methods from '../mixins/methods';
 import events from '../mixins/events';
-import utils from '../mixins/utils';
 import TableHeader from './ExcelHeader.vue';
 import TableBody from './ExcelBody.vue';
 import Editor from './ExcelEditor.vue';
@@ -159,11 +158,6 @@ export default {
       isOperation: false,
 
       excelPos: {},
-
-      tKeydown: null,
-      tMousemove: null,
-      tableScrollLeft: 0,
-      tableScrollTop: 0,
     };
   },
   watch: {
@@ -176,8 +170,11 @@ export default {
           if (this.historyData.length !== this.curHisory) {
             this.historyData = this.historyData.slice(0, this.curHisory);
           }
-          this.historyData.push(JSON.stringify(val));
-          this.curHisory += 1;
+          this.$nextTick(() => {
+            this.historyData.push(JSON.stringify(this.changeData));
+            console.log('changeData', this.changeData);
+            this.curHisory += 1;
+          });
         }
         this.$emit('input', val);
         if (!this.initialData) {
@@ -200,7 +197,7 @@ export default {
   mounted() {
     this.init();
   },
-  mixins: [methods, events, utils],
+  mixins: [methods, events],
   methods: {
     init() {
       if (this.value.length > 0) {
@@ -209,10 +206,9 @@ export default {
       this.$refs.tbody.addEventListener('scroll', () => {
         this.$refs.theader.scrollLeft = this.$refs.tbody.scrollLeft;
         this.$refs.fixedTbody.scrollTop = this.$refs.tbody.scrollTop;
-        this.store.states.dropdown.index = null;
+        this.store.tableBodyScroll(this.$refs.tbody);
         this.store.states.dropdown.index = null;
       });
-      this.store.setTableBody(this.$refs.tbody);
       this.store.handleIsMac();
       this.initColumns();
       this.handleResize();
@@ -242,7 +238,10 @@ export default {
         errors: [],
       }));
       this.initialData = JSON.parse(JSON.stringify(this.data));
-      this.historyData = [JSON.stringify(this.data)];
+      this.historyData = [JSON.stringify(this.data.map((v, i) => ({
+        ...v,
+        _index: i,
+      })))];
       this.curHisory = 1;
       if (this.$refs.theaderContent) {
         this.$refs.theaderContent.checkedAll = false;
@@ -403,7 +402,7 @@ export default {
       });
     },
     handleChangeData() {
-      const data = JSON.parse(JSON.stringify(this.data));
+      const data = JSON.parse(JSON.stringify(this.data.map((v, i) => ({ ...v, _index: i }))));
       const initialData = JSON.parse(JSON.stringify(this.initialData));
       this.changeData = data.filter((item, index) => JSON.stringify(item) !== JSON.stringify(initialData[index]));
     },
@@ -413,33 +412,28 @@ export default {
       this.store.states.editor.editorShow = false;
       this.store.states.selector.selectedXArr = [];
       this.store.states.selector.selectedYArr = [];
-      window.removeEventListener('keydown', this.tKeydown);
-      window.removeEventListener('mousemove', this.tMousemove);
-      this.tKeydown = null;
-      this.tMousemove = null;
+      window.removeEventListener('keydown', this.keySubmit);
+      window.removeEventListener('mousemove', this.multiSelectAdjustPostion);
     },
     // 选择单元格
     selectCell(e, x, y, type) {
       if (this.disabled) return;
       if (e.button !== 0) return;
-      if (!this.tKeydown && !this.tMousemove) {
-        this.tKeydown = this.throttle(this.keySubmit, 16);
-        this.tMousemove = this.throttle(this.multiSelectAdjustPostion, 16, true);
-        window.addEventListener('keydown', this.tKeydown);
-        window.addEventListener('mousemove', this.tMousemove);
-      }
+      window.addEventListener('keydown', this.keySubmit);
+      window.addEventListener('mousemove', this.multiSelectAdjustPostion);
       if (type === 'selection') return;
+      this.timer = setInterval(this.multiSelectAdjustPostion, 16);
+      window.addEventListener('mouseup', this.selectUp);
       this.store.states.editor.editing = false;
       this.store.states.editor.editType = 'text';
-
+      this.store.states.editor.editorShow = true;
       this.store.states.autofill.autofillXIndex = x;
       this.store.states.autofill.autofillYIndex = y;
-      this.store.states.editor.editorShow = true;
-
       this.store.states.selector.selectedXIndex = x;
       this.store.states.selector.selectedYIndex = y;
       this.store.states.selector.selectedXArr = [x, x];
       this.store.states.selector.selectedYArr = [y, y];
+      this.store.states.selector.isSelected = true;
       this.$nextTick(() => {
         this.store.states.editor.editorXIndex = x;
         this.store.states.editor.editorYIndex = y;
@@ -449,9 +443,6 @@ export default {
           this.$refs.editor.$refs.clipboard.focus();
         });
       });
-      this.store.states.selector.isSelected = true;
-      this.timer = setInterval(this.multiSelectAdjustPostion, 20);
-      window.addEventListener('mouseup', this.selectUp);
     },
     keySubmit(e) {
       if ((e.ctrlKey && e.keyCode === 90) || (e.metaKey && e.keyCode === 90)) {
@@ -648,11 +639,11 @@ export default {
         curRightShould = scrollLeftArr[this.store.states.editor.editorXIndex + 1] - this.wrapperWidth + scrollBarWidth + 2;
       }
       if (this.tableWidth > this.wrapperWidth) {
-        if (this.store.states.tableBody.scrollLeft > curLeftShould) {
+        if (this.store.states.tableBodyLeft > curLeftShould) {
           this.$refs.theader.scrollLeft = curLeftShould;
           this.$refs.tbody.scrollLeft = curLeftShould;
         }
-        if (this.store.states.tableBody.scrollLeft < curRightShould) {
+        if (this.store.states.tableBodyLeft < curRightShould) {
           this.$refs.theader.scrollLeft = curRightShould + 2;
           this.$refs.tbody.scrollLeft = curRightShould + 2;
         }
@@ -660,12 +651,12 @@ export default {
       // 上下调整
       if (this.maxHeight) {
         const curTopShould = this.scrollTopArr[this.store.states.editor.editorYIndex];
-        if (this.store.states.tableBody.scrollTop > curTopShould) {
+        if (this.store.states.tableBodyTop > curTopShould) {
           this.$refs.tbody.scrollTop = curTopShould;
           this.$refs.fixedTbody.scrollTop = curTopShould;
         }
         const curBottomShould = this.scrollTopArr[this.store.states.editor.editorYIndex + 1] - this.maxHeight + scrollBarWidth + 2;
-        if (this.store.states.tableBody.scrollTop < curBottomShould) {
+        if (this.store.states.tableBodyTop < curBottomShould) {
           this.$refs.tbody.scrollTop = curBottomShould;
           this.$refs.fixedTbody.scrollTop = curBottomShould;
         }
@@ -719,9 +710,9 @@ export default {
           this.curHisory += 1;
         }
         this.isOperation = true;
-        this.data.forEach((i, index) => {
+        JSON.parse(this.historyData[this.curHisory - 1]).forEach((i) => {
           Object.keys(i).forEach((j) => {
-            i[j] = JSON.parse(this.historyData[this.curHisory - 1])[index][j];
+            this.data[i._index][j] = i[j];
           });
         });
         this.$nextTick(() => {

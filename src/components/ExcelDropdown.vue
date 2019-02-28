@@ -86,12 +86,12 @@ export default {
         if (!val) return;
         let left;
         if (this.dropdown.index < this.fixedCount) {
-          left = this.store.states.tableBody.scrollLeft + this.columnsWidth.filter((item, index) => index <= this.dropdown.index).reduce((sum, item) => sum + item, 0);
+          left = this.store.states.tableBodyLeft + this.columnsWidth.filter((item, index) => index <= this.dropdown.index).reduce((sum, item) => sum + item, 0);
         } else {
           left = this.columnsWidth.filter((item, index) => index <= this.dropdown.index).reduce((sum, item) => sum + item, 0);
         }
         this.$nextTick(() => {
-          left = left - this.$refs.dropdown.offsetWidth + this.$parent.$refs.wrapper.offsetLeft - this.store.states.tableBody.scrollLeft;
+          left = left - this.$refs.dropdown.offsetWidth + this.$parent.$refs.wrapper.offsetLeft - this.store.states.tableBodyLeft;
           if (left < this.$parent.$refs.wrapper.offsetLeft) {
             left = this.$parent.$refs.wrapper.offsetLeft;
           }

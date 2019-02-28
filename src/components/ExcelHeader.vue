@@ -43,7 +43,6 @@
 <script>
 import { checkbox } from 'element-ui';
 import clickoutside from '../directives/clickoutside';
-import utils from '../mixins/utils';
 
 export default {
   directives: { clickoutside },
@@ -77,7 +76,6 @@ export default {
       adjustWidthIndex: 0,
       adjustWidthType: '',
       mouseX: 0,
-      tMousemove: null,
     };
   },
   computed: {
@@ -91,7 +89,6 @@ export default {
       return this.store.states.filters;
     },
   },
-  mixins: [utils],
   methods: {
     selectAll() {
       this.$parent.selectAll();
@@ -100,8 +97,7 @@ export default {
       this.adjustWidthFlag = true;
       this.adjustWidthIndex = index;
       this.store.states.adjustLineShow = true;
-      this.tMousemove = this.throttle(this.handlerMove, 16);
-      window.addEventListener('mousemove', this.tMousemove);
+      window.addEventListener('mousemove', this.handlerMove);
       window.addEventListener('mouseup', this.handlerUp);
     },
     handlerMove(e) {
@@ -111,7 +107,7 @@ export default {
         if (this.fixedCount >= this.adjustWidthIndex + 1) {
           width = e.pageX - this.$parent.excelPos.left - this.$refs.tr.children[this.adjustWidthIndex].offsetLeft;
         } else {
-          width = e.pageX + this.store.states.tableBody.scrollLeft - this.$parent.excelPos.left - this.$refs.tr.children[this.adjustWidthIndex].offsetLeft;
+          width = e.pageX + this.store.states.tableBodyLeft - this.$parent.excelPos.left - this.$refs.tr.children[this.adjustWidthIndex].offsetLeft;
         }
         if (width >= 80) {
           this.adjustWidthValue = width;
@@ -123,7 +119,7 @@ export default {
       this.$parent.adjustWidth(this.adjustWidthIndex, this.adjustWidthValue);
       this.adjustWidthFlag = false;
       this.store.states.adjustLineShow = false;
-      window.removeEventListener('mousemove', this.tMousemove);
+      window.removeEventListener('mousemove', this.handlerMove);
       window.removeEventListener('mouseup', this.handlerUp);
     },
     openDropdown(i) {

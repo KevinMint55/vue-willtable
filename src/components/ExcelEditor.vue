@@ -65,8 +65,21 @@
       class="autofill-handler"
       :style="autofillHandlerStyle"
       @mousedown="handleAutofill"
-      v-show="!editor.editing && editor.editorShow">
+      v-show="!editor.editing && editor.editorShow"
+      ref="autofillHandler">
     </div>
+    <div
+      class="cover-area selected"
+      :style="selectedStyle"></div>
+    <div
+      class="cover-area selected fixed"
+      :style="fixedSelectedStyle"></div>
+    <div
+      class="cover-area autofill"
+      :style="autofillStyle"></div>
+    <div
+      class="cover-area autofill fixed"
+      :style="fixedAutofillStyle"></div>
   </div>
 </template>
 
@@ -100,7 +113,7 @@ export default {
     cellEditorStyle() {
       let left;
       if (this.editor.editorIsFixed) {
-        left = this.store.states.tableBody.scrollLeft + this.columnsWidth.filter((item, index) => index < this.editor.editorXIndex).reduce((sum, item) => sum + item, 0);
+        left = this.store.states.tableBodyLeft + this.columnsWidth.filter((item, index) => index < this.editor.editorXIndex).reduce((sum, item) => sum + item, 0);
       } else {
         left = this.columnsWidth.filter((item, index) => index < this.editor.editorXIndex).reduce((sum, item) => sum + item, 0);
       }
@@ -114,7 +127,7 @@ export default {
     autofillHandlerStyle() {
       let left;
       if (this.editor.editorIsFixed && this.selector.selectedYArr[0] === this.selector.selectedYArr[1]) {
-        left = this.store.states.tableBody.scrollLeft + this.columnsWidth.filter((item, index) => index < this.autofill.autofillXIndex).reduce((sum, item) => sum + item, 0);
+        left = this.store.states.tableBodyLeft + this.columnsWidth.filter((item, index) => index < this.autofill.autofillXIndex).reduce((sum, item) => sum + item, 0);
       } else {
         left = this.columnsWidth.filter((item, index) => index < this.autofill.autofillXIndex).reduce((sum, item) => sum + item, 0);
       }
@@ -123,6 +136,38 @@ export default {
         top: `${this.autofill.autofillYIndex * 28 + 24}px`,
         left: `${left}px`,
         'z-index': this.fixedCount > this.autofill.autofillXIndex ? 4 : 1,
+      };
+    },
+    selectedStyle() {
+      return {
+        top: `${this.selector.selectedYArr[0] * 28}px`,
+        left: `${this.columnsWidth.filter((item, index) => index < this.selector.selectedXArr[0]).reduce((sum, item) => sum + item, 0)}px`,
+        width: `${this.columnsWidth.filter((item, index) => (index <= this.selector.selectedXArr[1]) && (index >= this.selector.selectedXArr[0])).reduce((sum, item) => sum + item, 0)}px`,
+        height: `${(this.selector.selectedYArr[1] - this.selector.selectedYArr[0] + 1) * 28}px`,
+      };
+    },
+    fixedSelectedStyle() {
+      return {
+        top: `${this.selector.selectedYArr[0] * 28}px`,
+        left: `${this.store.states.tableBodyLeft + this.columnsWidth.filter((item, index) => index < this.selector.selectedXArr[0]).reduce((sum, item) => sum + item, 0)}px`,
+        width: `${this.columnsWidth.filter((item, index) => (index <= this.selector.selectedXArr[1]) && (index >= this.selector.selectedXArr[0]) && this.columns[index].fixed).reduce((sum, item) => sum + item, 0)}px`,
+        height: `${(this.selector.selectedYArr[1] - this.selector.selectedYArr[0] + 1) * 28}px`,
+      };
+    },
+    autofillStyle() {
+      return {
+        top: `${this.autofill.autofillYArr[0] * 28}px`,
+        left: `${this.columnsWidth.filter((item, index) => index < this.selector.selectedXArr[0]).reduce((sum, item) => sum + item, 0)}px`,
+        width: `${this.columnsWidth.filter((item, index) => (index <= this.selector.selectedXArr[1]) && (index >= this.selector.selectedXArr[0])).reduce((sum, item) => sum + item, 0)}px`,
+        height: `${this.autofill.autofillYArr.length > 0 ? (this.autofill.autofillYArr[1] - this.autofill.autofillYArr[0] + 1) * 28 : 0}px`,
+      };
+    },
+    fixedAutofillStyle() {
+      return {
+        top: `${this.autofill.autofillYArr[0] * 28}px`,
+        left: `${this.store.states.tableBodyLeft + this.columnsWidth.filter((item, index) => index < this.selector.selectedXArr[0]).reduce((sum, item) => sum + item, 0)}px`,
+        width: `${this.columnsWidth.filter((item, index) => (index <= this.selector.selectedXArr[1]) && (index >= this.selector.selectedXArr[0]) && this.columns[index].fixed).reduce((sum, item) => sum + item, 0)}px`,
+        height: `${this.autofill.autofillYArr.length > 0 ? (this.autofill.autofillYArr[1] - this.autofill.autofillYArr[0] + 1) * 28 : 0}px`,
       };
     },
     columns() {
@@ -203,6 +248,7 @@ export default {
   textarea {
     width: 100%;
     height: 50px;
+    line-height: 20px;
     outline: 0;
     resize: none;
     padding: 4px 6px;
@@ -228,5 +274,21 @@ export default {
   height: 0 0 !important;
   flex: 0 0 !important;
   padding: 0 !important;
+}
+
+.cover-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  &.selected {
+    background-color: rgba(74, 149, 235, 0.2) ;
+  }
+  &.autofill {
+    background-color: rgba(127, 127, 127, 0.2) ;
+  }
+  &.fixed {
+    z-index: 3;
+  }
 }
 </style>

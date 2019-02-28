@@ -7,10 +7,7 @@
     </colgroup>
     <tbody class="km-tbody">
       <tr
-        v-for="(tr, yIndex) in showData" :key="yIndex"
-        :class="{
-          curRow: editor.editorShow && editor.editorYIndex == yIndex
-        }">
+        v-for="(tr, yIndex) in showData" :key="yIndex">
         <td
           v-for="(th, xIndex) in columns"
           :key="xIndex"
@@ -40,7 +37,6 @@
 <script>
 import { checkbox } from 'element-ui';
 import clickoutside from '../directives/clickoutside';
-import utils from '../mixins/utils';
 
 export default {
   directives: { clickoutside },
@@ -90,13 +86,12 @@ export default {
       return this.store.states.autofill;
     },
   },
-  mixins: [utils],
   methods: {
     selectionChange() {
       this.$parent.selectionChange();
     },
     multiSelect(e, x, y, columnType) {
-      this.throttle(this.store.multiSelect(e, x, y, columnType), 50, true);
+      this.store.multiSelect(e, x, y, columnType);
     },
     selectCell(e, x, y, type) {
       this.$parent.selectCell(e, x, y, type);
@@ -123,16 +118,6 @@ export default {
     },
     classObj(row, column, rowIndex, columnIndex) {
       return {
-        selected:
-          columnIndex <= this.selector.selectedXArr[1]
-          && columnIndex >= this.selector.selectedXArr[0]
-          && rowIndex <= this.selector.selectedYArr[1]
-          && rowIndex >= this.selector.selectedYArr[0],
-        autofill:
-          columnIndex <= this.selector.selectedXArr[1]
-          && columnIndex >= this.selector.selectedXArr[0]
-          && rowIndex <= this.autofill.autofillYArr[1]
-          && rowIndex >= this.autofill.autofillYArr[0],
         disabled: column.type === 'disabled',
         error: !this.verify(column, row[column.key], rowIndex),
         ...this.cellClassName({
@@ -140,9 +125,9 @@ export default {
         }),
       };
     },
-    verify(column, value, index) {
+    verify(column, value) {
       if (!value) {
-        this.$parent.setErrors(index, column.key, true);
+        // this.$parent.setErrors(index, column.key, true);
         return true;
       }
       let correct;
@@ -162,7 +147,7 @@ export default {
         default:
           correct = true;
       }
-      this.$parent.setErrors(index, column.key, correct);
+      // this.$parent.setErrors(index, column.key, correct);
       return correct;
     },
     verifyDate(value) {
@@ -206,13 +191,6 @@ export default {
 
 <style lang="scss" scoped>
 .km-tbody {
-  tr {
-    &.curRow {
-      td {
-        background-color: #dceff7;
-      }
-    }
-  }
   td {
     position: relative;
     border: none;
@@ -221,15 +199,6 @@ export default {
     text-indent: 4px;
     height: 28px;
   }
-}
-.selected {
-  background-color: rgba(74, 149, 235, 0.2) !important;
-  &.error {
-    background-color: #f1c4c4 !important;
-  }
-}
-.autofill {
-  background-color: rgba(127, 127, 127, 0.2) !important;
 }
 .disabled {
   color: #80848f;
