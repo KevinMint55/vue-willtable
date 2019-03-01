@@ -83,6 +83,7 @@ import '../style/reset.scss';
 import clickoutside from '../directives/clickoutside';
 import methods from '../mixins/methods';
 import events from '../mixins/events';
+import verify from '../mixins/verify';
 import TableHeader from './ExcelHeader.vue';
 import TableBody from './ExcelBody.vue';
 import Editor from './ExcelEditor.vue';
@@ -180,6 +181,7 @@ export default {
         this.handleResize();
         this.handleFilters();
         this.handleChangeData();
+        this.handleErrors();
       },
       deep: true,
     },
@@ -194,7 +196,7 @@ export default {
   mounted() {
     this.init();
   },
-  mixins: [methods, events],
+  mixins: [methods, events, verify],
   methods: {
     init() {
       if (this.value.length > 0) {
@@ -217,7 +219,7 @@ export default {
         if (item.width) {
           item.width = parseInt(item.width, 10);
         }
-        return item;
+        return { ...item };
       });
       this.columnsWidth = this.store.states.columns.map(item => item.width);
       this.columnsStatusList = this.store.states.columns.map(item => ({
@@ -453,6 +455,9 @@ export default {
       if ((e.ctrlKey && e.keyCode === 67) || (e.metaKey && e.keyCode === 67)) {
         return this.getContentToclipboard();
       }
+      if ((e.ctrlKey && e.keyCode === 65) || (e.metaKey && e.keyCode === 65)) {
+        return this.selectAllCells();
+      }
       if (e.ctrlKey || e.metaKey) {
         return;
       }
@@ -571,6 +576,12 @@ export default {
           }
         }
       }
+    },
+    selectAllCells() {
+      this.store.states.selector.selectedXIndex = this.store.states.editor.editorRange.minX;
+      this.store.states.selector.selectedYIndex = this.store.states.editor.editorRange.minY;
+      this.store.states.selector.selectedXArr = [this.store.states.editor.editorRange.minX, this.store.states.editor.editorRange.maxX];
+      this.store.states.selector.selectedYArr = [this.store.states.editor.editorRange.minY, this.store.states.editor.editorRange.maxY];
     },
     // 设置启用编辑
     setEditing(key) {
@@ -714,9 +725,6 @@ export default {
     adjustWidth(index, width) {
       this.store.states.columns[index].width = width;
       this.handleResize();
-      this.$nextTick(() => {
-        this.handleFilters();
-      });
     },
     sort(type) {
       this.columnsStatusList.forEach((item) => {
@@ -760,20 +768,43 @@ export default {
       this.store.states.dropdown.index = null;
       this.handleResize();
     },
-    setErrors(index, key, correct) {
-      if (!this.dataStatusList[index]) return;
-      if (!this.dataStatusList[index].errors) {
-        this.dataStatusList[index].errors = [];
+    handleErrors() {
+      this.dataStatusList.forEach((item, yIndex) => {
+        this.store.states.columns.forEach((column) => {
+          if (this.verify(column, this.data[yIndex][column.key])) {
+            if (item.errors.includes(column.key)) {
+              item.errors.splice(item.errors.indexOf(column.key), 1);
+            }
+          } else {
+            if (!item.errors.includes(column.key)) {
+              item.errors.push(column.key);
+            }
+          }
+        });
+      });
+    },
+    verify(column, value) {
+      if (!value) {
+        return true;
       }
-      if (correct) {
-        if (this.dataStatusList[index].errors.includes(key)) {
-          this.dataStatusList[index].errors.splice(this.dataStatusList[index].errors.indexOf(key), 1);
-        }
-      } else {
-        if (!this.dataStatusList[index].errors.includes(key)) {
-          this.dataStatusList[index].errors.push(key);
-        }
+      let correct;
+      switch (column.type) {
+        case 'date':
+          correct = this.verifyDate(value);
+          break;
+        case 'month':
+          correct = this.verifyMonth(value);
+          break;
+        case 'select':
+          correct = this.verifySelect(value, column.options);
+          break;
+        case 'number':
+          correct = this.verifyNumber(value);
+          break;
+        default:
+          correct = true;
       }
+      return correct;
     },
   },
 };

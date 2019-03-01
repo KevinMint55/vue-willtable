@@ -37,6 +37,7 @@
 <script>
 import { checkbox } from 'element-ui';
 import clickoutside from '../directives/clickoutside';
+import verify from '../mixins/verify';
 
 export default {
   directives: { clickoutside },
@@ -86,6 +87,7 @@ export default {
       return this.store.states.autofill;
     },
   },
+  mixins: [verify],
   methods: {
     selectionChange() {
       this.$parent.selectionChange();
@@ -127,7 +129,6 @@ export default {
     },
     verify(column, value) {
       if (!value) {
-        // this.$parent.setErrors(index, column.key, true);
         return true;
       }
       let correct;
@@ -147,43 +148,7 @@ export default {
         default:
           correct = true;
       }
-      // this.$parent.setErrors(index, column.key, correct);
       return correct;
-    },
-    verifyDate(value) {
-      const result = value.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/);
-      if (result == null) {
-        return false;
-      }
-      const d = new Date(result[1], result[3] - 1, result[4]);
-      if (d.getFullYear() === Number(result[1]) && d.getMonth() + 1 === Number(result[3]) && d.getDate() === Number(result[4])) {
-        return true;
-      }
-      return false;
-    },
-    verifyMonth(value) {
-      const result = value.match(/^(\d{1,4})(-|\/)(\d{1,2})$/);
-      if (result == null) {
-        return false;
-      }
-      const d = new Date(result[1], result[3] - 1);
-      if (d.getFullYear() === Number(result[1]) && d.getMonth() + 1 === Number(result[3])) {
-        return true;
-      }
-      return false;
-    },
-    verifySelect(value, options) {
-      const arr = options.map(item => item.value);
-      if (arr.includes(value)) {
-        return true;
-      }
-      return false;
-    },
-    verifyNumber(value) {
-      if (isNaN(value)) {
-        return false;
-      }
-      return true;
     },
   },
 };

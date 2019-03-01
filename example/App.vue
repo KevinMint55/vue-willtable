@@ -4,6 +4,7 @@
     <el-button @click="getList3">getList3</el-button>
     <el-button @click="disabled = !disabled">{{ disabled ? '启用' : '禁用'}}</el-button>
     <el-button @click="getChangeData">getChangeData</el-button>
+    <el-button @click="getErrorRows">getErrorRows</el-button>
     <el-button @click="show = !show">show</el-button>
     <excel
       ref="excel"
@@ -52,7 +53,6 @@ export default {
           title: '日期',
           key: 'date',
           type: 'date',
-          fixed: true,
           width: '100',
         },
         {
@@ -60,6 +60,7 @@ export default {
           key: 'email',
           width: 300,
           type: 'select',
+          fixed: true,
           options: [
             {
               value: 'New York',
@@ -152,6 +153,9 @@ export default {
     },
     selectionChange(selection) {
       console.log(selection);
+    },
+    getErrorRows() {
+      console.log(this.$refs.excel.getErrorRows());
     },
     getChangeData() {
       console.log(this.$refs.excel.getChangeData());
