@@ -170,11 +170,8 @@ export default {
           if (this.historyData.length !== this.curHisory) {
             this.historyData = this.historyData.slice(0, this.curHisory);
           }
-          this.$nextTick(() => {
-            this.historyData.push(JSON.stringify(this.changeData));
-            console.log('changeData', this.changeData);
-            this.curHisory += 1;
-          });
+          this.historyData.push(JSON.stringify(val));
+          this.curHisory += 1;
         }
         this.$emit('input', val);
         if (!this.initialData) {
@@ -238,10 +235,7 @@ export default {
         errors: [],
       }));
       this.initialData = JSON.parse(JSON.stringify(this.data));
-      this.historyData = [JSON.stringify(this.data.map((v, i) => ({
-        ...v,
-        _index: i,
-      })))];
+      this.historyData = [JSON.stringify(this.data)];
       this.curHisory = 1;
       if (this.$refs.theaderContent) {
         this.$refs.theaderContent.checkedAll = false;
@@ -250,9 +244,6 @@ export default {
         this.$refs.fixedTheaderContent.checkedAll = false;
       }
       this.initColumns();
-      this.handleResize();
-      this.handleFilters();
-      this.handleChangeData();
     },
     handleResize() {
       this.excelPos = this.$refs.excel.getBoundingClientRect();
@@ -402,7 +393,7 @@ export default {
       });
     },
     handleChangeData() {
-      const data = JSON.parse(JSON.stringify(this.data.map((v, i) => ({ ...v, _index: i }))));
+      const data = JSON.parse(JSON.stringify(this.data));
       const initialData = JSON.parse(JSON.stringify(this.initialData));
       this.changeData = data.filter((item, index) => JSON.stringify(item) !== JSON.stringify(initialData[index]));
     },
@@ -710,9 +701,9 @@ export default {
           this.curHisory += 1;
         }
         this.isOperation = true;
-        JSON.parse(this.historyData[this.curHisory - 1]).forEach((i) => {
+        JSON.parse(this.historyData[this.curHisory - 1]).forEach((i, index) => {
           Object.keys(i).forEach((j) => {
-            this.data[i._index][j] = i[j];
+            this.data[index][j] = i[j];
           });
         });
         this.$nextTick(() => {
