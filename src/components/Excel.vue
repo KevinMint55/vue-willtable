@@ -178,10 +178,10 @@ export default {
         if (!this.initialData) {
           this.initData();
         }
-        this.handleResize();
         this.handleFilters();
         this.handleChangeData();
-        this.handleErrors();
+        // this.handleErrors();
+        this.handleResize();
       },
       deep: true,
     },
@@ -332,13 +332,15 @@ export default {
         this.theaderHeight = this.$refs.theaderContent.$el.offsetHeight;
 
         // 设置左侧定位高度
-        if (this.tableWidth > this.wrapperWidth) {
-          this.$refs.fixedWrapper.style.height = `${this.$refs.wrapper.offsetHeight - scrollBarWidth}px`;
-          this.$refs.fixedTbody.style.height = `${this.$refs.wrapper.offsetHeight - scrollBarWidth - this.theaderHeight}px`;
-        } else {
-          this.$refs.fixedWrapper.style.height = `${this.$refs.wrapper.offsetHeight}px`;
-          this.$refs.fixedTbody.style.height = `${this.$refs.wrapper.offsetHeight - this.theaderHeight}px`;
-        }
+        this.$nextTick(() => {
+          if (this.tableWidth > this.wrapperWidth) {
+            this.$refs.fixedWrapper.style.height = `${this.$refs.wrapper.offsetHeight - scrollBarWidth}px`;
+            this.$refs.fixedTbody.style.height = `${this.$refs.wrapper.offsetHeight - scrollBarWidth - this.theaderHeight}px`;
+          } else {
+            this.$refs.fixedWrapper.style.height = `${this.$refs.wrapper.offsetHeight}px`;
+            this.$refs.fixedTbody.style.height = `${this.$refs.wrapper.offsetHeight - this.theaderHeight}px`;
+          }
+        });
         // 当出现竖向滚动条时处理滚动条
         if (this.$refs.tbodyContent.$el.offsetHeight > this.maxHeight) {
           this.$refs.tbody.style.overflowY = 'auto';
@@ -712,8 +714,6 @@ export default {
           this.curHisory += 1;
         }
         this.isOperation = true;
-        // if (this.data.length != JSON.parse(this.historyData[this.curHisory - 1]).length) {
-        // }
         JSON.parse(this.historyData[this.curHisory - 1]).forEach((i, index) => {
           Object.keys(i).forEach((j) => {
             this.data[index][j] = i[j];

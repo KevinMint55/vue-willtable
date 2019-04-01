@@ -10,7 +10,7 @@ module.exports = {
   build: {
     assetsRoot: path.resolve(__dirname, './demo'),
     assetsPublicPath: '/',
-    bundleAnalyzerReport: true
+    bundleAnalyzerReport: false
   },
   release: {
     assetsRoot: path.resolve(__dirname, './dist'),

@@ -27,7 +27,7 @@ import axios from 'axios';
 import { button } from 'element-ui';
 import Excel from '../src/components/Excel.vue';
 // import Excel from '../dist/km-excel.min';
-import '../dist/km-excel.min.css';
+// import '../dist/km-excel.min.css';
 
 export default {
   name: 'App',

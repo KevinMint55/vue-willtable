@@ -32,10 +32,8 @@ export default {
       if (key && values instanceof Array) {
         values.forEach((value) => {
           const dIndex = this.data.findIndex(d => d[key] === value);
-          if (dIndex) {
-            this.dataStatusList.splice(dIndex, 1);
-            this.data.splice(dIndex, 1);
-          }
+          this.dataStatusList.splice(dIndex, 1);
+          this.data.splice(dIndex, 1);
         });
       }
     },
