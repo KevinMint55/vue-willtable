@@ -9,7 +9,7 @@ module.exports = {
   },
   build: {
     assetsRoot: path.resolve(__dirname, './demo'),
-    assetsPublicPath: '/',
+    assetsPublicPath: '/kmExcel/',
     bundleAnalyzerReport: false
   },
   release: {

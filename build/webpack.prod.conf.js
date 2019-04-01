@@ -17,6 +17,7 @@ const webpackConfig = {
   mode: 'production',
   output: {
     path: config.build.assetsRoot,
+    publicPath: config.build.assetsPublicPath,
     filename: 'js/[name].[chunkhash].js',
     chunkFilename: 'js/[name].[chunkhash].js',
   },
