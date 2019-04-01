@@ -712,6 +712,8 @@ export default {
           this.curHisory += 1;
         }
         this.isOperation = true;
+        // if (this.data.length != JSON.parse(this.historyData[this.curHisory - 1]).length) {
+        // }
         JSON.parse(this.historyData[this.curHisory - 1]).forEach((i, index) => {
           Object.keys(i).forEach((j) => {
             this.data[index][j] = i[j];

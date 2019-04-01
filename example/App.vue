@@ -6,6 +6,8 @@
     <el-button @click="getChangeData">getChangeData</el-button>
     <el-button @click="getErrorRows">getErrorRows</el-button>
     <el-button @click="show = !show">show</el-button>
+    <el-button @click="add">add</el-button>
+    <el-button @click="remove">remove</el-button>
     <excel
       ref="excel"
       :columns="columns"
@@ -123,6 +125,7 @@ export default {
       data1: [],
       data2: [],
       disabled: false,
+      selection: [],
     };
   },
   mounted() {
@@ -152,7 +155,7 @@ export default {
       }).catch(() => {});
     },
     selectionChange(selection) {
-      console.log(selection);
+      this.selection = selection;
     },
     getErrorRows() {
       console.log(this.$refs.excel.getErrorRows());
@@ -171,6 +174,19 @@ export default {
           color: 'green',
         };
       }
+    },
+    add() {
+      const obj = {};
+      obj.id = new Date().getTime();
+      this.columns.forEach((item) => {
+        if (item.key) {
+          obj[item.key] = '';
+        }
+      });
+      this.$refs.excel.addItem(obj);
+    },
+    remove() {
+      this.$refs.excel.removeItems('sid', this.selection.map(s => s.sid));
     },
   },
 };

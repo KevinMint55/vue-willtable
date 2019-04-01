@@ -21,5 +21,23 @@ export default {
       }).filter(i => i);
       return errorRows;
     },
+    addItem(item) {
+      this.data.push(item);
+      this.dataStatusList.push({
+        checked: false,
+        errors: [],
+      });
+    },
+    removeItems(key, values) {
+      if (key && values instanceof Array) {
+        values.forEach((value) => {
+          const dIndex = this.data.findIndex(d => d[key] === value);
+          if (dIndex) {
+            this.dataStatusList.splice(dIndex, 1);
+            this.data.splice(dIndex, 1);
+          }
+        });
+      }
+    },
   },
 };
