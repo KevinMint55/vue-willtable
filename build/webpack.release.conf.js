@@ -15,7 +15,7 @@ function resolve(dir) {
 const webpackConfig = {
   mode: 'production',
   entry: {
-    app: "./src/index.js",
+    app: ['./src/index.js'],
   },
   output: {
     path: config.release.assetsRoot,

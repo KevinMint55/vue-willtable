@@ -1,4 +1,41 @@
-## km-excel在线编辑类excel组件
+# vue-editable-table编辑表格组件
+
+适用于Vue的表格编辑组件，支持多种快捷键操作，模拟Excel的操作体验
+
+## Installation
+
+```javascript
+npm install vue-editable-table --save
+```
+
+## Usage
+
+### use with global
+
+``` javascript
+import Vue from 'vue'
+import VueEditableTable from 'vue-editable-table'
+
+// require styles
+import 'vue-editable-table/dist/vue-editable-table.min.css'
+
+Vue.component('VueEditableTable', VueEditableTable)
+```
+
+### use with component
+
+``` javascript
+import VueEditableTable from 'vue-editable-table'
+
+// require styles
+import 'vue-editable-table/dist/vue-editable-table.min.css'
+
+export default {
+  components: {
+    VueEditableTable
+  }
+}
+```
 
 ### Value-Binding
 
