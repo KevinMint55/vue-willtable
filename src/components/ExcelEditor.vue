@@ -12,7 +12,9 @@
       <textarea
         ref="clipboard"
         class="clipboard"
-        @paste="clipboardToContent">
+        @paste="clipboardToContent"
+        @focus="cf"
+        @blur="cb">
       </textarea>
       <div style="flex:1;" v-show="editor.editing">
         <textarea v-model="editContent" ref="text" v-if="editor.editType == 'text'"></textarea>
@@ -217,6 +219,7 @@ export default {
       this.$parent.$parent.setEditing();
     },
     clipboardToContent(e) {
+      console.log(e);
       this.$parent.$parent.clipboardToContent(e);
     },
     handleAutofill() {
@@ -224,6 +227,12 @@ export default {
     },
     resetEditor() {
       this.store.resetEditor();
+    },
+    cf() {
+      console.log('cf');
+    },
+    cb() {
+      console.log('cb');
     },
   },
 };

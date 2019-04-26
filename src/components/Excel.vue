@@ -180,7 +180,7 @@ export default {
         }
         this.handleFilters();
         this.handleChangeData();
-        // this.handleErrors();
+        this.handleErrors();
         this.handleResize();
       },
       deep: true,
