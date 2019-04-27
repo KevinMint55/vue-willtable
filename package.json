@@ -1,5 +1,5 @@
 {
-  "name": "vue-editable-table",
+  "name": "km-excel",
   "version": "1.0.0",
   "description": "editable table for Vue",
   "author": {
@@ -8,7 +8,7 @@
     "url": "https://www.kevinmint.me"
   },
   "private": false,
-  "main": "dist/vue-editable-table.min.js",
+  "main": "dist/km-excel.min.js",
   "license": "MIT",
   "scripts": {
     "start": "npm run dev",

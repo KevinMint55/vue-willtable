@@ -12,9 +12,7 @@
       <textarea
         ref="clipboard"
         class="clipboard"
-        @paste="clipboardToContent"
-        @focus="cf"
-        @blur="cb">
+        @paste="clipboardToContent">
       </textarea>
       <div style="flex:1;" v-show="editor.editing">
         <textarea v-model="editContent" ref="text" v-if="editor.editType == 'text'"></textarea>
@@ -87,10 +85,8 @@
 
 <script>
 import { DatePicker, Select, Option } from 'element-ui';
-import clickoutside from '../directives/clickoutside';
 
 export default {
-  directives: { clickoutside },
   props: {
     columnsWidth: {
       type: Array,
@@ -219,7 +215,6 @@ export default {
       this.$parent.$parent.setEditing();
     },
     clipboardToContent(e) {
-      console.log(e);
       this.$parent.$parent.clipboardToContent(e);
     },
     handleAutofill() {
@@ -227,12 +222,6 @@ export default {
     },
     resetEditor() {
       this.store.resetEditor();
-    },
-    cf() {
-      console.log('cf');
-    },
-    cb() {
-      console.log('cb');
     },
   },
 };
@@ -280,7 +269,7 @@ export default {
 
 .clipboard {
   width: 0 !important;
-  height: 0 0 !important;
+  height: 0 !important;
   flex: 0 0 !important;
   padding: 0 !important;
 }

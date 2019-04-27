@@ -42,10 +42,8 @@
 
 <script>
 import { checkbox } from 'element-ui';
-import clickoutside from '../directives/clickoutside';
 
 export default {
-  directives: { clickoutside },
   components: {
     'el-checkbox': checkbox,
   },

@@ -1,11 +1,11 @@
-# vue-editable-table编辑表格组件
+# km-excel编辑表格组件
 
 适用于Vue的表格编辑组件，支持多种快捷键操作，模拟Excel的操作体验
 
 ## Installation
 
 ```javascript
-npm install vue-editable-table --save
+npm install km-excel --save
 ```
 
 ## Usage
@@ -14,10 +14,10 @@ npm install vue-editable-table --save
 
 ``` javascript
 import Vue from 'vue'
-import VueEditableTable from 'vue-editable-table'
+import VueEditableTable from 'km-excel'
 
 // require styles
-import 'vue-editable-table/dist/vue-editable-table.min.css'
+import 'km-excel/dist/km-excel.min.css'
 
 Vue.component('VueEditableTable', VueEditableTable)
 ```
@@ -25,10 +25,10 @@ Vue.component('VueEditableTable', VueEditableTable)
 ### use with component
 
 ``` javascript
-import VueEditableTable from 'vue-editable-table'
+import VueEditableTable from 'km-excel'
 
 // require styles
-import 'vue-editable-table/dist/vue-editable-table.min.css'
+import 'km-excel/dist/km-excel.min.css'
 
 export default {
   components: {

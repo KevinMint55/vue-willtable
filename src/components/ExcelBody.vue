@@ -16,7 +16,7 @@
           :class="classObj(tr, th, yIndex, xIndex)"
           :data-key="th.key"
           @mouseenter="multiSelect($event, xIndex, yIndex, th.type)"
-          @mousedown="selectCell($event, xIndex, yIndex, th.type)"
+          @mousedown.prevent="selectCell($event, xIndex, yIndex, th.type)"
           v-show="th.fixed || allShow">
           <el-checkbox
             size="mini"
@@ -36,11 +36,9 @@
 
 <script>
 import { checkbox } from 'element-ui';
-import clickoutside from '../directives/clickoutside';
 import verify from '../mixins/verify';
 
 export default {
-  directives: { clickoutside },
   props: {
     allShow: Boolean,
     dataStatusList: {
