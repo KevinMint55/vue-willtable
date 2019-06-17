@@ -547,7 +547,7 @@ export default {
       document.body.removeChild(textArea);
     },
     clipboardToContent(e) {
-      this.$nextTick(() => {
+      setTimeout(() => {
         const arr = [];
         e.target.value.split('\n').forEach((item, index, curArr) => {
           if (this.store.states.isMac) {
@@ -568,7 +568,7 @@ export default {
           }
         }
         this.$refs.editor.$refs.clipboard.value = '';
-      });
+      }, 0);
     },
     clearSelected() {
       for (let i = 0; i <= this.store.states.selector.selectedYArr[1] - this.store.states.selector.selectedYArr[0]; i += 1) {
