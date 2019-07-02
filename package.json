@@ -1,9 +1,9 @@
 {
-  "name": "km-excel",
+  "name": "vue-willtable",
   "version": "1.0.0",
-  "description": "editable table for Vue",
+  "description": "Editable table for Vue",
   "author": {
-    "name": "Will",
+    "name": "WillWu",
     "email": "innovation55@foxmail.com",
     "url": "https://www.kevinmint.me"
   },

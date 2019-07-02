@@ -1,11 +1,11 @@
-# km-excel编辑表格组件
+# vue-willtable编辑表格组件
 
 适用于Vue的表格编辑组件，支持多种快捷键操作，模拟Excel的操作体验
 
 ## Installation
 
 ```javascript
-npm install km-excel --save
+npm install vue-willtable --save
 ```
 
 ## Usage
@@ -14,25 +14,25 @@ npm install km-excel --save
 
 ``` javascript
 import Vue from 'vue'
-import VueEditableTable from 'km-excel'
+import VueWilltable from 'vue-willtable'
 
 // require styles
-import 'km-excel/dist/km-excel.min.css'
+import 'vue-willtable/dist/vue-willtable.min.css'
 
-Vue.component('VueEditableTable', VueEditableTable)
+Vue.component('VueWilltable', VueWilltable)
 ```
 
 ### use with component
 
 ``` javascript
-import VueEditableTable from 'km-excel'
+import VueWilltable from 'vue-willtable'
 
 // require styles
-import 'km-excel/dist/km-excel.min.css'
+import 'vue-willtable/dist/vue-willtable.min.css'
 
 export default {
   components: {
-    VueEditableTable
+    VueWilltable
   }
 }
 ```

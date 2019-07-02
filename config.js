@@ -9,13 +9,13 @@ module.exports = {
   },
   build: {
     assetsRoot: path.resolve(__dirname, './demo'),
-    assetsPublicPath: '/kmExcel/',
+    assetsPublicPath: '/vueWilltable/',
     bundleAnalyzerReport: false
   },
   release: {
     assetsRoot: path.resolve(__dirname, './dist'),
     assetsPublicPath: '/',
-    filename: 'km-excel',
-    library: 'KmExcel'
+    filename: 'vue-willtable',
+    library: 'VueWilltable'
   }
 }
