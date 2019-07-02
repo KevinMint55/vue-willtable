@@ -30,7 +30,7 @@
 <script>
 import axios from 'axios';
 import { button } from 'element-ui';
-import Excel from '../src/components/Excel.vue';
+import Excel from '../src/components/Table.vue';
 
 export default {
   name: 'App',

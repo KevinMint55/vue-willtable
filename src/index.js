@@ -1,7 +1,7 @@
-import KmExcel from './components/Excel.vue';
+import WillTable from './components/Table.vue';
 
 const install = (Vue) => {
-  Vue.component(KmExcel.name, KmExcel);
+  Vue.component(WillTable.name, WillTable);
 };
 
 /* 支持使用标签的方式引入 */
@@ -11,7 +11,7 @@ if (typeof window !== 'undefined' && window.Vue) {
 
 export {
   install,
-  KmExcel,
+  WillTable,
 };
 
-export default KmExcel;
+export default WillTable;

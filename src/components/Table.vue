@@ -78,21 +78,19 @@
 </template>
 
 <script>
-import TableStore from '../store';
 import '../style/reset.scss';
+import TableStore from '../store';
 import clickoutside from '../directives/clickoutside';
 import methods from '../mixins/methods';
 import events from '../mixins/events';
 import verify from '../mixins/verify';
-import TableHeader from './ExcelHeader.vue';
-import TableBody from './ExcelBody.vue';
-import Editor from './ExcelEditor.vue';
-import Dropdown from './ExcelDropdown.vue';
-
-const scrollBarWidth = 10;
+import TableHeader from './TableHeader.vue';
+import TableBody from './TableBody.vue';
+import Editor from './TableEditor.vue';
+import Dropdown from './TableDropdown.vue';
 
 export default {
-  name: 'km-excel',
+  name: 'vue-willtable',
   directives: { clickoutside },
   components: {
     TableHeader,
@@ -269,7 +267,7 @@ export default {
           const surplusWidth = this.wrapperWidth - this.store.states.columns.filter(item => item.width).reduce((total, item) => total + item.width, 0);
           if (surplusWidth > 0) {
             if (this.$refs.tbodyContent.$el.offsetHeight > this.maxHeight) {
-              surplusColumnAvg = (surplusWidth - 1 - scrollBarWidth) / surplusColumns.length;
+              surplusColumnAvg = (surplusWidth - 1 - this.store.states.scrollBarWidth) / surplusColumns.length;
             } else {
               surplusColumnAvg = (surplusWidth - 1) / surplusColumns.length;
             }
@@ -334,8 +332,8 @@ export default {
         // 设置左侧定位高度
         this.$nextTick(() => {
           if (this.tableWidth > this.wrapperWidth) {
-            this.$refs.fixedWrapper.style.height = `${this.$refs.wrapper.offsetHeight - scrollBarWidth}px`;
-            this.$refs.fixedTbody.style.height = `${this.$refs.wrapper.offsetHeight - scrollBarWidth - this.theaderHeight}px`;
+            this.$refs.fixedWrapper.style.height = `${this.$refs.wrapper.offsetHeight - this.store.states.scrollBarWidth}px`;
+            this.$refs.fixedTbody.style.height = `${this.$refs.wrapper.offsetHeight - this.store.states.scrollBarWidth - this.theaderHeight}px`;
           } else {
             this.$refs.fixedWrapper.style.height = `${this.$refs.wrapper.offsetHeight}px`;
             this.$refs.fixedTbody.style.height = `${this.$refs.wrapper.offsetHeight - this.theaderHeight}px`;
@@ -350,21 +348,21 @@ export default {
 
             // 如果已存在Col，删除组中重新在末尾添加
             for (let i = 0; i < colgroup.children.length; i += 1) {
-              if (colgroup.children[i].width === scrollBarWidth) {
+              if (colgroup.children[i].width === this.store.states.scrollBarWidth) {
                 colgroup.removeChild(colgroup.children[i]);
                 tr.removeChild(tr.children[i]);
               }
             }
             const col = document.createElement('col');
-            col.width = scrollBarWidth;
+            col.width = this.store.states.scrollBarWidth;
             colgroup.appendChild(col);
 
             const th = document.createElement('th');
-            th.style.width = `${scrollBarWidth}px`;
+            th.style.width = `${this.store.states.scrollBarWidth}px`;
             th.style.borderTop = '1px solid #d6dfe4';
             tr.appendChild(th);
 
-            this.$refs.tbodyContent.$el.style.width = `${this.tableWidth - scrollBarWidth - 1}px`;
+            this.$refs.tbodyContent.$el.style.width = `${this.tableWidth - this.store.states.scrollBarWidth - 1}px`;
           });
         }
       });
@@ -636,11 +634,11 @@ export default {
         const unFixedLeftArr = this.scrollLeftArr.slice(this.fixedCount - 1, -1).map(item => item - this.fixedWidth);
         const unFixedRightArr = this.scrollLeftArr.slice(this.fixedCount).map(item => item - this.fixedWidth);
         curLeftShould = unFixedLeftArr[this.store.states.editor.editorXIndex - this.fixedCount];
-        curRightShould = unFixedRightArr[this.store.states.editor.editorXIndex - this.fixedCount] + this.fixedWidth - this.wrapperWidth + scrollBarWidth + 2;
+        curRightShould = unFixedRightArr[this.store.states.editor.editorXIndex - this.fixedCount] + this.fixedWidth - this.wrapperWidth + this.store.states.scrollBarWidth + 2;
       } else {
         const scrollLeftArr = [0, ...this.scrollLeftArr];
         curLeftShould = scrollLeftArr[this.store.states.editor.editorXIndex];
-        curRightShould = scrollLeftArr[this.store.states.editor.editorXIndex + 1] - this.wrapperWidth + scrollBarWidth + 2;
+        curRightShould = scrollLeftArr[this.store.states.editor.editorXIndex + 1] - this.wrapperWidth + this.store.states.scrollBarWidth + 2;
       }
       if (this.tableWidth > this.wrapperWidth) {
         if (this.store.states.tableBodyLeft > curLeftShould) {
@@ -659,7 +657,7 @@ export default {
           this.$refs.tbody.scrollTop = curTopShould;
           this.$refs.fixedTbody.scrollTop = curTopShould;
         }
-        const curBottomShould = this.scrollTopArr[this.store.states.editor.editorYIndex + 1] - this.maxHeight + scrollBarWidth + 2;
+        const curBottomShould = this.scrollTopArr[this.store.states.editor.editorYIndex + 1] - this.maxHeight + this.store.states.scrollBarWidth + 2;
         if (this.store.states.tableBodyTop < curBottomShould) {
           this.$refs.tbody.scrollTop = curBottomShould;
           this.$refs.fixedTbody.scrollTop = curBottomShould;

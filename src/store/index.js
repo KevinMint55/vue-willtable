@@ -1,6 +1,7 @@
 class TableStore {
   constructor() {
     this.states = {
+      scrollBarWidth: 10,
       tableBodyLeft: 0,
       tableBodyTop: 0,
       columns: [],
