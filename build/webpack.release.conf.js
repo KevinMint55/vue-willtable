@@ -25,10 +25,7 @@ const webpackConfig = {
     libraryTarget: 'umd'
   },
   plugins: [
-    new CleanWebpackPlugin(['dist/*'], {
-      root: resolve('./'),
-      verbose: false,
-    }),
+    new CleanWebpackPlugin(),
     new UglifyJSPlugin({
       uglifyOptions: {
         compress: {

@@ -19,12 +19,13 @@
           @mousedown.prevent="selectCell($event, xIndex, yIndex, th.type)"
           v-show="th.fixed || allShow">
           <el-checkbox
+            v-if="th.type === 'selection' && dataStatusList[yIndex]"
             size="mini"
             v-model="dataStatusList[yIndex].checked"
-            @change="selectionChange"
-            v-if="th.type === 'selection' && dataStatusList[yIndex]"></el-checkbox>
+            @change="selectionChange">
+          </el-checkbox>
           <div
-            class="cell-content"
+            class="km-cell-content"
             :style="{'max-width':  `${columnsWidth[xIndex]}px`}"
             v-else>{{ format(tr[th.key], th.type, th.format) }}</div>
         </td>
@@ -162,11 +163,15 @@ export default {
     text-indent: 4px;
     height: 28px;
   }
+
+  .disabled {
+    color: #80848f;
+  }
+
+  .error {
+    background-color: #ff4c42 !important;
+  }
 }
-.disabled {
-  color: #80848f;
-}
-.error {
-  background-color: #ff4c42 !important;
-}
+
+
 </style>

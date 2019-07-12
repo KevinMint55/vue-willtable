@@ -17,23 +17,30 @@
           :title="th.title"
           v-show="th.fixed || allShow">
           <el-checkbox
+            v-if="th.type === 'selection'"
             size="mini"
             v-model="checkedAll"
-            @change="selectAll"
-            v-if="th.type === 'selection'">
+            @change="selectAll">
           </el-checkbox>
           <p
-            class="cell-content"
+            class="km-cell-content"
             :style="{width: `${columnsWidth[index] - 20}px`}"
             :class="{active: isActive(columnsStatusList[index])}"
             v-else>
             <span class="icon" :class="iconClass(th.type)" v-if="showIcon"></span>
             <span class="content">{{ th.title }}</span>
           </p>
-          <div class="dropdown" v-if="th.type != 'selection'" :class="{active: dropdown.index === index}">
-            <i @click.stop="openDropdown(index)" v-if="th.action"></i>
+          <div
+            v-if="th.type != 'selection'"
+            class="dropdown"
+            :class="{active: dropdown.index === index}">
+            <i v-if="th.action" @click.stop="openDropdown(index)"></i>
           </div>
-          <div class="handler" @mousedown="handlerDown(index)" v-if="th.type != 'selection'"></div>
+          <div
+            v-if="th.type != 'selection'"
+            class="handler"
+            @mousedown="handlerDown(index)">
+          </div>
         </th>
       </tr>
     </thead>
@@ -203,35 +210,34 @@ export default {
     cursor: ew-resize;
     text-align: center;
   }
-}
-
-.active {
-  color: #2d8cf0;
-}
-
-.content {
-  vertical-align: middle;
-}
-
-.icon {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-  vertical-align: middle;
-  &.text {
-    background-image: url("../assets/text.png");
+  .active {
+    color: #2d8cf0;
   }
-  &.select {
-    background-image: url("../assets/select.png");
+
+  .content {
+    vertical-align: middle;
   }
-  &.date {
-    background-image: url("../assets/date.png");
-  }
-  &.number {
-    background-image: url("../assets/number.png");
+
+  .icon {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    vertical-align: middle;
+    &.text {
+      background-image: url("../assets/text.png");
+    }
+    &.select {
+      background-image: url("../assets/select.png");
+    }
+    &.date {
+      background-image: url("../assets/date.png");
+    }
+    &.number {
+      background-image: url("../assets/number.png");
+    }
   }
 }
 </style>

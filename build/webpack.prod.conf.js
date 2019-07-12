@@ -22,10 +22,7 @@ const webpackConfig = {
     chunkFilename: 'js/[name].[chunkhash].js',
   },
   plugins: [
-    new CleanWebpackPlugin(['demo/*'], {
-      root: resolve('./'),
-      verbose: false,
-    }),
+    new CleanWebpackPlugin(),
     new UglifyJSPlugin({
       uglifyOptions: {
         compress: {

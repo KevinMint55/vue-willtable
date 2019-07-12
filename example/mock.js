@@ -82,7 +82,7 @@ Mock.mock('http://3.json', 'get', {
 });
 
 Mock.mock('http://4.json', 'get', {
-  'list|500': [{
+  'list|200': [{
     // 属性 sid 是一个自增数，起始值为 1，每次增 1
     'sid|+1': 1,
     // 属性 userId 是一个5位的随机码

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      class="cell-editor"
+      class="km-cell-editor"
       :style="cellEditorStyle"
       :class="{
         'else': editor.editType != 'text' && editor.editType != 'number'
@@ -11,11 +11,15 @@
       v-show="editor.editorShow">
       <textarea
         ref="clipboard"
-        class="clipboard"
+        class="km-clipboard"
         @paste="clipboardToContent">
       </textarea>
       <div style="flex:1;" v-show="editor.editing">
-        <textarea v-model="editContent" ref="text" v-if="editor.editType == 'text'"></textarea>
+        <textarea
+          v-if="editor.editType == 'text'"
+          ref="text"
+          v-model="editContent">
+        </textarea>
         <el-date-picker
           size="mini"
           v-model="editContent"
@@ -62,23 +66,23 @@
       </div>
     </div>
     <div
-      class="autofill-handler"
+      ref="autofillHandler"
+      class="km-autofill-handler"
       :style="autofillHandlerStyle"
       @mousedown="handleAutofill"
-      v-show="!editor.editing && editor.editorShow"
-      ref="autofillHandler">
+      v-show="!editor.editing && editor.editorShow">
     </div>
     <div
-      class="cover-area selected"
+      class="km-cover-area selected"
       :style="selectedStyle"></div>
     <div
-      class="cover-area selected fixed"
+      class="km-cover-area selected fixed"
       :style="fixedSelectedStyle"></div>
     <div
-      class="cover-area autofill"
+      class="km-cover-area autofill"
       :style="autofillStyle"></div>
     <div
-      class="cover-area autofill fixed"
+      class="km-cover-area autofill fixed"
       :style="fixedAutofillStyle"></div>
   </div>
 </template>
@@ -229,7 +233,7 @@ export default {
 
 <style lang="scss" scoped>
 // 编辑框
-.cell-editor {
+.km-cell-editor {
   position: absolute;
   top: 30px;
   left: 0;
@@ -255,7 +259,7 @@ export default {
   }
 }
 
-.autofill-handler {
+.km-autofill-handler {
   position: absolute;
   top: 56px;
   left: 196px;
@@ -267,14 +271,14 @@ export default {
   z-index: 5;
 }
 
-.clipboard {
+.km-clipboard {
   width: 0 !important;
   height: 0 !important;
   flex: 0 0 !important;
   padding: 0 !important;
 }
 
-.cover-area {
+.km-cover-area {
   position: absolute;
   top: 0;
   left: 0;

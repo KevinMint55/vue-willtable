@@ -168,6 +168,14 @@ class TableStore {
       states.dropdown.index = null;
     }
   }
+
+  selectAllCells() {
+    const { states } = this;
+    states.selector.selectedXIndex = states.editor.editorRange.minX;
+    states.selector.selectedYIndex = states.editor.editorRange.minY;
+    states.selector.selectedXArr = [states.editor.editorRange.minX, states.editor.editorRange.maxX];
+    states.selector.selectedYArr = [states.editor.editorRange.minY, states.editor.editorRange.maxY];
+  }
 }
 
 export default TableStore;

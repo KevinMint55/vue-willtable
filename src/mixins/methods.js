@@ -1,5 +1,12 @@
 export default {
   methods: {
+    setData(data) {
+      this.data = data;
+      this.$nextTick(() => {
+        this.initData();
+        this.handleFilters();
+      });
+    },
     getChangeData() {
       return this.changeData;
     },

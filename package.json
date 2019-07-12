@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "description": "Editable table for Vue",
   "author": {
-    "name": "WillWu",
+    "name": "KevinMint",
     "email": "innovation55@foxmail.com",
     "url": "https://www.kevinmint.me"
   },
   "private": false,
-  "main": "dist/km-excel.min.js",
+  "main": "dist/vue-willtable.min.js",
   "license": "MIT",
   "scripts": {
     "start": "npm run dev",

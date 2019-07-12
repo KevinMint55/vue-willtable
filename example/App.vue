@@ -3,27 +3,25 @@
     <div class="button-bar">
       <div>
         <el-button @click="getList2">获取20条数据</el-button>
-        <el-button @click="getList3">获取500条数据</el-button>
-        <el-button @click="getChangeData">获取改变的数据</el-button>
+        <el-button @click="getList3">获取200条数据</el-button>
+        <el-button @click="getChangeData">获取改变的数据行</el-button>
         <el-button @click="getErrorRows">获取错误行</el-button>
         <el-button @click="disabled = !disabled">{{ disabled ? '启用' : '禁用'}}</el-button>
         <el-button @click="show = !show">{{ show ? '隐藏' : '显示'}}</el-button>
         <el-button @click="add">添加行</el-button>
         <el-button @click="remove">勾选删除行</el-button>
       </div>
-      <el-button type="primary" @click="lookDocument">文档地址</el-button>
     </div>
     <excel
-      ref="excel"
+      v-if="show"
+      ref="willtable"
       :columns="columns"
-      v-model="data1"
+      v-model="data"
       style="width: 100%;margin-top: 10px;"
       maxHeight="800"
       @selection-change="selectionChange"
       :disabled="disabled"
-      :showIcon="true"
-      v-if="show" />
-    <!-- <excel :columns-data="columns" v-model="data2" style="width: 100%;" maxHeight="800"></excel> -->
+      :showIcon="true" />
   </div>
 </template>
 
@@ -52,7 +50,6 @@ export default {
           key: 'sid',
           fixed: true,
           type: 'number',
-          format: false,
         },
         {
           title: '日期',
@@ -125,8 +122,7 @@ export default {
           width: 200,
         },
       ],
-      data1: [],
-      data2: [],
+      data: [],
       disabled: false,
       selection: [],
     };
@@ -137,34 +133,28 @@ export default {
   methods: {
     getList() {
       axios.get('https://demo.kevinmint.com/1.json').then((res) => {
-        this.data1 = res.data.list;
-        // this.data2 = res.data.list;
+        this.$refs.willtable.setData(res.data.list);
+        // this.data = res.data.list;
       }).catch(() => {});
     },
     getList2() {
       axios.get('http://3.json').then((res) => {
-        this.data1 = res.data.list;
-        this.$nextTick(() => {
-          this.$refs.excel.initData();
-        });
+        this.$refs.willtable.setData(res.data.list);
       }).catch(() => {});
     },
     getList3() {
       axios.get('http://4.json').then((res) => {
-        this.data1 = res.data.list;
-        this.$nextTick(() => {
-          this.$refs.excel.initData();
-        });
+        this.$refs.willtable.setData(res.data.list);
       }).catch(() => {});
     },
     selectionChange(selection) {
       this.selection = selection;
     },
     getErrorRows() {
-      console.log(this.$refs.excel.getErrorRows());
+      console.log(this.$refs.willtable.getErrorRows());
     },
     getChangeData() {
-      console.log(this.$refs.excel.getChangeData());
+      console.log(this.$refs.willtable.getChangeData());
     },
     cellStyle({ rowIndex, columnIndex }) {
       if (rowIndex === 1) {
@@ -186,13 +176,10 @@ export default {
           obj[item.key] = '';
         }
       });
-      this.$refs.excel.addItem(obj);
+      this.$refs.willtable.addItem(obj);
     },
     remove() {
-      this.$refs.excel.removeItems('sid', this.selection.map(s => s.sid));
-    },
-    lookDocument() {
-      window.open('http://120.132.26.206:4873/#/detail/km-excel', '_blank');
+      this.$refs.willtable.removeItems('sid', this.selection.map(s => s.sid));
     },
   },
 };

@@ -17,7 +17,9 @@
         <li v-for="(item, key) in dropdown.list" :key="key">
           <el-checkbox
             size="mini"
-            v-model="item.checked"></el-checkbox>
+            v-model="item.checked"
+            style="margin-right: 2px;">
+          </el-checkbox>
           <p>
             <span :title="key">{{ key }}</span>
             <i>（{{ item.count }}）</i>

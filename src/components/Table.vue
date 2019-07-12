@@ -1,5 +1,5 @@
 <template>
-  <div class="km-excel" ref="excel">
+  <div ref="willtable" class="km-willtable">
     <div
       v-if="store.states.columns.length > 0"
       ref="wrapper"
@@ -33,7 +33,10 @@
             :fixedCount="fixedCount"
             :store="store" />
         </table-body>
-        <div v-if="store.states.showData.length == 0" class="empty-block" :style="{width: `${tableWidth}px`}">
+        <div
+          v-if="store.states.showData.length == 0"
+          class="empty-block"
+          :style="{width: `${tableWidth}px`}">
             暂无数据
         </div>
       </div>
@@ -73,7 +76,7 @@
       :fixedCount="fixedCount"
       :store="store"
     ></dropdown>
-    <div class="adjustLine" :style="{ left: `${store.states.adjustLineLeft}px` }" v-show="store.states.adjustLineShow"></div>
+    <div class="km-adjustLine" :style="{ left: `${store.states.adjustLineLeft}px` }" v-show="store.states.adjustLineShow"></div>
   </div>
 </template>
 
@@ -246,7 +249,7 @@ export default {
       this.initColumns();
     },
     handleResize() {
-      this.excelPos = this.$refs.excel.getBoundingClientRect();
+      this.excelPos = this.$refs.willtable.getBoundingClientRect();
       // 获取编辑框可移动范围, X是横轴, Y是竖轴
       this.store.states.editor.editorRange = {
         minX: this.store.states.columns.filter(item => item.type === 'selection').length,
@@ -456,7 +459,7 @@ export default {
         return this.getContentToclipboard();
       }
       if ((e.ctrlKey && e.keyCode === 65) || (e.metaKey && e.keyCode === 65)) {
-        return this.selectAllCells();
+        return this.store.selectAllCells();
       }
       if (e.ctrlKey || e.metaKey) {
         return;
@@ -577,20 +580,15 @@ export default {
         }
       }
     },
-    selectAllCells() {
-      this.store.states.selector.selectedXIndex = this.store.states.editor.editorRange.minX;
-      this.store.states.selector.selectedYIndex = this.store.states.editor.editorRange.minY;
-      this.store.states.selector.selectedXArr = [this.store.states.editor.editorRange.minX, this.store.states.editor.editorRange.maxX];
-      this.store.states.selector.selectedYArr = [this.store.states.editor.editorRange.minY, this.store.states.editor.editorRange.maxY];
-    },
     // 设置启用编辑
     setEditing(key) {
-      if (this.store.states.columns[this.store.states.editor.editorXIndex].type === 'disabled') {
+      const { states } = this.store;
+      if (states.columns[states.editor.editorXIndex].type === 'disabled') {
         return;
       }
-      this.store.states.editor.editType = this.store.states.columns[this.store.states.editor.editorXIndex].type ? this.store.states.columns[this.store.states.editor.editorXIndex].type : 'text';
-      this.store.states.editor.curEditorWidth = this.columnsWidth[this.store.states.editor.editorXIndex];
-      if (key && (this.store.states.editor.editType === 'text' || this.store.states.editor.editType === 'number')) {
+      states.editor.editType = states.columns[states.editor.editorXIndex].type ? states.columns[states.editor.editorXIndex].type : 'text';
+      states.editor.curEditorWidth = this.columnsWidth[states.editor.editorXIndex];
+      if (key && (states.editor.editType === 'text' || states.editor.editType === 'number')) {
         if (key === 'Process' || key === 'Unidentified') {
           if (key.match(/\d/)) {
             [this.$refs.editor.editContent] = key.match(/\d/);
@@ -601,14 +599,14 @@ export default {
           this.$refs.editor.editContent = key;
         }
       } else {
-        this.$refs.editor.editContent = this.store.states.showData[this.store.states.editor.editorYIndex][this.store.states.columns[this.store.states.editor.editorXIndex].key];
+        this.$refs.editor.editContent = states.showData[states.editor.editorYIndex][states.columns[states.editor.editorXIndex].key];
       }
-      this.store.states.editor.editing = true;
-      if (this.store.states.editor.editType === 'select') {
-        this.store.states.editor.options = this.store.states.columns[this.store.states.editor.editorXIndex].options;
+      states.editor.editing = true;
+      if (states.editor.editType === 'select') {
+        states.editor.options = states.columns[states.editor.editorXIndex].options;
       }
       this.$nextTick(() => {
-        this.$refs.editor.$refs[this.store.states.editor.editType].focus();
+        this.$refs.editor.$refs[states.editor.editType].focus();
       });
     },
     selectUp() {
@@ -618,66 +616,68 @@ export default {
       }, 0);
     },
     adjustPosition() {
-      if (this.store.states.editor.editorXIndex < this.fixedCount) {
-        this.store.states.editor.editorIsFixed = true;
+      const { states } = this.store;
+      if (states.editor.editorXIndex < this.fixedCount) {
+        states.editor.editorIsFixed = true;
       } else {
-        this.store.states.editor.editorIsFixed = false;
+        states.editor.editorIsFixed = false;
       }
-      this.store.states.autofill.autofillXIndex = this.store.states.editor.editorXIndex;
-      this.store.states.autofill.autofillYIndex = this.store.states.editor.editorYIndex;
-      this.store.states.selector.selectedXArr = [this.store.states.editor.editorXIndex, this.store.states.editor.editorXIndex];
-      this.store.states.selector.selectedYArr = [this.store.states.editor.editorYIndex, this.store.states.editor.editorYIndex];
+      states.autofill.autofillXIndex = states.editor.editorXIndex;
+      states.autofill.autofillYIndex = states.editor.editorYIndex;
+      states.selector.selectedXArr = [states.editor.editorXIndex, states.editor.editorXIndex];
+      states.selector.selectedYArr = [states.editor.editorYIndex, states.editor.editorYIndex];
       // 左右调整
       let curLeftShould; let
         curRightShould;
       if (this.fixedCount > 0) {
         const unFixedLeftArr = this.scrollLeftArr.slice(this.fixedCount - 1, -1).map(item => item - this.fixedWidth);
         const unFixedRightArr = this.scrollLeftArr.slice(this.fixedCount).map(item => item - this.fixedWidth);
-        curLeftShould = unFixedLeftArr[this.store.states.editor.editorXIndex - this.fixedCount];
-        curRightShould = unFixedRightArr[this.store.states.editor.editorXIndex - this.fixedCount] + this.fixedWidth - this.wrapperWidth + this.store.states.scrollBarWidth + 2;
+        curLeftShould = unFixedLeftArr[states.editor.editorXIndex - this.fixedCount];
+        curRightShould = unFixedRightArr[states.editor.editorXIndex - this.fixedCount] + this.fixedWidth - this.wrapperWidth + states.scrollBarWidth + 2;
       } else {
         const scrollLeftArr = [0, ...this.scrollLeftArr];
-        curLeftShould = scrollLeftArr[this.store.states.editor.editorXIndex];
-        curRightShould = scrollLeftArr[this.store.states.editor.editorXIndex + 1] - this.wrapperWidth + this.store.states.scrollBarWidth + 2;
+        curLeftShould = scrollLeftArr[states.editor.editorXIndex];
+        curRightShould = scrollLeftArr[states.editor.editorXIndex + 1] - this.wrapperWidth + states.scrollBarWidth + 2;
       }
       if (this.tableWidth > this.wrapperWidth) {
-        if (this.store.states.tableBodyLeft > curLeftShould) {
+        if (states.tableBodyLeft > curLeftShould) {
           this.$refs.theader.scrollLeft = curLeftShould;
           this.$refs.tbody.scrollLeft = curLeftShould;
         }
-        if (this.store.states.tableBodyLeft < curRightShould) {
+        if (states.tableBodyLeft < curRightShould) {
           this.$refs.theader.scrollLeft = curRightShould + 2;
           this.$refs.tbody.scrollLeft = curRightShould + 2;
         }
       }
       // 上下调整
       if (this.maxHeight) {
-        const curTopShould = this.scrollTopArr[this.store.states.editor.editorYIndex];
-        if (this.store.states.tableBodyTop > curTopShould) {
+        const curTopShould = this.scrollTopArr[states.editor.editorYIndex];
+        if (states.tableBodyTop > curTopShould) {
           this.$refs.tbody.scrollTop = curTopShould;
           this.$refs.fixedTbody.scrollTop = curTopShould;
         }
-        const curBottomShould = this.scrollTopArr[this.store.states.editor.editorYIndex + 1] - this.maxHeight + this.store.states.scrollBarWidth + 2;
-        if (this.store.states.tableBodyTop < curBottomShould) {
+        const curBottomShould = this.scrollTopArr[states.editor.editorYIndex + 1] - this.maxHeight + states.scrollBarWidth + 2;
+        if (states.tableBodyTop < curBottomShould) {
           this.$refs.tbody.scrollTop = curBottomShould;
           this.$refs.fixedTbody.scrollTop = curBottomShould;
         }
       }
     },
     multiSelectAdjustPostion(e) {
-      if (this.store.states.selector.isSelected) {
+      const { states } = this.store;
+      if (states.selector.isSelected) {
         if (e) {
           e = e || window.event;
           this.mouseX = e.pageX;
           this.mouseY = e.pageY;
         }
-        if (this.store.states.selector.selectedYArr[0] === this.store.states.selector.selectedYArr[1] && this.store.states.selector.selectedXArr[0] === this.store.states.selector.selectedXArr[1]) {
+        if (states.selector.selectedYArr[0] === states.selector.selectedYArr[1] && states.selector.selectedXArr[0] === states.selector.selectedXArr[1]) {
           return;
         }
-        const sTop = this.$refs.excel.offsetTop + 30;
+        const sTop = this.$refs.willtable.offsetTop + 30;
         const sLeft = this.excelPos.left + this.fixedWidth;
-        const sBottom = this.$refs.excel.offsetTop + this.$refs.excel.offsetHeight - 10;
-        const sRight = this.excelPos.left + this.$refs.excel.offsetWidth - 10;
+        const sBottom = this.$refs.willtable.offsetTop + this.$refs.willtable.offsetHeight - 10;
+        const sRight = this.excelPos.left + this.$refs.willtable.offsetWidth - 10;
         if (this.mouseY < sTop) {
           this.$refs.tbody.scrollTop -= 20;
           this.$refs.fixedTbody.scrollTop -= 20;
@@ -704,7 +704,8 @@ export default {
       this.selectionChange();
     },
     operation(type) {
-      if (!this.store.states.editor.editing) {
+      const { states } = this.store;
+      if (!states.editor.editing) {
         if (type === 'undo' && this.curHisory > 1) {
           this.curHisory -= 1;
         }
@@ -727,59 +728,66 @@ export default {
       this.handleResize();
     },
     sort(type) {
+      const { states } = this.store;
       this.columnsStatusList.forEach((item) => {
         item.sort = '';
       });
-      this.columnsStatusList[this.store.states.dropdown.index].sort = type;
+      this.columnsStatusList[states.dropdown.index].sort = type;
       if (type === 'ascending') {
-        this.store.states.showData.sort((x, y) => (x[this.columnsStatusList[this.store.states.dropdown.index].key] > y[this.columnsStatusList[this.store.states.dropdown.index].key] ? 1 : -1));
+        states.showData.sort((x, y) => (x[this.columnsStatusList[states.dropdown.index].key] > y[this.columnsStatusList[states.dropdown.index].key] ? 1 : -1));
       } else {
-        this.store.states.showData.sort((x, y) => (x[this.columnsStatusList[this.store.states.dropdown.index].key] > y[this.columnsStatusList[this.store.states.dropdown.index].key] ? -1 : 1));
+        states.showData.sort((x, y) => (x[this.columnsStatusList[states.dropdown.index].key] > y[this.columnsStatusList[states.dropdown.index].key] ? -1 : 1));
       }
-      this.store.states.dropdown.index = null;
+      states.dropdown.index = null;
     },
     handleFilter() {
-      this.columnsStatusList[this.store.states.dropdown.index] = {
-        list: this.store.states.dropdown.list,
-        key: this.store.states.dropdown.key,
-        sort: this.store.states.dropdown.sort,
+      const { states } = this.store;
+      this.columnsStatusList[states.dropdown.index] = {
+        list: states.dropdown.list,
+        key: states.dropdown.key,
+        sort: states.dropdown.sort,
       };
       const arr = [];
-      Object.keys(this.store.states.dropdown.list).forEach((key) => {
-        if (this.store.states.dropdown.list[key].checked) {
+      Object.keys(states.dropdown.list).forEach((key) => {
+        if (states.dropdown.list[key].checked) {
           arr.push(key);
         }
       });
-      this.store.states.filters[this.columnsStatusList[this.store.states.dropdown.index].key] = arr;
+      states.filters[this.columnsStatusList[states.dropdown.index].key] = arr;
       this.filterData();
     },
     resetFilter() {
-      delete this.store.states.filters[this.columnsStatusList[this.store.states.dropdown.index].key];
-      Object.keys(this.columnsStatusList[this.store.states.dropdown.index].list).forEach((key) => {
-        this.columnsStatusList[this.store.states.dropdown.index].list[key].checked = false;
+      const { states } = this.store;
+      delete states.filters[this.columnsStatusList[states.dropdown.index].key];
+      Object.keys(this.columnsStatusList[states.dropdown.index].list).forEach((key) => {
+        this.columnsStatusList[states.dropdown.index].list[key].checked = false;
       });
       this.filterData();
     },
     filterData() {
-      this.store.states.showData = this.data;
-      Object.keys(this.store.states.filters).forEach((key) => {
-        this.store.states.showData = this.store.states.showData.filter(item => this.store.states.filters[key].includes(item[key].toString()));
+      const { states } = this.store;
+      states.showData = this.data;
+      Object.keys(states.filters).forEach((key) => {
+        states.showData = states.showData.filter(item => states.filters[key].includes(item[key].toString()));
       });
-      this.store.states.dropdown.index = null;
+      states.dropdown.index = null;
       this.handleResize();
     },
     handleErrors() {
-      this.dataStatusList.forEach((item, yIndex) => {
-        this.store.states.columns.forEach((column) => {
-          if (this.verify(column, this.data[yIndex][column.key])) {
-            if (item.errors.includes(column.key)) {
-              item.errors.splice(item.errors.indexOf(column.key), 1);
+      const { states } = this.store;
+      this.$nextTick(() => {
+        this.dataStatusList.forEach((item, yIndex) => {
+          states.columns.forEach((column) => {
+            if (this.verify(column, this.data[yIndex][column.key])) {
+              if (item.errors.includes(column.key)) {
+                item.errors.splice(item.errors.indexOf(column.key), 1);
+              }
+            } else {
+              if (!item.errors.includes(column.key)) {
+                item.errors.push(column.key);
+              }
             }
-          } else {
-            if (!item.errors.includes(column.key)) {
-              item.errors.push(column.key);
-            }
-          }
+          });
         });
       });
     },
@@ -811,7 +819,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.km-excel {
+.km-willtable {
   position: relative;
 }
 
@@ -859,7 +867,7 @@ ul {
     border-collapse: collapse;
     font-size: 12px;
     table-layout: fixed;
-    .cell-content {
+    .km-cell-content {
       width: 100%;
       overflow: hidden;
       white-space: nowrap;
@@ -948,7 +956,7 @@ ul {
   font-size: 12px;
 }
 
-.adjustLine {
+.km-adjustLine {
   position: absolute;
   top: 0;
   left: 0;
