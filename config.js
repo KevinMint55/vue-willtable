@@ -9,7 +9,7 @@ module.exports = {
   },
   build: {
     assetsRoot: path.resolve(__dirname, './demo'),
-    assetsPublicPath: '/vueWilltable/',
+    assetsPublicPath: '/willtable/',
     bundleAnalyzerReport: false
   },
   release: {
