@@ -1,8 +1,12 @@
-# vue-willtable编辑表格组件
+# vue-willtable可编辑的表格组件
 
-适用于Vue的表格编辑组件，支持多种快捷键操作，模拟Excel的操作体验
+适用于Vue的可编辑的表格组件，支持多种快捷键操作，模拟Excel的操作体验
 
 Demo here: https://demo.kevinmint.com/willtable/
+
+![image](https://qiniu.kevinmint.com/willtable1.gif)
+
+![image](https://qiniu.kevinmint.com/willtable2.gif)
 
 ## Installation
 
@@ -10,9 +14,9 @@ Demo here: https://demo.kevinmint.com/willtable/
 npm install vue-willtable --save
 ```
 
-## Usage
+## Mount
 
-### use with global
+### mount with global
 
 ``` javascript
 import Vue from 'vue'
@@ -24,7 +28,7 @@ import 'vue-willtable/dist/vue-willtable.min.css'
 Vue.component('VueWilltable', VueWilltable)
 ```
 
-### use with component
+### mount with component
 
 ``` javascript
 import VueWilltable from 'vue-willtable'
@@ -37,6 +41,120 @@ export default {
     VueWilltable
   }
 }
+```
+
+## Usage
+
+```vue
+<template>
+  <willtable
+    ref="willtable"
+    :columns="columns"
+    v-model="data"
+    maxHeight="800" />
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      columns: [
+        {
+          type: 'selection',
+          width: 40,
+          fixed: true,
+        },
+        {
+          title: '序号',
+          key: 'sid',
+          fixed: true,
+          type: 'number',
+        },
+        {
+          title: '日期',
+          key: 'date',
+          type: 'date',
+          width: '100',
+        },
+        {
+          title: '邮箱地址',
+          key: 'email',
+          width: 300,
+          type: 'select',
+          fixed: true,
+          options: [
+            {
+              value: 'New York',
+              label: 'New York',
+            },
+            {
+              value: 'London',
+              label: 'London',
+            },
+            {
+              value: 'Sydney',
+              label: 'Sydney',
+            },
+          ],
+        },
+        {
+          title: '月份',
+          key: 'month',
+          type: 'month',
+          width: 100,
+        },
+        {
+          title: '地址',
+          key: 'address',
+          width: 200,
+          action: true,
+        },
+        {
+          title: '标题',
+          key: 'title',
+          width: 300,
+        },
+        {
+          title: '内容',
+          key: 'paragraph',
+          width: 300,
+        },
+        {
+          title: '链接',
+          key: 'url',
+          width: 200,
+        },
+        {
+          title: 'ip',
+          key: 'ip',
+          width: 200,
+        },
+        {
+          title: '总金额',
+          key: 'sum',
+          width: 200,
+        },
+        {
+          title: 'ID',
+          key: 'id',
+          type: 'disabled',
+          width: 200,
+        },
+      ],
+      data: [],
+    },
+  },
+  mounted() {
+    this.getData();
+  },
+  methods: {
+    getData() {
+      const data = [];
+      this.$refs.willtable.setData(data);
+    },
+  },
+};
+</script>
 ```
 
 ### Value-Binding
@@ -110,3 +228,7 @@ Enter | 单元格编辑/完成单元格编辑
 - 获取校验非法的数据行
 - 支持撤销与重做
 - 可自定义每个单元格样式与类名
+
+## Author
+
+[KevinMint](https://www.kevinmint.com)
