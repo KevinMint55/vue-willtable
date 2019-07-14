@@ -31,9 +31,9 @@
 <script>
 import axios from 'axios';
 import { button } from 'element-ui';
-// import Willtable from '../src/components/Table';
-import Willtable from '../dist/vue-willtable.min';
-import '../dist/vue-willtable.min.css';
+import Willtable from '../src/components/Table';
+// import Willtable from '../dist/vue-willtable.min';
+// import '../dist/vue-willtable.min.css';
 
 export default {
   name: 'App',

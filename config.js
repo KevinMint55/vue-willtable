@@ -14,7 +14,7 @@ module.exports = {
   },
   release: {
     assetsRoot: path.resolve(__dirname, './dist'),
-    assetsPublicPath: '/',
+    assetsPublicPath: './',
     filename: 'vue-willtable',
     library: 'VueWilltable'
   }

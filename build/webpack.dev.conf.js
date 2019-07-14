@@ -12,6 +12,10 @@ function resolve(dir) {
 
 const webpackConfig = {
   mode: 'development',
+  context: resolve('./'),
+  entry: {
+    app: ['babel-polyfill', './example/main.js'],
+  },
   devtool: config.dev.devtool,
   plugins: [
     new webpack.NamedModulesPlugin(),

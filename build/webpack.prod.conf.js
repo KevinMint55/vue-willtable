@@ -15,6 +15,10 @@ function resolve(dir) {
 
 const webpackConfig = {
   mode: 'production',
+  context: resolve('./'),
+  entry: {
+    app: ['babel-polyfill', './example/main.js'],
+  },
   output: {
     path: config.build.assetsRoot,
     publicPath: config.build.assetsPublicPath,

@@ -8,10 +8,6 @@ function resolve(dir) {
 }
 
 const webpackConfig = {
-  context: resolve('./'),
-  entry: {
-    app: ['babel-polyfill', './example/main.js'],
-  },
   output: {
     filename: 'js/[name].js',
     publicPath: '/',
