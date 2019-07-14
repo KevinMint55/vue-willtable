@@ -1,3 +1,10 @@
+import {
+  verifyDate,
+  verifyMonth,
+  verifySelect,
+  verifyNumber,
+} from '../mixins/verify';
+
 class TableStore {
   constructor() {
     this.states = {
@@ -5,7 +12,10 @@ class TableStore {
       tableBodyLeft: 0,
       tableBodyTop: 0,
       columns: [],
+      data: [],
       showData: [],
+      dataStatusList: [],
+      columnsStatusList: [],
 
       // 编辑器
       editor: {
@@ -152,7 +162,7 @@ class TableStore {
     }
   }
 
-  openDropdown(i, columnsStatusList) {
+  openDropdown(i) {
     const { states } = this;
     if (typeof (i) === 'number') {
       if (states.dropdown.index === i) {
@@ -160,7 +170,7 @@ class TableStore {
       } else {
         states.dropdown.index = i;
         states.dropdown = JSON.parse(JSON.stringify({
-          ...columnsStatusList[states.dropdown.index],
+          ...states.columnsStatusList[states.dropdown.index],
           index: states.dropdown.index,
         }));
       }
@@ -175,6 +185,129 @@ class TableStore {
     states.selector.selectedYIndex = states.editor.editorRange.minY;
     states.selector.selectedXArr = [states.editor.editorRange.minX, states.editor.editorRange.maxX];
     states.selector.selectedYArr = [states.editor.editorRange.minY, states.editor.editorRange.maxY];
+  }
+
+  handleFilters() {
+    const { states } = this;
+    states.columnsStatusList.forEach((th) => {
+      if (th.type === 'selection') return;
+      if (th.list) {
+        Object.keys(th.list).forEach((item) => {
+          th.list[item].count = 0;
+        });
+      } else {
+        th.list = {};
+      }
+      states.data.forEach((td) => {
+        if (td[th.key]) {
+          if (th.list[td[th.key]]) {
+            th.list[td[th.key]].count += 1;
+          } else {
+            th.list[td[th.key]] = {};
+            th.list[td[th.key]].count = 1;
+          }
+        }
+      });
+      Object.keys(th.list).forEach((item) => {
+        if (th.list[item].count === 0) {
+          delete th.list[item];
+        }
+      });
+    });
+  }
+
+  // 处理错误数据
+  handleErrors() {
+    const { states } = this;
+    setTimeout(() => {
+      states.dataStatusList.forEach((item, yIndex) => {
+        states.columns.forEach((column) => {
+          if (this.verify(column, states.data[yIndex][column.key])) {
+            if (item.errors.includes(column.key)) {
+              item.errors.splice(item.errors.indexOf(column.key), 1);
+            }
+          } else {
+            if (!item.errors.includes(column.key)) {
+              item.errors.push(column.key);
+            }
+          }
+        });
+      });
+    }, 0);
+  }
+
+  verify(column, value) {
+    if (!value) {
+      return true;
+    }
+    let correct;
+    switch (column.type) {
+      case 'date':
+        correct = verifyDate(value);
+        break;
+      case 'month':
+        correct = verifyMonth(value);
+        break;
+      case 'select':
+        correct = verifySelect(value, column.options);
+        break;
+      case 'number':
+        correct = verifyNumber(value);
+        break;
+      default:
+        correct = true;
+    }
+    return correct;
+  }
+
+  sort(type) {
+    const { states } = this;
+    states.columnsStatusList.forEach((item) => {
+      item.sort = '';
+    });
+    states.columnsStatusList[states.dropdown.index].sort = type;
+    if (type === 'ascending') {
+      states.showData.sort((x, y) => (x[states.columnsStatusList[states.dropdown.index].key] > y[states.columnsStatusList[states.dropdown.index].key] ? 1 : -1));
+    } else {
+      states.showData.sort((x, y) => (x[states.columnsStatusList[states.dropdown.index].key] > y[states.columnsStatusList[states.dropdown.index].key] ? -1 : 1));
+    }
+    states.dropdown.index = null;
+  }
+
+  // 过滤处理
+  handleFilter() {
+    const { states } = this;
+    states.columnsStatusList[states.dropdown.index] = {
+      list: states.dropdown.list,
+      key: states.dropdown.key,
+      sort: states.dropdown.sort,
+    };
+    const arr = [];
+    Object.keys(states.dropdown.list).forEach((key) => {
+      if (states.dropdown.list[key].checked) {
+        arr.push(key);
+      }
+    });
+    states.filters[states.columnsStatusList[states.dropdown.index].key] = arr;
+    this.filterData();
+  }
+
+  resetFilter() {
+    const { states } = this;
+    delete states.filters[states.columnsStatusList[states.dropdown.index].key];
+    Object.keys(states.columnsStatusList[states.dropdown.index].list).forEach((key) => {
+      states.columnsStatusList[states.dropdown.index].list[key].checked = false;
+    });
+    this.filterData();
+  }
+
+  filterData() {
+    const { states } = this;
+    states.showData = states.data;
+    Object.keys(states.filters).forEach((key) => {
+      states.showData = states.showData.filter(item => states.filters[key].includes(item[key].toString()));
+    });
+    states.dropdown.index = null;
   }
 }
 

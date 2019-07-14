@@ -11,8 +11,11 @@
         <el-button @click="add">添加行</el-button>
         <el-button @click="remove">勾选删除行</el-button>
       </div>
+      <div>
+        <button class="github-link" @click="linkGithub"></button>
+      </div>
     </div>
-    <excel
+    <willtable
       v-if="show"
       ref="willtable"
       :columns="columns"
@@ -28,12 +31,14 @@
 <script>
 import axios from 'axios';
 import { button } from 'element-ui';
-import Excel from '../src/components/Table.vue';
+// import Willtable from '../src/components/Table';
+import Willtable from '../dist/vue-willtable.min';
+import '../dist/vue-willtable.min.css';
 
 export default {
   name: 'App',
   components: {
-    Excel,
+    Willtable,
     'el-button': button,
   },
   data() {
@@ -181,6 +186,9 @@ export default {
     remove() {
       this.$refs.willtable.removeItems('sid', this.selection.map(s => s.sid));
     },
+    linkGithub() {
+      window.open('https://github.com/KevinMint55/vue-willtable', '_blank');
+    },
   },
 };
 </script>
@@ -193,5 +201,24 @@ export default {
 .button-bar {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+
+.github-link {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-image: url('./github.jpg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  transition: all 0.3s;
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.github-link:hover {
+  transform: rotate(360deg) scale(2);
+  opacity: 1;
 }
 </style>

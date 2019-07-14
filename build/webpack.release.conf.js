@@ -1,16 +1,10 @@
-const webpack = require('webpack');
 const merge = require('webpack-merge');
-const path = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const baseWebpackConfig = require('./webpack.base.conf');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const config = require('../config');
-
-function resolve(dir) {
-  return path.join(__dirname, '..', dir)
-}
 
 const webpackConfig = {
   mode: 'production',

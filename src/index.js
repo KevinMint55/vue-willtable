@@ -1,7 +1,7 @@
-import WillTable from './components/Table.vue';
+import VueWilltable from './components/Table.vue';
 
 const install = (Vue) => {
-  Vue.component(WillTable.name, WillTable);
+  Vue.component(VueWilltable.name, VueWilltable);
 };
 
 /* 支持使用标签的方式引入 */
@@ -11,7 +11,7 @@ if (typeof window !== 'undefined' && window.Vue) {
 
 export {
   install,
-  WillTable,
+  VueWilltable,
 };
 
-export default WillTable;
+export default VueWilltable;

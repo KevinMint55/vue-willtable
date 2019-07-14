@@ -25,9 +25,11 @@
             @change="selectionChange">
           </el-checkbox>
           <div
+            v-else
             class="km-cell-content"
-            :style="{'max-width':  `${columnsWidth[xIndex]}px`}"
-            v-else>{{ format(tr[th.key], th.type, th.format) }}</div>
+            :style="{'max-width':  `${columnsWidth[xIndex]}px`}">
+            {{ format(tr[th.key], th.type, th.format) }}
+          </div>
         </td>
       </tr>
     </tbody>
@@ -37,15 +39,10 @@
 
 <script>
 import { checkbox } from 'element-ui';
-import verify from '../mixins/verify';
 
 export default {
   props: {
     allShow: Boolean,
-    dataStatusList: {
-      type: Array,
-      default: () => [],
-    },
     columnsWidth: {
       type: Array,
       default: () => [],
@@ -73,6 +70,9 @@ export default {
     columns() {
       return this.store.states.columns;
     },
+    dataStatusList() {
+      return this.store.states.dataStatusList;
+    },
     showData() {
       return this.store.states.showData;
     },
@@ -86,7 +86,6 @@ export default {
       return this.store.states.autofill;
     },
   },
-  mixins: [verify],
   methods: {
     selectionChange() {
       this.$parent.selectionChange();
@@ -120,34 +119,11 @@ export default {
     classObj(row, column, rowIndex, columnIndex) {
       return {
         disabled: column.type === 'disabled',
-        error: !this.verify(column, row[column.key], rowIndex),
+        error: !this.store.verify(column, row[column.key], rowIndex),
         ...this.cellClassName({
           row, column, rowIndex, columnIndex,
         }),
       };
-    },
-    verify(column, value) {
-      if (!value) {
-        return true;
-      }
-      let correct;
-      switch (column.type) {
-        case 'date':
-          correct = this.verifyDate(value);
-          break;
-        case 'month':
-          correct = this.verifyMonth(value);
-          break;
-        case 'select':
-          correct = this.verifySelect(value, column.options);
-          break;
-        case 'number':
-          correct = this.verifyNumber(value);
-          break;
-        default:
-          correct = true;
-      }
-      return correct;
     },
   },
 };
@@ -172,6 +148,4 @@ export default {
     background-color: #ff4c42 !important;
   }
 }
-
-
 </style>

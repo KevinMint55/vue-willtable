@@ -1,5 +1,5 @@
 <template>
-  <div class="dropdown-wrapper"
+  <div class="km-dropdown-wrapper"
     :class="{ active: parseInt(dropdown.index) >= 0 }"
     :style="{
       'top': `${$parent.$refs.wrapper.offsetTop + 30}px`,
@@ -7,11 +7,11 @@
     }"
     ref="dropdown"
     v-clickoutside="openDropdown">
-    <div class="sort">
+    <div class="km-sort">
       <span :class="{ active: dropdown.sort == 'ascending' }" @click="sort('ascending')">升序</span>
       <span :class="{ active: dropdown.sort == 'descending' }" @click="sort('descending')">降序</span>
     </div>
-    <div class="filter">
+    <div class="km-filter">
       <div class="title">名称<span>（计数）</span></div>
       <ul class="content">
         <li v-for="(item, key) in dropdown.list" :key="key">
@@ -107,7 +107,7 @@ export default {
       this.store.openDropdown();
     },
     sort(type) {
-      this.$parent.sort(type);
+      this.store.sort(type);
     },
     handleFilter() {
       let haveChecked = false;
@@ -117,17 +117,19 @@ export default {
         }
       });
       if (!haveChecked) return;
-      this.$parent.handleFilter();
+      this.store.handleFilter();
+      this.$parent.handleResize();
     },
     resetFilter() {
-      this.$parent.resetFilter();
+      this.store.resetFilter();
+      this.$parent.handleResize();
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.dropdown-wrapper {
+.km-dropdown-wrapper {
   position: absolute;
   top: 0;
   left: 0;
@@ -149,7 +151,7 @@ export default {
   }
 }
 
-.sort {
+.km-sort {
   display: flex;
   font-size: 13px;
   span {
@@ -186,7 +188,7 @@ export default {
   }
 }
 
-.filter {
+.km-filter {
   border: 1px solid #e0e0e0;
   padding: 4px;
   .title {
@@ -208,14 +210,15 @@ export default {
       align-items: center;
     }
     p {
+      display: flex;
       margin-left: 4px;
+      font-size: 12px;
       span {
         display: inline-block;
         max-width: 200px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        vertical-align: middle;
       }
       i {
         color: #909399;

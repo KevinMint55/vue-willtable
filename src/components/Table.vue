@@ -12,7 +12,6 @@
           ref="theaderContent"
           :showIcon="showIcon"
           :columnsWidth="columnsWidth"
-          :columnsStatusList="columnsStatusList"
           :fixedCount="fixedCount"
           :all-show="true"
           :store="store" />
@@ -20,7 +19,6 @@
       <div ref="tbody" class="km-table-body" :style="{maxHeight: `${maxHeight}px`}">
         <table-body
           ref="tbodyContent"
-          :dataStatusList="dataStatusList"
           :columnsWidth="columnsWidth"
           :all-show="true"
           :cellStyle="cellStyle"
@@ -47,14 +45,12 @@
             ref="fixedTheaderContent"
             :showIcon="showIcon"
             :columnsWidth="columnsWidth"
-            :columnsStatusList="columnsStatusList"
             :fixedCount="fixedCount"
             :store="store" />
         </div>
         <div ref="fixedTbody" class="km-table-fixed-body">
           <table-body
             ref="fixedTbodyContent"
-            :dataStatusList="dataStatusList"
             :columnsWidth="columnsWidth"
             :cellStyle="cellStyle"
             :cellClassName="cellClassName"
@@ -86,7 +82,6 @@ import TableStore from '../store';
 import clickoutside from '../directives/clickoutside';
 import methods from '../mixins/methods';
 import events from '../mixins/events';
-import verify from '../mixins/verify';
 import TableHeader from './TableHeader.vue';
 import TableBody from './TableBody.vue';
 import Editor from './TableEditor.vue';
@@ -142,8 +137,6 @@ export default {
       data: [],
       initialData: null,
       changeData: [],
-      columnsStatusList: [],
-      dataStatusList: [],
       scrollLeftArr: [],
       scrollTopArr: [],
       fixedCount: 0,
@@ -179,9 +172,9 @@ export default {
         if (!this.initialData) {
           this.initData();
         }
-        this.handleFilters();
+        this.store.handleFilters();
         this.handleChangeData();
-        this.handleErrors();
+        this.store.handleErrors();
         this.handleResize();
       },
       deep: true,
@@ -197,7 +190,7 @@ export default {
   mounted() {
     this.init();
   },
-  mixins: [methods, events, verify],
+  mixins: [methods, events],
   methods: {
     init() {
       if (this.value.length > 0) {
@@ -214,26 +207,29 @@ export default {
       this.handleResize();
     },
     initColumns() {
+      const { states } = this.store;
       const fixedArr = this.columns.filter(item => item.fixed);
       const unFixedArr = this.columns.filter(item => !item.fixed);
-      this.store.states.columns = fixedArr.concat(unFixedArr).map((item) => {
+      states.columns = fixedArr.concat(unFixedArr).map((item) => {
         if (item.width) {
           item.width = parseInt(item.width, 10);
         }
         return { ...item };
       });
-      this.columnsWidth = this.store.states.columns.map(item => item.width);
-      this.columnsStatusList = this.store.states.columns.map(item => ({
+      this.columnsWidth = states.columns.map(item => item.width);
+      states.columnsStatusList = states.columns.map(item => ({
         key: item.key,
         type: item.type,
         list: {},
         sort: '',
       }));
-      this.store.states.filters = {};
+      states.filters = {};
     },
     initData() {
-      this.store.states.showData = this.data;
-      this.dataStatusList = this.data.map(() => ({
+      const { states } = this.store;
+      states.data = this.data;
+      states.showData = this.data;
+      states.dataStatusList = this.data.map(() => ({
         checked: false,
         errors: [],
       }));
@@ -368,33 +364,6 @@ export default {
             this.$refs.tbodyContent.$el.style.width = `${this.tableWidth - this.store.states.scrollBarWidth - 1}px`;
           });
         }
-      });
-    },
-    handleFilters() {
-      this.columnsStatusList.forEach((th) => {
-        if (th.type === 'selection') return;
-        if (th.list) {
-          Object.keys(th.list).forEach((item) => {
-            th.list[item].count = 0;
-          });
-        } else {
-          th.list = {};
-        }
-        this.data.forEach((td) => {
-          if (td[th.key]) {
-            if (th.list[td[th.key]]) {
-              th.list[td[th.key]].count += 1;
-            } else {
-              th.list[td[th.key]] = {};
-              th.list[td[th.key]].count = 1;
-            }
-          }
-        });
-        Object.keys(th.list).forEach((item) => {
-          if (th.list[item].count === 0) {
-            delete th.list[item];
-          }
-        });
       });
     },
     handleChangeData() {
@@ -697,8 +666,9 @@ export default {
       }
     },
     selectAll() {
-      const checkedAll = this.dataStatusList.every(item => item.checked);
-      this.dataStatusList.forEach((item, index) => {
+      const { states } = this.store;
+      const checkedAll = states.dataStatusList.every(item => item.checked);
+      states.dataStatusList.forEach((item, index) => {
         this.$set(this.dataStatusList[index], 'checked', !checkedAll);
       });
       this.selectionChange();
@@ -726,93 +696,6 @@ export default {
     adjustWidth(index, width) {
       this.store.states.columns[index].width = width;
       this.handleResize();
-    },
-    sort(type) {
-      const { states } = this.store;
-      this.columnsStatusList.forEach((item) => {
-        item.sort = '';
-      });
-      this.columnsStatusList[states.dropdown.index].sort = type;
-      if (type === 'ascending') {
-        states.showData.sort((x, y) => (x[this.columnsStatusList[states.dropdown.index].key] > y[this.columnsStatusList[states.dropdown.index].key] ? 1 : -1));
-      } else {
-        states.showData.sort((x, y) => (x[this.columnsStatusList[states.dropdown.index].key] > y[this.columnsStatusList[states.dropdown.index].key] ? -1 : 1));
-      }
-      states.dropdown.index = null;
-    },
-    handleFilter() {
-      const { states } = this.store;
-      this.columnsStatusList[states.dropdown.index] = {
-        list: states.dropdown.list,
-        key: states.dropdown.key,
-        sort: states.dropdown.sort,
-      };
-      const arr = [];
-      Object.keys(states.dropdown.list).forEach((key) => {
-        if (states.dropdown.list[key].checked) {
-          arr.push(key);
-        }
-      });
-      states.filters[this.columnsStatusList[states.dropdown.index].key] = arr;
-      this.filterData();
-    },
-    resetFilter() {
-      const { states } = this.store;
-      delete states.filters[this.columnsStatusList[states.dropdown.index].key];
-      Object.keys(this.columnsStatusList[states.dropdown.index].list).forEach((key) => {
-        this.columnsStatusList[states.dropdown.index].list[key].checked = false;
-      });
-      this.filterData();
-    },
-    filterData() {
-      const { states } = this.store;
-      states.showData = this.data;
-      Object.keys(states.filters).forEach((key) => {
-        states.showData = states.showData.filter(item => states.filters[key].includes(item[key].toString()));
-      });
-      states.dropdown.index = null;
-      this.handleResize();
-    },
-    handleErrors() {
-      const { states } = this.store;
-      this.$nextTick(() => {
-        this.dataStatusList.forEach((item, yIndex) => {
-          states.columns.forEach((column) => {
-            if (this.verify(column, this.data[yIndex][column.key])) {
-              if (item.errors.includes(column.key)) {
-                item.errors.splice(item.errors.indexOf(column.key), 1);
-              }
-            } else {
-              if (!item.errors.includes(column.key)) {
-                item.errors.push(column.key);
-              }
-            }
-          });
-        });
-      });
-    },
-    verify(column, value) {
-      if (!value) {
-        return true;
-      }
-      let correct;
-      switch (column.type) {
-        case 'date':
-          correct = this.verifyDate(value);
-          break;
-        case 'month':
-          correct = this.verifyMonth(value);
-          break;
-        case 'select':
-          correct = this.verifySelect(value, column.options);
-          break;
-        case 'number':
-          correct = this.verifyNumber(value);
-          break;
-        default:
-          correct = true;
-      }
-      return correct;
     },
   },
 };

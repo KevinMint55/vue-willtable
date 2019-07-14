@@ -4,14 +4,15 @@ export default {
       this.data = data;
       this.$nextTick(() => {
         this.initData();
-        this.handleFilters();
+        this.store.handleFilters();
       });
     },
     getChangeData() {
       return this.changeData;
     },
     getErrorRows() {
-      const errorRowsIndex = this.dataStatusList.map((item, index) => {
+      const { states } = this.store;
+      const errorRowsIndex = states.dataStatusList.map((item, index) => {
         if (item.errors.length > 0) {
           return index;
         }
@@ -29,17 +30,19 @@ export default {
       return errorRows;
     },
     addItem(item) {
+      const { states } = this.store;
       this.data.push(item);
-      this.dataStatusList.push({
+      states.dataStatusList.push({
         checked: false,
         errors: [],
       });
     },
     removeItems(key, values) {
+      const { states } = this.store;
       if (key && values instanceof Array) {
         values.forEach((value) => {
           const dIndex = this.data.findIndex(d => d[key] === value);
-          this.dataStatusList.splice(dIndex, 1);
+          states.dataStatusList.splice(dIndex, 1);
           this.data.splice(dIndex, 1);
         });
       }

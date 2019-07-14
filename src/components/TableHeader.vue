@@ -64,10 +64,6 @@ export default {
       type: Array,
       default: () => [],
     },
-    columnsStatusList: {
-      type: Array,
-      default: () => [],
-    },
     fixedCount: [String, Number],
     store: {
       required: true,
@@ -86,6 +82,9 @@ export default {
   computed: {
     columns() {
       return this.store.states.columns;
+    },
+    columnsStatusList() {
+      return this.store.states.columnsStatusList;
     },
     dropdown() {
       return this.store.states.dropdown;
@@ -128,7 +127,7 @@ export default {
       window.removeEventListener('mouseup', this.handlerUp);
     },
     openDropdown(i) {
-      this.store.openDropdown(i, this.columnsStatusList);
+      this.store.openDropdown(i);
     },
     isActive(th) {
       if (!th) return false;
@@ -207,7 +206,7 @@ export default {
     right: -8px;
     width: 16px;
     height: 30px;
-    cursor: ew-resize;
+    cursor: col-resize;
     text-align: center;
   }
   .active {
