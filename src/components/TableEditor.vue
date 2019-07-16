@@ -97,6 +97,10 @@ export default {
       default: () => [],
     },
     fixedCount: [String, Number],
+    rowHeight: {
+      type: [String, Number],
+      default: 28,
+    },
     store: {
       required: true,
     },
@@ -120,9 +124,10 @@ export default {
         left = this.columnsWidth.filter((item, index) => index < this.editor.editorXIndex).reduce((sum, item) => sum + item, 0);
       }
       return {
-        top: `${this.editor.editorYIndex * 28}px`,
+        top: `${this.editor.editorYIndex * this.rowHeight}px`,
         left: `${left}px`,
         width: `${this.columnsWidth[this.editor.editorXIndex]}px`,
+        height: `${this.rowHeight}px`,
         'z-index': this.editor.editorIsFixed ? 4 : 1,
       };
     },
@@ -135,41 +140,41 @@ export default {
       }
       left = left + this.columnsWidth[this.autofill.autofillXIndex] - 5;
       return {
-        top: `${this.autofill.autofillYIndex * 28 + 24}px`,
+        top: `${(this.autofill.autofillYIndex + 1) * this.rowHeight - 4}px`,
         left: `${left}px`,
         'z-index': this.fixedCount > this.autofill.autofillXIndex ? 4 : 1,
       };
     },
     selectedStyle() {
       return {
-        top: `${this.selector.selectedYArr[0] * 28}px`,
+        top: `${this.selector.selectedYArr[0] * this.rowHeight}px`,
         left: `${this.columnsWidth.filter((item, index) => index < this.selector.selectedXArr[0]).reduce((sum, item) => sum + item, 0)}px`,
         width: `${this.columnsWidth.filter((item, index) => (index <= this.selector.selectedXArr[1]) && (index >= this.selector.selectedXArr[0])).reduce((sum, item) => sum + item, 0)}px`,
-        height: `${(this.selector.selectedYArr[1] - this.selector.selectedYArr[0] + 1) * 28}px`,
+        height: `${(this.selector.selectedYArr[1] - this.selector.selectedYArr[0] + 1) * this.rowHeight}px`,
       };
     },
     fixedSelectedStyle() {
       return {
-        top: `${this.selector.selectedYArr[0] * 28}px`,
+        top: `${this.selector.selectedYArr[0] * this.rowHeight}px`,
         left: `${this.store.states.tableBodyLeft + this.columnsWidth.filter((item, index) => index < this.selector.selectedXArr[0]).reduce((sum, item) => sum + item, 0)}px`,
         width: `${this.columnsWidth.filter((item, index) => (index <= this.selector.selectedXArr[1]) && (index >= this.selector.selectedXArr[0]) && this.columns[index].fixed).reduce((sum, item) => sum + item, 0)}px`,
-        height: `${(this.selector.selectedYArr[1] - this.selector.selectedYArr[0] + 1) * 28}px`,
+        height: `${(this.selector.selectedYArr[1] - this.selector.selectedYArr[0] + 1) * this.rowHeight}px`,
       };
     },
     autofillStyle() {
       return {
-        top: `${this.autofill.autofillYArr[0] * 28}px`,
+        top: `${this.autofill.autofillYArr[0] * this.rowHeight}px`,
         left: `${this.columnsWidth.filter((item, index) => index < this.selector.selectedXArr[0]).reduce((sum, item) => sum + item, 0)}px`,
         width: `${this.columnsWidth.filter((item, index) => (index <= this.selector.selectedXArr[1]) && (index >= this.selector.selectedXArr[0])).reduce((sum, item) => sum + item, 0)}px`,
-        height: `${this.autofill.autofillYArr.length > 0 ? (this.autofill.autofillYArr[1] - this.autofill.autofillYArr[0] + 1) * 28 : 0}px`,
+        height: `${this.autofill.autofillYArr.length > 0 ? (this.autofill.autofillYArr[1] - this.autofill.autofillYArr[0] + 1) * this.rowHeight : 0}px`,
       };
     },
     fixedAutofillStyle() {
       return {
-        top: `${this.autofill.autofillYArr[0] * 28}px`,
+        top: `${this.autofill.autofillYArr[0] * this.rowHeight}px`,
         left: `${this.store.states.tableBodyLeft + this.columnsWidth.filter((item, index) => index < this.selector.selectedXArr[0]).reduce((sum, item) => sum + item, 0)}px`,
         width: `${this.columnsWidth.filter((item, index) => (index <= this.selector.selectedXArr[1]) && (index >= this.selector.selectedXArr[0]) && this.columns[index].fixed).reduce((sum, item) => sum + item, 0)}px`,
-        height: `${this.autofill.autofillYArr.length > 0 ? (this.autofill.autofillYArr[1] - this.autofill.autofillYArr[0] + 1) * 28 : 0}px`,
+        height: `${this.autofill.autofillYArr.length > 0 ? (this.autofill.autofillYArr[1] - this.autofill.autofillYArr[0] + 1) * this.rowHeight : 0}px`,
       };
     },
     columns() {
@@ -239,7 +244,6 @@ export default {
   left: 0;
   display: flex;
   width: 200px;
-  height: 28px;
   border: 1px solid #57a3f3;
   z-index: 4;
   overflow: hidden;

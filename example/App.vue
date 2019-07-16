@@ -1,36 +1,46 @@
 <template>
-  <div class="main">
-    <div class="button-bar">
-      <div>
-        <el-button @click="getList2">获取20条数据</el-button>
-        <el-button @click="getList3">获取200条数据</el-button>
-        <el-button @click="getChangeData">获取改变的数据行</el-button>
-        <el-button @click="getErrorRows">获取错误行</el-button>
-        <el-button @click="disabled = !disabled">{{ disabled ? '启用' : '禁用'}}</el-button>
-        <el-button @click="show = !show">{{ show ? '隐藏' : '显示'}}</el-button>
-        <el-button @click="add">添加行</el-button>
-        <el-button @click="remove">勾选删除行</el-button>
+  <div id="app">
+    <hgroup :class="s.title">
+      <h2>从左侧features中勾选定制你的数据表格</h2>
+      <h3>
+        本页代码实现可查看
+        <a href="https://github.com/KevinMint55/vue-willtable/tree/master/example" target="blank">example</a>
+      </h3>
+    </hgroup>
+    <div :class="s.main">
+      <div :class="s.features_wrapper">
+        <div :class="s.features_title">
+          <span>Features</span>
+          <button :class="s.github_link" @click="linkGithub"></button>
+        </div>
+        <ul :class="s.features_list">
+          <li
+            v-for="(item, index) in features"
+            :key="index">
+            <label>{{ item.label }}</label>
+            <el-checkbox v-model="item.checked" @change="item.handleChange"></el-checkbox>
+          </li>
+        </ul>
+        <div :class="s.more">...</div>
       </div>
-      <div>
-        <button class="github-link" @click="linkGithub"></button>
+      <div :class="s.willtable_wrapper">
+        <willtable
+        ref="willtable"
+        :columns="columns"
+        v-model="data"
+        :maxHeight="maxHeight"
+        :disabled="disabled"
+        :showIcon="showIcon"
+        :cellStyle="cellStyle"
+        :cellClassName="cellClassName" />
       </div>
     </div>
-    <willtable
-      v-if="show"
-      ref="willtable"
-      :columns="columns"
-      v-model="data"
-      style="width: 100%;margin-top: 10px;"
-      maxHeight="800"
-      @selection-change="selectionChange"
-      :disabled="disabled"
-      :showIcon="true" />
   </div>
 </template>
 
 <script>
 import axios from 'axios';
-import { button } from 'element-ui';
+import { checkbox } from 'element-ui';
 import Willtable from '../src/components/Table';
 // import Willtable from '../dist/vue-willtable.min';
 // import '../dist/vue-willtable.min.css';
@@ -39,11 +49,114 @@ export default {
   name: 'App',
   components: {
     Willtable,
-    'el-button': button,
+    'el-checkbox': checkbox,
   },
   data() {
     return {
-      show: true,
+      features: [
+        {
+          label: '显示数据类型icon',
+          checked: true,
+          handleChange: (checked) => {
+            if (checked) {
+              this.showIcon = true;
+            } else {
+              this.showIcon = false;
+            }
+          },
+        },
+        {
+          label: '显示行多选',
+          checked: true,
+          handleChange: (checked) => {
+            if (checked) {
+              this.columns.unshift({
+                type: 'selection',
+                width: 40,
+                fixed: true,
+              });
+            } else {
+              this.columns.shift();
+            }
+          },
+        },
+        {
+          label: '固定列（序号、姓名）',
+          checked: true,
+          handleChange: (checked) => {
+            this.columns.forEach((col) => {
+              if (['sid', 'name'].includes(col.key)) {
+                col.fixed = checked;
+              }
+            });
+          },
+        },
+        {
+          label: '启用筛选与过滤（序号、姓名、日期）',
+          checked: false,
+          handleChange: (checked) => {
+            this.columns.forEach((col) => {
+              if (['sid', 'name', 'date'].includes(col.key)) {
+                this.$set(col, 'action', checked);
+              }
+            });
+          },
+        },
+        {
+          label: '禁止整表操作',
+          checked: false,
+          handleChange: (checked) => {
+            this.disabled = checked;
+          },
+        },
+        {
+          label: '禁止序号操作',
+          checked: false,
+          handleChange: (checked) => {
+            this.columns.some((col) => {
+              if (col.key === 'sid') {
+                this.$set(col, 'disabled', checked);
+                return true;
+              }
+              return false;
+            });
+          },
+        },
+        {
+          label: '自定义单元格样式',
+          checked: false,
+          handleChange: (checked) => {
+            if (checked) {
+              this.cellStyle = ({ rowIndex, columnIndex }) => {
+                if (rowIndex % 2 === 1 && columnIndex % 2 === 0) {
+                  return {
+                    color: '#67C23A',
+                  };
+                }
+              };
+            } else {
+              this.cellStyle = () => {};
+            }
+          },
+        },
+        {
+          label: '自定义单元格类名',
+          checked: false,
+          handleChange: (checked) => {
+            if (checked) {
+              this.cellClassName = ({ rowIndex, columnIndex }) => {
+                if (rowIndex % 2 === 0 && columnIndex % 2 === 1) {
+                  return {
+                    customChanged: true,
+                  };
+                }
+              };
+            } else {
+              this.cellClassName = () => {};
+            }
+          },
+        },
+      ],
       columns: [
         {
           type: 'selection',
@@ -55,31 +168,41 @@ export default {
           key: 'sid',
           fixed: true,
           type: 'number',
+          width: 100,
+        },
+        {
+          title: '姓名',
+          key: 'name',
+          fixed: true,
+          width: 120,
         },
         {
           title: '日期',
           key: 'date',
           type: 'date',
-          width: '100',
+          width: 100,
         },
         {
-          title: '邮箱地址',
+          title: '工作岗位',
           key: 'email',
           width: 300,
           type: 'select',
-          fixed: true,
           options: [
             {
-              value: 'New York',
-              label: 'New York',
+              value: 'Web前端开发',
+              label: 'Web前端开发',
             },
             {
-              value: 'London',
-              label: 'London',
+              value: 'Java开发',
+              label: 'Java开发',
             },
             {
-              value: 'Sydney',
-              label: 'Sydney',
+              value: 'Python开发',
+              label: 'Python开发',
+            },
+            {
+              value: 'Php开发',
+              label: 'Php开发',
             },
           ],
         },
@@ -93,7 +216,6 @@ export default {
           title: '地址',
           key: 'address',
           width: 200,
-          action: true,
         },
         {
           title: '标题',
@@ -123,37 +245,31 @@ export default {
         {
           title: 'ID',
           key: 'id',
-          type: 'disabled',
+          width: 200,
+        },
+        {
+          title: '色值',
+          key: 'color',
           width: 200,
         },
       ],
       data: [],
+      showIcon: true,
       disabled: false,
-      selection: [],
+      maxHeight: 800,
+      cellStyle: () => {},
+      cellClassName: () => {},
     };
   },
   mounted() {
     this.getList();
+    this.maxHeight = document.documentElement.clientHeight - 200;
   },
   methods: {
     getList() {
       axios.get('https://demo.kevinmint.com/1.json').then((res) => {
         this.$refs.willtable.setData(res.data.list);
-        // this.data = res.data.list;
       }).catch(() => {});
-    },
-    getList2() {
-      axios.get('http://3.json').then((res) => {
-        this.$refs.willtable.setData(res.data.list);
-      }).catch(() => {});
-    },
-    getList3() {
-      axios.get('http://4.json').then((res) => {
-        this.$refs.willtable.setData(res.data.list);
-      }).catch(() => {});
-    },
-    selectionChange(selection) {
-      this.selection = selection;
     },
     getErrorRows() {
       console.log(this.$refs.willtable.getErrorRows());
@@ -161,18 +277,18 @@ export default {
     getChangeData() {
       console.log(this.$refs.willtable.getChangeData());
     },
-    cellStyle({ rowIndex, columnIndex }) {
-      if (rowIndex === 1) {
-        return {
-          color: 'red',
-        };
-      }
-      if (columnIndex === 5) {
-        return {
-          color: 'green',
-        };
-      }
-    },
+    // cellStyle({ rowIndex, columnIndex }) {
+    //   if (rowIndex === 1) {
+    //     return {
+    //       color: 'red',
+    //     };
+    //   }
+    //   if (columnIndex === 5) {
+    //     return {
+    //       color: 'green',
+    //     };
+    //   }
+    // },
     add() {
       const obj = {};
       obj.id = new Date().getTime();
@@ -193,18 +309,80 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss" module="s">
+:global {
+  html, body, #app {
+    height: 100%;
+  }
+  .customChanged {
+    background-color: rgba(247,181,0,0.1);
+  }
+}
+
+.title {
+  text-align: center;
+  padding-top: 20px;
+  h2 {
+    font-size: 24px;
+    margin-bottom: 6px;
+  }
+  h3 {
+    font-size: 18px;
+    font-weight: normal;
+    a {
+      color: #0366d6;
+      cursor: pointer;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
 .main {
-  padding: 20px;
-}
-
-.button-bar {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  padding: 20px;
+  overflow: auto;
+  height: calc(100% - 81px);
 }
 
-.github-link {
+.features_wrapper {
+  flex: none;
+  width: 280px;
+  margin-right: 30px;
+}
+
+.features_title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #363636;
+  margin-bottom: 20px;
+  span {
+    font-size: 18px;
+  }
+}
+
+.features_list {
+  padding-left: 20px;
+  li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 10px 2px;
+    border-bottom: 1px solid #e3e3e3;
+  }
+}
+
+.willtable_wrapper {
+  flex: auto;
+  overflow-x: auto;
+  height: 100%;
+}
+
+.github_link {
   display: inline-block;
   width: 24px;
   height: 24px;
@@ -215,10 +393,14 @@ export default {
   transition: all 0.3s;
   opacity: 0.7;
   cursor: pointer;
+  &:hover {
+    transform: rotate(360deg) scale(2);
+    opacity: 1;
+  }
 }
 
-.github-link:hover {
-  transform: rotate(360deg) scale(2);
-  opacity: 1;
+.more {
+  font-size: 32px;
+  text-align: right;
 }
 </style>

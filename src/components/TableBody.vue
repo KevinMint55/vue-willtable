@@ -55,6 +55,10 @@ export default {
       type: [Object, Function],
       default: () => () => {},
     },
+    rowHeight: {
+      type: [String, Number],
+      default: 28,
+    },
     store: {
       required: true,
     },
@@ -110,6 +114,7 @@ export default {
     styleObj(row, column, rowIndex, columnIndex, columnsWidth) {
       return {
         width: `${columnsWidth[columnIndex]}px`,
+        height: `${this.rowHeight}px`,
         textAlign: column.align,
         ...this.cellStyle({
           row, column, rowIndex, columnIndex,
@@ -118,7 +123,7 @@ export default {
     },
     classObj(row, column, rowIndex, columnIndex) {
       return {
-        disabled: column.type === 'disabled',
+        disabled: column.disabled,
         error: !this.store.verify(column, row[column.key], rowIndex),
         ...this.cellClassName({
           row, column, rowIndex, columnIndex,
@@ -137,11 +142,10 @@ export default {
     border: 1px solid #d6dfe4;
     min-width: 0;
     text-indent: 4px;
-    height: 28px;
   }
 
   .disabled {
-    color: #80848f;
+    color: #c5c5c5;
   }
 
   .error {

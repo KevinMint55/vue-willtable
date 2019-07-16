@@ -100,14 +100,14 @@ const webpackConfig = {
       }
     ]
   },
-  // node: {
-  //   setImmediate: false,
-  //   dgram: 'empty',
-  //   fs: 'empty',
-  //   net: 'empty',
-  //   tls: 'empty',
-  //   child_process: 'empty'
-  // },
+  node: {
+    setImmediate: false,
+    dgram: 'empty',
+    fs: 'empty',
+    net: 'empty',
+    tls: 'empty',
+    child_process: 'empty'
+  },
   plugins: [
     new VueLoaderPlugin()
   ],

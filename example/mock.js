@@ -35,6 +35,8 @@ Mock.mock('https://demo.kevinmint.com/1.json', 'get', {
     ip: '@ip',
     // 属性 regexp 是一个正则表达式匹配到的值 如aA1
     regexp: /[a-z][A-Z][0-9]/,
+    name: '@name()',
+    color: '@rgba()',
   }],
 });
 

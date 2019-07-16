@@ -8,6 +8,23 @@ Demo here: https://demo.kevinmint.com/willtable/
 
 ![image](https://qiniu.kevinmint.com/willtable2.gif)
 
+## Features
+
+- 表格宽度调整
+- 表格列固定
+- 数据过滤与筛选
+- 选择多行数据时使用Checkbox
+- 批量框选删除与复制粘贴
+- 可与Excel互相复制粘贴
+- 框选单元格拖动超过表格区域时自动滚动
+- 数据下拉复制
+- 获取改变的数据行
+- 按需使用[element-ui](https://github.com/ElemeFE/element)组件作为部分数据类型选择器
+- 多种数据类型校验
+- 获取校验非法的数据行
+- 支持撤销与重做
+- 可自定义每个单元格样式与类名
+
 ## Installation
 
 ```
@@ -69,31 +86,41 @@ export default {
           key: 'sid',
           fixed: true,
           type: 'number',
+          width: 100,
+        },
+        {
+          title: '姓名',
+          key: 'name',
+          fixed: true,
+          width: 120,
         },
         {
           title: '日期',
           key: 'date',
           type: 'date',
-          width: '100',
+          width: 100,
         },
         {
-          title: '邮箱地址',
+          title: '工作岗位',
           key: 'email',
           width: 300,
           type: 'select',
-          fixed: true,
           options: [
             {
-              value: 'New York',
-              label: 'New York',
+              value: 'Web前端开发',
+              label: 'Web前端开发',
             },
             {
-              value: 'London',
-              label: 'London',
+              value: 'Java开发',
+              label: 'Java开发',
             },
             {
-              value: 'Sydney',
-              label: 'Sydney',
+              value: 'Python开发',
+              label: 'Python开发',
+            },
+            {
+              value: 'Php开发',
+              label: 'Php开发',
             },
           ],
         },
@@ -107,7 +134,6 @@ export default {
           title: '地址',
           key: 'address',
           width: 200,
-          action: true,
         },
         {
           title: '标题',
@@ -137,7 +163,11 @@ export default {
         {
           title: 'ID',
           key: 'id',
-          type: 'disabled',
+          width: 200,
+        },
+        {
+          title: '色值',
+          key: 'color',
           width: 200,
         },
       ],
@@ -167,9 +197,10 @@ export default {
 
 参数 | 说明 | 类型 | 可选值 | 默认值
 ---|---|---|---|---
-columns | 表格列的配置描述 | Arry | —— | []
+columns | 表格列的配置描述 | Array | —— | []
 maxHeight | 表格最大高度 | string / number  | —— | ——
-disabled | 是否可编辑 | Boolean  | —— | true
+rowHeight | 每行高度 | string / number | —— | ——
+disabled | 是否禁止编辑 | Boolean  | —— | true
 showIcon | 是否显示表头类型图标 | Boolean  | —— | false
 cellStyle | 单元格的 style 的回调方法 | Function({row, column, rowIndex, columnIndex}) | —— | ——
 cellClassName | 单元格的 className 的回调方法 | Function({row, column, rowIndex, columnIndex})  | —— | ——
@@ -196,10 +227,14 @@ removeItems | 批量删除，参数key为每行的唯一标识属性如id，valu
 ---|---|---|---|---
 key | 对应列内容的字段名 | String | —— | ——
 title | 列头显示文字 | String | —— | ——
-type | 列类型 | String | selection/number/date/select/month/disabled | ——
+width | 列宽度 | String / Number | —— | ——
+type | 列类型 | String | selection/number/date/select/month | ——
 format | number类型是否格式化千分号 | Boolean | —— | true
 options | select下拉选项 | Array | { value: '值', label: '显示文字' } | ——
 fixed | 是否固定在左侧 | Boolean | —— | false
+action | 是否启用过滤和筛选 | Boolean | —— | false
+disabled | 是否可编辑 | Boolean | —— | false
+hidden | 是否可隐藏 | Boolean | —— | false
 
 ### Shortcut
 
@@ -212,22 +247,6 @@ Ctrl + A | 单元格全选
 Ctrl + Z | 撤销
 Ctrl + Y | 重做
 Enter | 单元格编辑/完成单元格编辑
-
-### Feature
-
-- 表格宽度调整
-- 表单列固定
-- 数据过滤与筛选
-- 支持行多选
-- 批量框选删除与复制粘贴
-- 可与Excel互相复制粘贴
-- 框选单元格拖动超过表格时自动滚动表格区域
-- 数据下拉复制
-- 获取改变的数据行
-- 多种数据类型选择和校验
-- 获取校验非法的数据行
-- 支持撤销与重做
-- 可自定义每个单元格样式与类名
 
 ## Author
 

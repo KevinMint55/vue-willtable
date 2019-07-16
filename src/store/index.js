@@ -14,6 +14,8 @@ class TableStore {
       columns: [],
       data: [],
       showData: [],
+      initialData: null,
+      changeData: [],
       dataStatusList: [],
       columnsStatusList: [],
 
@@ -61,6 +63,11 @@ class TableStore {
 
       adjustLineLeft: 0,
       adjustLineShow: false,
+
+      // 历史记录
+      historyData: [],
+      curHisory: 0,
+      isOperation: false,
     };
   }
 
@@ -100,7 +107,7 @@ class TableStore {
     if (states.autofill.autofillYArr[1] > states.selector.selectedYArr[1]) {
       for (let i = 0; i <= states.autofill.autofillYArr[1] - states.autofill.autofillYArr[0]; i += 1) {
         for (let j = 0; j <= states.selector.selectedXArr[1] - states.selector.selectedXArr[0]; j += 1) {
-          if (states.columns[j + states.selector.selectedXArr[0]].type !== 'disabled') {
+          if (!states.columns[j + states.selector.selectedXArr[0]].disabled) {
             states.showData[i + states.autofill.autofillYArr[0]][states.columns[j + states.selector.selectedXArr[0]].key] = states.showData[states.selector.selectedYArr[1]][states.columns[j + states.selector.selectedXArr[0]].key];
           }
         }
@@ -112,7 +119,7 @@ class TableStore {
     if (states.autofill.autofillYArr[0] < states.selector.selectedYArr[0]) {
       for (let i = 0; i <= states.autofill.autofillYArr[1] - states.autofill.autofillYArr[0]; i += 1) {
         for (let j = 0; j <= states.selector.selectedXArr[1] - states.selector.selectedXArr[0]; j += 1) {
-          if (states.columns[j + states.selector.selectedXArr[0]].type !== 'disabled') {
+          if (!states.columns[j + states.selector.selectedXArr[0]].disabled) {
             states.showData[i + states.autofill.autofillYArr[0]][states.columns[j + states.selector.selectedXArr[0]].key] = states.showData[states.selector.selectedYArr[0]][states.columns[j + states.selector.selectedXArr[0]].key];
           }
         }
@@ -308,6 +315,47 @@ class TableStore {
       states.showData = states.showData.filter(item => states.filters[key].includes(item[key].toString()));
     });
     states.dropdown.index = null;
+  }
+
+  handleChangeData() {
+    const { states } = this;
+    const data = JSON.parse(JSON.stringify(states.data));
+    const initialData = JSON.parse(JSON.stringify(states.initialData));
+    states.changeData = data.filter((item, index) => JSON.stringify(item) !== JSON.stringify(initialData[index]));
+  }
+
+  // 撤销与重做
+  operation(type) {
+    const { states } = this;
+    if (!states.editor.editing) {
+      if (type === 'undo' && states.curHisory > 1) {
+        states.curHisory -= 1;
+      }
+      if (type === 'recovery' && states.curHisory < states.historyData.length) {
+        states.curHisory += 1;
+      }
+      states.isOperation = true;
+      JSON.parse(states.historyData[states.curHisory - 1]).forEach((i, index) => {
+        Object.keys(i).forEach((j) => {
+          states.data[index][j] = i[j];
+        });
+      });
+      setTimeout(() => {
+        states.isOperation = false;
+      }, 0);
+    }
+  }
+
+  // 清楚数据
+  clearSelected() {
+    const { states } = this;
+    for (let i = 0; i <= states.selector.selectedYArr[1] - states.selector.selectedYArr[0]; i += 1) {
+      for (let j = 0; j <= states.selector.selectedXArr[1] - states.selector.selectedXArr[0]; j += 1) {
+        if (!states.columns[j + states.selector.selectedXArr[0]].disabled) {
+          states.showData[i + states.selector.selectedYArr[0]][states.columns[j + states.selector.selectedXArr[0]].key] = '';
+        }
+      }
+    }
   }
 }
 

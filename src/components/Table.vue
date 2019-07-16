@@ -23,12 +23,14 @@
           :all-show="true"
           :cellStyle="cellStyle"
           :cellClassName="cellClassName"
+          :rowHeight="rowHeight"
           :store="store">
           <!-- 编辑器 -->
           <editor
             ref="editor"
             :columnsWidth="columnsWidth"
             :fixedCount="fixedCount"
+            :rowHeight="rowHeight"
             :store="store" />
         </table-body>
         <div
@@ -54,6 +56,7 @@
             :columnsWidth="columnsWidth"
             :cellStyle="cellStyle"
             :cellClassName="cellClassName"
+            :rowHeight="rowHeight"
             :store="store" />
         </div>
       </div>
@@ -108,6 +111,10 @@ export default {
     maxHeight: {
       type: [String, Number],
     },
+    rowHeight: {
+      type: [String, Number],
+      default: 28,
+    },
     disabled: {
       type: Boolean,
       default: false,
@@ -135,8 +142,6 @@ export default {
       columnsWidth: [],
 
       data: [],
-      initialData: null,
-      changeData: [],
       scrollLeftArr: [],
       scrollTopArr: [],
       fixedCount: 0,
@@ -147,11 +152,6 @@ export default {
       mouseY: 0,
       timer: null,
 
-      // 历史记录
-      historyData: [],
-      curHisory: 0,
-      isOperation: false,
-
       excelPos: {},
     };
   },
@@ -161,19 +161,20 @@ export default {
     },
     data: {
       handler(val) {
-        if (!this.isOperation) {
-          if (this.historyData.length !== this.curHisory) {
-            this.historyData = this.historyData.slice(0, this.curHisory);
+        const { states } = this.store;
+        if (!states.isOperation) {
+          if (states.historyData.length !== states.curHisory) {
+            states.historyData = states.historyData.slice(0, states.curHisory);
           }
-          this.historyData.push(JSON.stringify(val));
-          this.curHisory += 1;
+          states.historyData.push(JSON.stringify(val));
+          states.curHisory += 1;
         }
         this.$emit('input', val);
-        if (!this.initialData) {
+        if (!states.initialData) {
           this.initData();
         }
         this.store.handleFilters();
-        this.handleChangeData();
+        this.store.handleChangeData();
         this.store.handleErrors();
         this.handleResize();
       },
@@ -182,6 +183,7 @@ export default {
     columns: {
       handler() {
         this.initColumns();
+        this.store.handleFilters();
         this.handleResize();
       },
       deep: true,
@@ -233,9 +235,9 @@ export default {
         checked: false,
         errors: [],
       }));
-      this.initialData = JSON.parse(JSON.stringify(this.data));
-      this.historyData = [JSON.stringify(this.data)];
-      this.curHisory = 1;
+      states.initialData = JSON.parse(JSON.stringify(states.data));
+      states.historyData = [JSON.stringify(states.data)];
+      states.curHisory = 1;
       if (this.$refs.theaderContent) {
         this.$refs.theaderContent.checkedAll = false;
       }
@@ -245,28 +247,29 @@ export default {
       this.initColumns();
     },
     handleResize() {
+      const { states } = this.store;
       this.excelPos = this.$refs.willtable.getBoundingClientRect();
       // 获取编辑框可移动范围, X是横轴, Y是竖轴
-      this.store.states.editor.editorRange = {
-        minX: this.store.states.columns.filter(item => item.type === 'selection').length,
-        maxX: this.store.states.columns.length - 1,
+      states.editor.editorRange = {
+        minX: states.columns.filter(item => item.type === 'selection').length,
+        maxX: states.columns.length - 1,
         minY: 0,
-        maxY: this.store.states.showData.length - 1,
+        maxY: states.showData.length - 1,
       };
 
       this.wrapperWidth = this.$refs.wrapper.offsetWidth;
 
       this.$nextTick(() => {
         // 计算剩余列宽度
-        const surplusColumns = this.store.states.columns.filter(item => !item.width);
+        const surplusColumns = states.columns.filter(item => !item.width);
         let surplusColumnAvg;
 
         if (!this.$refs.tbodyContent.$el) return;
         if (surplusColumns.length > 0) {
-          const surplusWidth = this.wrapperWidth - this.store.states.columns.filter(item => item.width).reduce((total, item) => total + item.width, 0);
+          const surplusWidth = this.wrapperWidth - states.columns.filter(item => item.width).reduce((total, item) => total + item.width, 0);
           if (surplusWidth > 0) {
             if (this.$refs.tbodyContent.$el.offsetHeight > this.maxHeight) {
-              surplusColumnAvg = (surplusWidth - 1 - this.store.states.scrollBarWidth) / surplusColumns.length;
+              surplusColumnAvg = (surplusWidth - 1 - states.scrollBarWidth) / surplusColumns.length;
             } else {
               surplusColumnAvg = (surplusWidth - 1) / surplusColumns.length;
             }
@@ -274,7 +277,7 @@ export default {
         }
 
         // 设置单元格宽度
-        this.store.states.columns.forEach((column, index) => {
+        states.columns.forEach((column, index) => {
           if (column.width) {
             this.$set(this.columnsWidth, index, column.width);
           } else {
@@ -297,10 +300,10 @@ export default {
           return sum;
         });
 
-        this.scrollTopArr = this.store.states.showData.map((item, index) => {
-          const sum = this.store.states.showData.reduce((total, curVal, curIndex) => {
+        this.scrollTopArr = states.showData.map((item, index) => {
+          const sum = states.showData.reduce((total, curVal, curIndex) => {
             if (curIndex <= index) {
-              return total + 28;
+              return total + parseInt(this.rowHeight, 10);
             }
             return total;
           }, 0);
@@ -308,13 +311,13 @@ export default {
         });
         this.scrollTopArr.unshift(0);
 
-        this.fixedCount = this.store.states.columns.filter(item => item.fixed).length;
+        this.fixedCount = states.columns.filter(item => item.fixed).length;
         this.fixedWidth = this.scrollLeftArr[this.fixedCount - 1] || 0;
 
         // 如果每列均设置了宽度
-        const allWidth = this.store.states.columns.every(cell => cell.width);
+        const allWidth = states.columns.every(cell => cell.width);
         if (allWidth) {
-          this.tableWidth = this.store.states.columns.map(cell => cell.width).reduce((a, b) => a + b, 0);
+          this.tableWidth = states.columns.map(cell => cell.width).reduce((a, b) => a + b, 0);
         } else {
           this.tableWidth = this.columnsWidth.reduce((total, cur) => total + cur, 0);
           if (this.tableWidth < this.wrapperWidth) {
@@ -331,8 +334,8 @@ export default {
         // 设置左侧定位高度
         this.$nextTick(() => {
           if (this.tableWidth > this.wrapperWidth) {
-            this.$refs.fixedWrapper.style.height = `${this.$refs.wrapper.offsetHeight - this.store.states.scrollBarWidth}px`;
-            this.$refs.fixedTbody.style.height = `${this.$refs.wrapper.offsetHeight - this.store.states.scrollBarWidth - this.theaderHeight}px`;
+            this.$refs.fixedWrapper.style.height = `${this.$refs.wrapper.offsetHeight - states.scrollBarWidth}px`;
+            this.$refs.fixedTbody.style.height = `${this.$refs.wrapper.offsetHeight - states.scrollBarWidth - this.theaderHeight}px`;
           } else {
             this.$refs.fixedWrapper.style.height = `${this.$refs.wrapper.offsetHeight}px`;
             this.$refs.fixedTbody.style.height = `${this.$refs.wrapper.offsetHeight - this.theaderHeight}px`;
@@ -347,36 +350,32 @@ export default {
 
             // 如果已存在Col，删除组中重新在末尾添加
             for (let i = 0; i < colgroup.children.length; i += 1) {
-              if (colgroup.children[i].width === this.store.states.scrollBarWidth) {
+              if (colgroup.children[i].width === states.scrollBarWidth) {
                 colgroup.removeChild(colgroup.children[i]);
                 tr.removeChild(tr.children[i]);
               }
             }
             const col = document.createElement('col');
-            col.width = this.store.states.scrollBarWidth;
+            col.width = states.scrollBarWidth;
             colgroup.appendChild(col);
 
             const th = document.createElement('th');
-            th.style.width = `${this.store.states.scrollBarWidth}px`;
+            th.style.width = `${states.scrollBarWidth}px`;
             th.style.borderTop = '1px solid #d6dfe4';
             tr.appendChild(th);
 
-            this.$refs.tbodyContent.$el.style.width = `${this.tableWidth - this.store.states.scrollBarWidth - 1}px`;
+            this.$refs.tbodyContent.$el.style.width = `${this.tableWidth - states.scrollBarWidth - 1}px`;
           });
         }
       });
     },
-    handleChangeData() {
-      const data = JSON.parse(JSON.stringify(this.data));
-      const initialData = JSON.parse(JSON.stringify(this.initialData));
-      this.changeData = data.filter((item, index) => JSON.stringify(item) !== JSON.stringify(initialData[index]));
-    },
     clickoutside() {
-      if (this.store.states.selector.isSelected || this.store.states.autofill.isAutofill) return;
-      this.store.states.editor.editing = false;
-      this.store.states.editor.editorShow = false;
-      this.store.states.selector.selectedXArr = [];
-      this.store.states.selector.selectedYArr = [];
+      const { states } = this.store;
+      if (states.selector.isSelected || states.autofill.isAutofill) return;
+      states.editor.editing = false;
+      states.editor.editorShow = false;
+      states.selector.selectedXArr = [];
+      states.selector.selectedYArr = [];
       window.removeEventListener('keydown', this.keySubmit);
       window.removeEventListener('mousemove', this.multiSelectAdjustPostion);
     },
@@ -384,25 +383,26 @@ export default {
     selectCell(e, x, y, type) {
       if (this.disabled) return;
       if (e.button !== 0) return;
+      const { states } = this.store;
       window.addEventListener('keydown', this.keySubmit);
       window.addEventListener('mousemove', this.multiSelectAdjustPostion);
       if (type === 'selection') return;
       this.timer = setInterval(this.multiSelectAdjustPostion, 16);
       window.addEventListener('mouseup', this.selectUp);
-      this.store.states.editor.editing = false;
-      this.store.states.editor.editType = 'text';
-      this.store.states.editor.editorShow = true;
-      this.store.states.autofill.autofillXIndex = x;
-      this.store.states.autofill.autofillYIndex = y;
-      this.store.states.selector.selectedXIndex = x;
-      this.store.states.selector.selectedYIndex = y;
-      this.store.states.selector.selectedXArr = [x, x];
-      this.store.states.selector.selectedYArr = [y, y];
-      this.store.states.selector.isSelected = true;
+      states.editor.editing = false;
+      states.editor.editType = 'text';
+      states.editor.editorShow = true;
+      states.autofill.autofillXIndex = x;
+      states.autofill.autofillYIndex = y;
+      states.selector.selectedXIndex = x;
+      states.selector.selectedYIndex = y;
+      states.selector.selectedXArr = [x, x];
+      states.selector.selectedYArr = [y, y];
+      states.selector.isSelected = true;
       this.$nextTick(() => {
-        this.store.states.editor.editorXIndex = x;
-        this.store.states.editor.editorYIndex = y;
-        this.store.states.editor.curEditorCoverValue = this.store.states.showData[this.store.states.editor.editorYIndex][this.store.states.columns[this.store.states.editor.editorXIndex].key];
+        states.editor.editorXIndex = x;
+        states.editor.editorYIndex = y;
+        states.editor.curEditorCoverValue = states.showData[states.editor.editorYIndex][states.columns[states.editor.editorXIndex].key];
         this.$nextTick(() => {
           this.adjustPosition();
           this.$refs.editor.$refs.clipboard.focus();
@@ -410,27 +410,29 @@ export default {
       });
     },
     keySubmit(e) {
-      if ((e.ctrlKey && e.keyCode === 90) || (e.metaKey && e.keyCode === 90)) {
-        return this.operation('undo');
+      const { states } = this.store;
+      const { keyCode, ctrlKey, metaKey } = e;
+      if ((ctrlKey && keyCode === 90) || (metaKey && keyCode === 90)) {
+        return this.store.operation('undo');
       }
-      if ((e.ctrlKey && e.keyCode === 89) || (e.metaKey && e.keyCode === 89)) {
-        return this.operation('recovery');
+      if ((ctrlKey && keyCode === 89) || (metaKey && keyCode === 89)) {
+        return this.store.operation('recovery');
       }
-      if (this.store.states.editor.editing && e.keyCode === 13) {
-        this.store.states.editor.editing = false;
-        this.store.states.editor.editType = 'text';
+      if (states.editor.editing && keyCode === 13) {
+        states.editor.editing = false;
+        states.editor.editType = 'text';
         return;
       }
-      if (this.store.states.editor.editing || !this.store.states.editor.editorShow) {
+      if (states.editor.editing || !states.editor.editorShow) {
         return;
       }
-      if ((e.ctrlKey && e.keyCode === 67) || (e.metaKey && e.keyCode === 67)) {
+      if ((ctrlKey && keyCode === 67) || (metaKey && keyCode === 67)) {
         return this.getContentToclipboard();
       }
-      if ((e.ctrlKey && e.keyCode === 65) || (e.metaKey && e.keyCode === 65)) {
+      if ((ctrlKey && keyCode === 65) || (metaKey && keyCode === 65)) {
         return this.store.selectAllCells();
       }
-      if (e.ctrlKey || e.metaKey) {
+      if (ctrlKey || metaKey) {
         return;
       }
       e.preventDefault();
@@ -441,66 +443,67 @@ export default {
         return false;
       };
       switch (true) {
-        case e.keyCode === 37:
+        case keyCode === 37:
           // 左
-          if (this.store.states.editor.editorXIndex === this.store.states.editor.editorRange.minX) {
-            this.store.states.editor.editorXIndex = this.store.states.editor.editorRange.minX;
+          if (states.editor.editorXIndex === states.editor.editorRange.minX) {
+            states.editor.editorXIndex = states.editor.editorRange.minX;
           } else {
-            this.store.states.editor.editorXIndex -= 1;
+            states.editor.editorXIndex -= 1;
           }
           this.adjustPosition();
           break;
-        case e.keyCode === 38:
+        case keyCode === 38:
           // 上
-          if (this.store.states.editor.editorYIndex === this.store.states.editor.editorRange.minY) {
-            this.store.states.editor.editorYIndex = this.store.states.editor.editorRange.minY;
+          if (states.editor.editorYIndex === states.editor.editorRange.minY) {
+            states.editor.editorYIndex = states.editor.editorRange.minY;
           } else {
-            this.store.states.editor.editorYIndex -= 1;
+            states.editor.editorYIndex -= 1;
           }
           this.adjustPosition();
           break;
-        case e.keyCode === 39:
+        case keyCode === 39:
           // 右
-          if (this.store.states.editor.editorXIndex === this.store.states.editor.editorRange.maxX) {
-            this.store.states.editor.editorXIndex = this.store.states.editor.editorRange.maxX;
+          if (states.editor.editorXIndex === states.editor.editorRange.maxX) {
+            states.editor.editorXIndex = states.editor.editorRange.maxX;
           } else {
-            this.store.states.editor.editorXIndex += 1;
+            states.editor.editorXIndex += 1;
           }
           this.adjustPosition();
           break;
-        case e.keyCode === 40:
+        case keyCode === 40:
           // 下
-          if (this.store.states.editor.editorYIndex === this.store.states.editor.editorRange.maxY) {
-            this.store.states.editor.editorYIndex = this.store.states.editor.editorRange.maxY;
+          if (states.editor.editorYIndex === states.editor.editorRange.maxY) {
+            states.editor.editorYIndex = states.editor.editorRange.maxY;
           } else {
-            this.store.states.editor.editorYIndex += 1;
+            states.editor.editorYIndex += 1;
           }
           this.adjustPosition();
           break;
-        case e.keyCode === 8:
+        case keyCode === 8:
           // 删除
-          this.clearSelected();
+          this.store.clearSelected();
           break;
-        case e.keyCode === 13:
+        case keyCode === 13:
           this.setEditing();
           break;
-        case isImportability(e.keyCode) || e.key === 'Process' || e.key === 'Unidentified':
+        case isImportability(keyCode) || e.key === 'Process' || e.key === 'Unidentified':
           this.setEditing(e.key);
           break;
       }
     },
     getContentToclipboard() {
+      const { states } = this.store;
       let content = '';
-      for (let i = 0; i <= this.store.states.selector.selectedYArr[1] - this.store.states.selector.selectedYArr[0]; i += 1) {
-        for (let j = 0; j <= this.store.states.selector.selectedXArr[1] - this.store.states.selector.selectedXArr[0]; j += 1) {
-          if (this.store.states.selector.selectedXArr[1] - this.store.states.selector.selectedXArr[0] === 0) {
-            content += `${this.store.states.showData[i + this.store.states.selector.selectedYArr[0]][this.store.states.columns[j + this.store.states.selector.selectedXArr[0]].key] || ''}\n`;
+      for (let i = 0; i <= states.selector.selectedYArr[1] - states.selector.selectedYArr[0]; i += 1) {
+        for (let j = 0; j <= states.selector.selectedXArr[1] - states.selector.selectedXArr[0]; j += 1) {
+          if (states.selector.selectedXArr[1] - states.selector.selectedXArr[0] === 0) {
+            content += `${states.showData[i + states.selector.selectedYArr[0]][states.columns[j + states.selector.selectedXArr[0]].key] || ''}\n`;
           } else if (j === 0) {
-            content += (this.store.states.showData[i + this.store.states.selector.selectedYArr[0]][this.store.states.columns[j + this.store.states.selector.selectedXArr[0]].key] || '');
-          } else if (j === this.store.states.selector.selectedXArr[1] - this.store.states.selector.selectedXArr[0]) {
-            content += `\t${this.store.states.showData[i + this.store.states.selector.selectedYArr[0]][this.store.states.columns[j + this.store.states.selector.selectedXArr[0]].key] || ''}\n`;
+            content += (states.showData[i + states.selector.selectedYArr[0]][states.columns[j + states.selector.selectedXArr[0]].key] || '');
+          } else if (j === states.selector.selectedXArr[1] - states.selector.selectedXArr[0]) {
+            content += `\t${states.showData[i + states.selector.selectedYArr[0]][states.columns[j + states.selector.selectedXArr[0]].key] || ''}\n`;
           } else {
-            content += `\t${this.store.states.showData[i + this.store.states.selector.selectedYArr[0]][this.store.states.columns[j + this.store.states.selector.selectedXArr[0]].key] || ''}`;
+            content += `\t${states.showData[i + states.selector.selectedYArr[0]][states.columns[j + states.selector.selectedXArr[0]].key] || ''}`;
           }
         }
       }
@@ -531,7 +534,7 @@ export default {
         for (let i = 0; i <= arr.length - 1; i += 1) {
           for (let j = 0; j <= arr[i].length - 1; j += 1) {
             if (this.store.states.showData[i + this.store.states.selector.selectedYArr[0]] && this.store.states.columns[j + this.store.states.selector.selectedXArr[0]]) {
-              if (this.store.states.columns[j + this.store.states.selector.selectedXArr[0]].type !== 'disabled') {
+              if (!this.store.states.columns[j + this.store.states.selector.selectedXArr[0]].disabled) {
                 this.store.states.showData[i + this.store.states.selector.selectedYArr[0]][this.store.states.columns[j + this.store.states.selector.selectedXArr[0]].key] = arr[i][j];
               }
             }
@@ -540,19 +543,10 @@ export default {
         this.$refs.editor.$refs.clipboard.value = '';
       }, 0);
     },
-    clearSelected() {
-      for (let i = 0; i <= this.store.states.selector.selectedYArr[1] - this.store.states.selector.selectedYArr[0]; i += 1) {
-        for (let j = 0; j <= this.store.states.selector.selectedXArr[1] - this.store.states.selector.selectedXArr[0]; j += 1) {
-          if (this.store.states.columns[j + this.store.states.selector.selectedXArr[0]].type !== 'disabled') {
-            this.store.states.showData[i + this.store.states.selector.selectedYArr[0]][this.store.states.columns[j + this.store.states.selector.selectedXArr[0]].key] = '';
-          }
-        }
-      }
-    },
     // 设置启用编辑
     setEditing(key) {
       const { states } = this.store;
-      if (states.columns[states.editor.editorXIndex].type === 'disabled') {
+      if (states.columns[states.editor.editorXIndex].disabled) {
         return;
       }
       states.editor.editType = states.columns[states.editor.editorXIndex].type ? states.columns[states.editor.editorXIndex].type : 'text';
@@ -669,29 +663,9 @@ export default {
       const { states } = this.store;
       const checkedAll = states.dataStatusList.every(item => item.checked);
       states.dataStatusList.forEach((item, index) => {
-        this.$set(this.dataStatusList[index], 'checked', !checkedAll);
+        this.$set(states.dataStatusList[index], 'checked', !checkedAll);
       });
       this.selectionChange();
-    },
-    operation(type) {
-      const { states } = this.store;
-      if (!states.editor.editing) {
-        if (type === 'undo' && this.curHisory > 1) {
-          this.curHisory -= 1;
-        }
-        if (type === 'recovery' && this.curHisory < this.historyData.length) {
-          this.curHisory += 1;
-        }
-        this.isOperation = true;
-        JSON.parse(this.historyData[this.curHisory - 1]).forEach((i, index) => {
-          Object.keys(i).forEach((j) => {
-            this.data[index][j] = i[j];
-          });
-        });
-        this.$nextTick(() => {
-          this.isOperation = false;
-        });
-      }
     },
     adjustWidth(index, width) {
       this.store.states.columns[index].width = width;
@@ -829,10 +803,10 @@ ul {
 }
 
 .empty-columns {
-    text-align: center;
-    border: 1px solid #DCDFE6;
-    padding: 10px 20px;
-    color: #909399;
+  text-align: center;
+  border: 1px solid #DCDFE6;
+  padding: 10px 20px;
+  color: #909399;
 }
 
 .el-checkbox {

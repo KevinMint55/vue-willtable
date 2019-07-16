@@ -8,7 +8,7 @@ export default {
       });
     },
     getChangeData() {
-      return this.changeData;
+      return this.store.states.changeData;
     },
     getErrorRows() {
       const { states } = this.store;
