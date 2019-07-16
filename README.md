@@ -234,7 +234,6 @@ options | select下拉选项 | Array | { value: '值', label: '显示文字' } |
 fixed | 是否固定在左侧 | Boolean | —— | false
 action | 是否启用过滤和筛选 | Boolean | —— | false
 disabled | 是否可编辑 | Boolean | —— | false
-hidden | 是否可隐藏 | Boolean | —— | false
 
 ### Shortcut
 
