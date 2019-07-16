@@ -233,7 +233,7 @@ format | number类型是否格式化千分号 | Boolean | —— | true
 options | select下拉选项 | Array | { value: '值', label: '显示文字' } | ——
 fixed | 是否固定在左侧 | Boolean | —— | false
 action | 是否启用过滤和筛选 | Boolean | —— | false
-disabled | 是否可编辑 | Boolean | —— | false
+disabled | 是否禁止编辑 | Boolean | —— | false
 
 ### Shortcut
 
