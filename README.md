@@ -4,6 +4,8 @@
 
 Demo here: https://demo.kevinmint.com/willtable/
 
+基于该组件实现的多人实时在线编辑表格系统: https://castle.kevinmint.com
+
 ![image](https://qiniu.kevinmint.com/willtable1.gif)
 
 ![image](https://qiniu.kevinmint.com/willtable2.gif)
