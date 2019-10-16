@@ -418,7 +418,7 @@ export default {
       if ((ctrlKey && keyCode === 89) || (metaKey && keyCode === 89)) {
         return this.store.operation('recovery');
       }
-      if (states.editor.editing && keyCode === 13) {
+      if (states.editor.editing && (keyCode === 13 || keyCode === 27)) {
         states.editor.editing = false;
         states.editor.editType = 'text';
         return;
