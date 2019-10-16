@@ -210,16 +210,16 @@ export default {
     },
     initColumns() {
       const { states } = this.store;
-      const fixedArr = this.columns.filter(item => item.fixed);
-      const unFixedArr = this.columns.filter(item => !item.fixed);
+      const fixedArr = this.columns.filter((item) => item.fixed);
+      const unFixedArr = this.columns.filter((item) => !item.fixed);
       states.columns = fixedArr.concat(unFixedArr).map((item) => {
         if (item.width) {
           item.width = parseInt(item.width, 10);
         }
         return { ...item };
       });
-      this.columnsWidth = states.columns.map(item => item.width);
-      states.columnsStatusList = states.columns.map(item => ({
+      this.columnsWidth = states.columns.map((item) => item.width);
+      states.columnsStatusList = states.columns.map((item) => ({
         key: item.key,
         type: item.type,
         list: {},
@@ -251,7 +251,7 @@ export default {
       this.excelPos = this.$refs.willtable.getBoundingClientRect();
       // 获取编辑框可移动范围, X是横轴, Y是竖轴
       states.editor.editorRange = {
-        minX: states.columns.filter(item => item.type === 'selection').length,
+        minX: states.columns.filter((item) => item.type === 'selection').length,
         maxX: states.columns.length - 1,
         minY: 0,
         maxY: states.showData.length - 1,
@@ -261,12 +261,12 @@ export default {
 
       this.$nextTick(() => {
         // 计算剩余列宽度
-        const surplusColumns = states.columns.filter(item => !item.width);
+        const surplusColumns = states.columns.filter((item) => !item.width);
         let surplusColumnAvg;
 
         if (!this.$refs.tbodyContent.$el) return;
         if (surplusColumns.length > 0) {
-          const surplusWidth = this.wrapperWidth - states.columns.filter(item => item.width).reduce((total, item) => total + item.width, 0);
+          const surplusWidth = this.wrapperWidth - states.columns.filter((item) => item.width).reduce((total, item) => total + item.width, 0);
           if (surplusWidth > 0) {
             if (this.$refs.tbodyContent.$el.offsetHeight > this.maxHeight) {
               surplusColumnAvg = (surplusWidth - 1 - states.scrollBarWidth) / surplusColumns.length;
@@ -311,13 +311,13 @@ export default {
         });
         this.scrollTopArr.unshift(0);
 
-        this.fixedCount = states.columns.filter(item => item.fixed).length;
+        this.fixedCount = states.columns.filter((item) => item.fixed).length;
         this.fixedWidth = this.scrollLeftArr[this.fixedCount - 1] || 0;
 
         // 如果每列均设置了宽度
-        const allWidth = states.columns.every(cell => cell.width);
+        const allWidth = states.columns.every((cell) => cell.width);
         if (allWidth) {
-          this.tableWidth = states.columns.map(cell => cell.width).reduce((a, b) => a + b, 0);
+          this.tableWidth = states.columns.map((cell) => cell.width).reduce((a, b) => a + b, 0);
         } else {
           this.tableWidth = this.columnsWidth.reduce((total, cur) => total + cur, 0);
           if (this.tableWidth < this.wrapperWidth) {
@@ -593,8 +593,8 @@ export default {
       let curLeftShould; let
         curRightShould;
       if (this.fixedCount > 0) {
-        const unFixedLeftArr = this.scrollLeftArr.slice(this.fixedCount - 1, -1).map(item => item - this.fixedWidth);
-        const unFixedRightArr = this.scrollLeftArr.slice(this.fixedCount).map(item => item - this.fixedWidth);
+        const unFixedLeftArr = this.scrollLeftArr.slice(this.fixedCount - 1, -1).map((item) => item - this.fixedWidth);
+        const unFixedRightArr = this.scrollLeftArr.slice(this.fixedCount).map((item) => item - this.fixedWidth);
         curLeftShould = unFixedLeftArr[states.editor.editorXIndex - this.fixedCount];
         curRightShould = unFixedRightArr[states.editor.editorXIndex - this.fixedCount] + this.fixedWidth - this.wrapperWidth + states.scrollBarWidth + 2;
       } else {
@@ -661,7 +661,7 @@ export default {
     },
     selectAll() {
       const { states } = this.store;
-      const checkedAll = states.dataStatusList.every(item => item.checked);
+      const checkedAll = states.dataStatusList.every((item) => item.checked);
       states.dataStatusList.forEach((item, index) => {
         this.$set(states.dataStatusList[index], 'checked', !checkedAll);
       });

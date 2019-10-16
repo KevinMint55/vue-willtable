@@ -26,7 +26,7 @@ export default {
           };
         }
         return null;
-      }).filter(i => i);
+      }).filter((i) => i);
       return errorRows;
     },
     addItem(item) {
@@ -41,7 +41,7 @@ export default {
       const { states } = this.store;
       if (key && values instanceof Array) {
         values.forEach((value) => {
-          const dIndex = this.data.findIndex(d => d[key] === value);
+          const dIndex = this.data.findIndex((d) => d[key] === value);
           states.dataStatusList.splice(dIndex, 1);
           this.data.splice(dIndex, 1);
         });

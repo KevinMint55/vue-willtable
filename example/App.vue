@@ -58,11 +58,7 @@ export default {
           label: '显示数据类型icon',
           checked: true,
           handleChange: (checked) => {
-            if (checked) {
-              this.showIcon = true;
-            } else {
-              this.showIcon = false;
-            }
+            this.showIcon = checked;
           },
         },
         {
@@ -300,7 +296,7 @@ export default {
       this.$refs.willtable.addItem(obj);
     },
     remove() {
-      this.$refs.willtable.removeItems('sid', this.selection.map(s => s.sid));
+      this.$refs.willtable.removeItems('sid', this.selection.map((s) => s.sid));
     },
     linkGithub() {
       window.open('https://github.com/KevinMint55/vue-willtable', '_blank');

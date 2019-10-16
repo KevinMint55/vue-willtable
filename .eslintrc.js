@@ -36,6 +36,8 @@ module.exports = {
     "no-prototype-builtins": 0,
     "no-restricted-globals": 0,
     "class-methods-use-this": 0,
+    'no-restricted-syntax': 'off',
+    'guard-for-in': 'off',
   },
   parserOptions: {
     parser: 'babel-eslint',

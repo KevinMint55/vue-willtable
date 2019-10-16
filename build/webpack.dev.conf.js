@@ -7,7 +7,7 @@ const baseWebpackConfig = require('./webpack.base.conf');
 const config = require('../config');
 
 function resolve(dir) {
-  return path.join(__dirname, '..', dir)
+  return path.join(__dirname, '..', dir);
 }
 
 const webpackConfig = {
@@ -21,7 +21,7 @@ const webpackConfig = {
     new webpack.NamedModulesPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.ProgressPlugin(betterProgress({
-      mode: 'compact',  // or 'detailed' or 'bar'
+      mode: 'compact', // or 'detailed' or 'bar'
     })),
     new HtmlWebpackPlugin({
       filename: 'index.html',
@@ -31,12 +31,12 @@ const webpackConfig = {
       minify: {
         removeComments: true,
         collapseWhitespace: true,
-        removeAttributeQuotes: true
+        removeAttributeQuotes: true,
       },
-      chunksSortMode: 'dependency'
-    })
-  ]
-}
+      chunksSortMode: 'dependency',
+    }),
+  ],
+};
 
 if (config.dev.styleLint) {
   const StyleLintPlugin = require('stylelint-webpack-plugin');
