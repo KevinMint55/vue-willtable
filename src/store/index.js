@@ -312,7 +312,7 @@ class TableStore {
     const { states } = this;
     states.showData = states.data;
     Object.keys(states.filters).forEach((key) => {
-      states.showData = states.showData.filter(item => states.filters[key].includes(item[key].toString()));
+      states.showData = states.showData.filter((item) => states.filters[key].includes(item[key].toString()));
     });
     states.dropdown.index = null;
   }

@@ -23,7 +23,7 @@ const verifyMonth = (value) => {
 };
 
 const verifySelect = (value, options) => {
-  const arr = options.map(item => item.value);
+  const arr = options.map((item) => item.value);
   if (arr.includes(value)) {
     return true;
   }
