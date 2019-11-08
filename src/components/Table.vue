@@ -76,6 +76,14 @@
       :store="store"
     ></dropdown>
     <div class="km-adjustLine" :style="{ left: `${store.states.adjustLineLeft}px` }" v-show="store.states.adjustLineShow"></div>
+    <scroll
+      :store="store"
+      barType="x">
+    </scroll>
+    <scroll
+      :store="store"
+      barType="y">
+    </scroll>
   </div>
 </template>
 
@@ -89,6 +97,7 @@ import TableHeader from './TableHeader.vue';
 import TableBody from './TableBody.vue';
 import Editor from './TableEditor.vue';
 import Dropdown from './TableDropdown.vue';
+import Scroll from './TableScroll.vue';
 
 export default {
   name: 'vue-willtable',
@@ -98,6 +107,7 @@ export default {
     TableBody,
     Editor,
     Dropdown,
+    Scroll,
   },
   props: {
     columns: {

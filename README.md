@@ -27,13 +27,6 @@ Demo here: https://demo.kevinmint.com/willtable/
 - 支持撤销与重做
 - 可自定义每个单元格样式与类名
 
-## Maybe TODO
-- 自定义滚动条
-- 过滤筛选传入自定义函数
-- 列或单元格传入自定义校验函数
-- table 与 table-column 拆分成两个组件使用
-- 撤销与重做功能数据操作优化
-
 ## Installation
 
 ```

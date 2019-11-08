@@ -19,7 +19,7 @@ class TableStore {
       dataStatusList: [],
       columnsStatusList: [],
 
-      // 编辑器
+      // editor
       editor: {
         editorRange: {},
         editorXIndex: 0,
@@ -33,7 +33,7 @@ class TableStore {
         curEditorWidth: 80,
       },
 
-      // 自动填充
+      // autofill
       autofill: {
         autofillXIndex: 0,
         autofillYIndex: 0,
@@ -41,7 +41,7 @@ class TableStore {
         autofillYArr: [],
       },
 
-      // 选择区域
+      // selection area
       selector: {
         isSelected: false,
         selectedXIndex: 0,
@@ -64,10 +64,18 @@ class TableStore {
       adjustLineLeft: 0,
       adjustLineShow: false,
 
-      // 历史记录
+      // history data
       historyData: [],
       curHisory: 0,
       isOperation: false,
+
+      // custom scrollbars
+      scrollbar: {
+        posX: 0,
+        posY: 0,
+        xWidth: 0,
+        yHeight: 0,
+      },
     };
   }
 
@@ -76,14 +84,13 @@ class TableStore {
     this.states.tableBodyTop = el.scrollTop;
   }
 
-  // 判断是否是mac
   handleIsMac() {
     if (/macintosh|mac os x/i.test(navigator.userAgent)) {
       this.states.isMac = true;
     }
   }
 
-  // 编辑器
+  // editor
   getEditorContent(editContent) {
     const { states } = this;
     states.showData[states.editor.editorYIndex][states.columns[states.editor.editorXIndex].key] = editContent;
@@ -95,7 +102,7 @@ class TableStore {
     states.editor.editType = 'text';
   }
 
-  // 自动填充
+  // autofill
   handleAutofill() {
     const { states } = this;
     states.autofill.isAutofill = true;
@@ -132,7 +139,7 @@ class TableStore {
     }, 0);
   }
 
-  // 选择器
+  // selector
   multiSelect(e, x, y, columnType) {
     const { states } = this;
     if (columnType === 'selection') return;
@@ -281,7 +288,7 @@ class TableStore {
     states.dropdown.index = null;
   }
 
-  // 过滤处理
+  // filter
   handleFilter() {
     const { states } = this;
     states.columnsStatusList[states.dropdown.index] = {
@@ -324,7 +331,7 @@ class TableStore {
     states.changeData = data.filter((item, index) => JSON.stringify(item) !== JSON.stringify(initialData[index]));
   }
 
-  // 撤销与重做
+  // undo and recovery
   operation(type) {
     const { states } = this;
     if (!states.editor.editing) {
@@ -346,7 +353,7 @@ class TableStore {
     }
   }
 
-  // 清楚数据
+  // delete the selected data
   clearSelected() {
     const { states } = this;
     for (let i = 0; i <= states.selector.selectedYArr[1] - states.selector.selectedYArr[0]; i += 1) {
