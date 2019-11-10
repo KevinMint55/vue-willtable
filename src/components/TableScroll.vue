@@ -11,6 +11,10 @@
 </template>
 
 <script>
+const tableLength = {
+  x: 'tableWidth',
+  y: 'tableHeight',
+};
 const pagePos = {
   x: 'pageX',
   y: 'pageY',
@@ -48,11 +52,13 @@ export default {
       if (this.barType === 'x') {
         return {
           width: length,
+          transform: `translateX(${this.scrollbar[barPos[this.barType]]}px)`,
         };
       }
-      if (this.barType === 'x') {
+      if (this.barType === 'y') {
         return {
           height: length,
+          transform: `translateY(${this.scrollbar[barPos[this.barType]]}px)`,
         };
       }
       return {};
@@ -66,8 +72,16 @@ export default {
       window.addEventListener('mousemove', this.handleMove);
     },
     handleMove(e) {
+      const { states } = this.store;
       if (this.canScroll) {
-        console.log('move', e);
+        const scrollBarPos = e[pagePos[this.barType]] - this.oriMousePos;
+        if (scrollBarPos <= 0) {
+          states.scrollbar[barPos[this.barType]] = 0;
+        } else if (scrollBarPos >= states[tableLength[this.barType]] - states.scrollbar[barLength[this.barType]]) {
+          states.scrollbar[barPos[this.barType]] = states[tableLength[this.barType]] - states.scrollbar[barLength[this.barType]];
+        } else {
+          states.scrollbar[barPos[this.barType]] = scrollBarPos;
+        }
       }
     },
     handleUp() {
@@ -84,21 +98,21 @@ export default {
   position: absolute;
   z-index: 20;
   &.x {
-    top: 0;
-    right: 0;
-    width: 8px;
-    height: 100%;
-    .ww_scroll_box {
-      width: 8px;
-    }
-  }
-  &.y {
     bottom: 0;
     left: 0;
     width: 100%;
     height: 8px;
     .ww_scroll_box {
       height: 8px;
+    }
+  }
+  &.y {
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 100%;
+    .ww_scroll_box {
+      width: 8px;
     }
   }
 }

@@ -8,6 +8,8 @@ import {
 class TableStore {
   constructor() {
     this.states = {
+      tableWidth: null,
+      tableHeight: null,
       scrollBarWidth: 10,
       tableBodyLeft: 0,
       tableBodyTop: 0,
@@ -73,8 +75,8 @@ class TableStore {
       scrollbar: {
         posX: 0,
         posY: 0,
-        xWidth: 0,
-        yHeight: 0,
+        xWidth: 100,
+        yHeight: 100,
       },
     };
   }

@@ -214,6 +214,9 @@ export default {
         this.store.tableBodyScroll(this.$refs.tbody);
         this.store.states.dropdown.index = null;
       });
+      window.addEventListener('resize', () => {
+        this.handleResize();
+      });
       this.store.handleIsMac();
       this.initColumns();
       this.handleResize();
@@ -268,6 +271,8 @@ export default {
       };
 
       this.wrapperWidth = this.$refs.wrapper.offsetWidth;
+      states.tableWidth = this.$refs.wrapper.offsetWidth;
+      states.tableHeight = this.maxHeight + 30;
 
       this.$nextTick(() => {
         // 计算剩余列宽度
@@ -353,7 +358,7 @@ export default {
         });
         // 当出现竖向滚动条时处理滚动条
         if (this.$refs.tbodyContent.$el.offsetHeight > this.maxHeight) {
-          this.$refs.tbody.style.overflowY = 'auto';
+          this.$refs.tbody.style.overflowY = 'hidden';
           this.$nextTick(() => {
             const colgroup = this.$refs.theaderContent.$el.querySelector('colgroup');
             const tr = this.$refs.theaderContent.$el.querySelector('tr');
@@ -726,7 +731,8 @@ ul {
       }
     }
     .km-table-body {
-      overflow-x: auto;
+      // overflow-x: auto;
+      overflow-x: hidden;
     }
   }
   /deep/ table {
