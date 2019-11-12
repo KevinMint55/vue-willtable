@@ -10,7 +10,10 @@ class TableStore {
     this.states = {
       tableWidth: null,
       tableHeight: null,
+      mainWidth: null,
+      mainHeight: null,
       scrollBarWidth: 10,
+      tableBody: null,
       tableBodyLeft: 0,
       tableBodyTop: 0,
       columns: [],
@@ -75,15 +78,36 @@ class TableStore {
       scrollbar: {
         posX: 0,
         posY: 0,
-        xWidth: 100,
-        yHeight: 100,
+        xWidth: 0,
+        yHeight: 0,
       },
     };
   }
 
   tableBodyScroll(el) {
-    this.states.tableBodyLeft = el.scrollLeft;
-    this.states.tableBodyTop = el.scrollTop;
+    const { states } = this;
+    states.tableBodyLeft = el.scrollLeft;
+    states.tableBodyTop = el.scrollTop;
+  }
+
+  initScrollBarLength() {
+    const { states } = this;
+    const barWidth = states.mainWidth / states.tableWidth * states.mainWidth;
+    if (barWidth > states.mainWidth) {
+      states.scrollbar.xWidth = 0;
+    } else if (barWidth <= 20) {
+      states.scrollbar.xWidth = 20;
+    } else {
+      states.scrollbar.xWidth = barWidth;
+    }
+    const barHeight = states.mainHeight / states.tableHeight * states.mainHeight;
+    if (barHeight > states.mainHeight) {
+      states.scrollbar.yHeight = 0;
+    } else if (barHeight <= 20) {
+      states.scrollbar.yHeight = 20;
+    } else {
+      states.scrollbar.yHeight = barHeight;
+    }
   }
 
   handleIsMac() {
@@ -232,7 +256,7 @@ class TableStore {
     });
   }
 
-  // 处理错误数据
+  // handle error data
   handleErrors() {
     const { states } = this;
     setTimeout(() => {

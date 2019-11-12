@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      class="km-cell-editor"
+      class="ww-cell-editor"
       :style="cellEditorStyle"
       :class="{
         'else': editor.editType != 'text' && editor.editType != 'number'
@@ -11,7 +11,7 @@
       v-show="editor.editorShow">
       <textarea
         ref="clipboard"
-        class="km-clipboard"
+        class="ww-clipboard"
         @paste="clipboardToContent">
       </textarea>
       <div style="flex:1;" v-show="editor.editing">
@@ -67,22 +67,22 @@
     </div>
     <div
       ref="autofillHandler"
-      class="km-autofill-handler"
+      class="ww-autofill-handler"
       :style="autofillHandlerStyle"
       @mousedown="handleAutofill"
       v-show="!editor.editing && editor.editorShow">
     </div>
     <div
-      class="km-cover-area selected"
+      class="ww-cover-area selected"
       :style="selectedStyle"></div>
     <div
-      class="km-cover-area selected fixed"
+      class="ww-cover-area selected fixed"
       :style="fixedSelectedStyle"></div>
     <div
-      class="km-cover-area autofill"
+      class="ww-cover-area autofill"
       :style="autofillStyle"></div>
     <div
-      class="km-cover-area autofill fixed"
+      class="ww-cover-area autofill fixed"
       :style="fixedAutofillStyle"></div>
   </div>
 </template>
@@ -236,9 +236,9 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 // 编辑框
-.km-cell-editor {
+.ww-cell-editor {
   position: absolute;
   top: 30px;
   left: 0;
@@ -263,7 +263,7 @@ export default {
   }
 }
 
-.km-autofill-handler {
+.ww-autofill-handler {
   position: absolute;
   top: 56px;
   left: 196px;
@@ -275,14 +275,14 @@ export default {
   z-index: 5;
 }
 
-.km-clipboard {
+.ww-clipboard {
   width: 0 !important;
   height: 0 !important;
   flex: 0 0 !important;
   padding: 0 !important;
 }
 
-.km-cover-area {
+.ww-cover-area {
   position: absolute;
   top: 0;
   left: 0;

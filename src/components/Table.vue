@@ -1,13 +1,16 @@
 <template>
-  <div ref="willtable" class="km-willtable">
+  <div ref="willtable" class="ww-willtable">
     <div
       v-if="store.states.columns.length > 0"
       ref="wrapper"
-      class="km-table-wrapper"
-      :class="{ scrollX: tableWidth > wrapperWidth }"
+      class="ww-table-wrapper"
+      :class="{
+        scrollX: tableWidth > wrapperWidth,
+        scrollY: tableHeight > maxHeight
+      }"
       :style="{ maxWidth: `${tableWidth}px` }"
       v-clickoutside="clickoutside">
-      <div class="km-table-header" ref="theader">
+      <div class="ww-table-header" ref="theader">
         <table-header
           ref="theaderContent"
           :showIcon="showIcon"
@@ -16,7 +19,7 @@
           :all-show="true"
           :store="store" />
       </div>
-      <div ref="tbody" class="km-table-body" :style="{maxHeight: `${maxHeight}px`}">
+      <div ref="tbody" class="ww-table-body" :style="{maxHeight: `${maxHeight}px`}">
         <table-body
           ref="tbodyContent"
           :columnsWidth="columnsWidth"
@@ -35,14 +38,19 @@
         </table-body>
         <div
           v-if="store.states.showData.length == 0"
-          class="empty-block"
+          class="ww-empty-block"
           :style="{width: `${tableWidth}px`}">
             暂无数据
         </div>
       </div>
       <!-- 左侧固定- -->
-      <div ref="fixedWrapper" class="km-table-fixed" :style="{width: `${fixedWidth}px`}">
-        <div class="km-table-fixed-header" ref="fixedTheader">
+      <div
+        ref="fixedWrapper"
+        class="ww-table-fixed"
+        :style="{width: `${fixedWidth}px`}">
+        <div
+          ref="fixedTheader"
+          class="ww-table-fixed-header">
           <table-header
             ref="fixedTheaderContent"
             :showIcon="showIcon"
@@ -50,7 +58,12 @@
             :fixedCount="fixedCount"
             :store="store" />
         </div>
-        <div ref="fixedTbody" class="km-table-fixed-body">
+        <div
+          ref="fixedTbody"
+          class="ww-table-fixed-body"
+          :class="{
+            scrollY: tableHeight > maxHeight
+          }">
           <table-body
             ref="fixedTbodyContent"
             :columnsWidth="columnsWidth"
@@ -61,7 +74,7 @@
         </div>
       </div>
     </div>
-    <div ref="wrapper" class="empty-columns" v-else>
+    <div ref="wrapper" class="ww-empty-columns" v-else>
       <div ref="theader">
         <div ref="theaderContent"></div>
       </div>
@@ -75,7 +88,7 @@
       :fixedCount="fixedCount"
       :store="store"
     ></dropdown>
-    <div class="km-adjustLine" :style="{ left: `${store.states.adjustLineLeft}px` }" v-show="store.states.adjustLineShow"></div>
+    <div class="ww-adjustLine" :style="{ left: `${store.states.adjustLineLeft}px` }" v-show="store.states.adjustLineShow"></div>
     <scroll
       :store="store"
       barType="x">
@@ -147,7 +160,6 @@ export default {
     return {
       store,
       wrapperWidth: null,
-      tableWidth: null,
       theaderHeight: null,
       columnsWidth: [],
 
@@ -164,6 +176,14 @@ export default {
 
       excelPos: {},
     };
+  },
+  computed: {
+    tableWidth() {
+      return this.store.states.tableWidth;
+    },
+    tableHeight() {
+      return this.store.states.tableHeight;
+    },
   },
   watch: {
     value(val) {
@@ -208,6 +228,7 @@ export default {
       if (this.value.length > 0) {
         this.data = this.value;
       }
+      this.store.states.tableBody = this.$refs.tbody;
       this.$refs.tbody.addEventListener('scroll', () => {
         this.$refs.theader.scrollLeft = this.$refs.tbody.scrollLeft;
         this.$refs.fixedTbody.scrollTop = this.$refs.tbody.scrollTop;
@@ -220,6 +241,33 @@ export default {
       this.store.handleIsMac();
       this.initColumns();
       this.handleResize();
+      this.handleMousewheel();
+    },
+    // 鼠标滚轮处理
+    handleMousewheel() {
+      const { states } = this.store;
+      const mainWrapperWheel = (e) => {
+        let scrollBarY;
+        if (e.wheelDelta) {
+          scrollBarY = states.scrollbar.posY - e.wheelDelta;
+        } else {
+          scrollBarY = states.scrollbar.posY + e.detail;
+        }
+        if (scrollBarY <= 0) {
+          states.scrollbar.posY = 0;
+        } else if (scrollBarY >= states.mainHeight - states.scrollbar.yHeight) {
+          states.scrollbar.posY = states.mainHeight - states.scrollbar.yHeight;
+        } else {
+          states.scrollbar.posY = scrollBarY;
+        }
+        states.tableBody.scrollTop = (states.scrollbar.posY / states.mainHeight) * states.tableHeight;
+      };
+      states.tableBody.addEventListener('mousewheel', mainWrapperWheel);
+      states.tableBody.addEventListener('DOMMouseScroll', mainWrapperWheel);
+      this.$nextTick(() => {
+        this.$refs.fixedTbody.addEventListener('mousewheel', mainWrapperWheel);
+        this.$refs.fixedTbody.addEventListener('DOMMouseScroll', mainWrapperWheel);
+      });
     },
     initColumns() {
       const { states } = this.store;
@@ -271,8 +319,6 @@ export default {
       };
 
       this.wrapperWidth = this.$refs.wrapper.offsetWidth;
-      states.tableWidth = this.$refs.wrapper.offsetWidth;
-      states.tableHeight = this.maxHeight + 30;
 
       this.$nextTick(() => {
         // 计算剩余列宽度
@@ -332,57 +378,30 @@ export default {
         // 如果每列均设置了宽度
         const allWidth = states.columns.every((cell) => cell.width);
         if (allWidth) {
-          this.tableWidth = states.columns.map((cell) => cell.width).reduce((a, b) => a + b, 0);
+          states.tableWidth = states.columns.map((cell) => cell.width).reduce((a, b) => a + b, 0);
         } else {
-          this.tableWidth = this.columnsWidth.reduce((total, cur) => total + cur, 0);
-          if (this.tableWidth < this.wrapperWidth) {
-            this.tableWidth = this.wrapperWidth;
+          states.tableWidth = this.columnsWidth.reduce((total, cur) => total + cur, 0);
+          if (states.tableWidth < this.wrapperWidth) {
+            states.tableWidth = this.wrapperWidth;
           }
         }
 
-        this.$refs.theaderContent.$el.style.width = `${this.tableWidth}px`;
-        this.$refs.tbodyContent.$el.style.width = `${this.tableWidth}px`;
+        this.$refs.theaderContent.$el.style.width = `${states.tableWidth}px`;
+        this.$refs.tbodyContent.$el.style.width = `${states.tableWidth}px`;
 
         // 设置左侧theader高度与tbody距离顶部距离
         this.theaderHeight = this.$refs.theaderContent.$el.offsetHeight;
 
         // 设置左侧定位高度
         this.$nextTick(() => {
-          if (this.tableWidth > this.wrapperWidth) {
-            this.$refs.fixedWrapper.style.height = `${this.$refs.wrapper.offsetHeight - states.scrollBarWidth}px`;
-            this.$refs.fixedTbody.style.height = `${this.$refs.wrapper.offsetHeight - states.scrollBarWidth - this.theaderHeight}px`;
-          } else {
-            this.$refs.fixedWrapper.style.height = `${this.$refs.wrapper.offsetHeight}px`;
-            this.$refs.fixedTbody.style.height = `${this.$refs.wrapper.offsetHeight - this.theaderHeight}px`;
-          }
+          this.$refs.fixedWrapper.style.height = `${this.$refs.wrapper.offsetHeight}px`;
+          this.$refs.fixedTbody.style.height = `${this.$refs.wrapper.offsetHeight - this.theaderHeight}px`;
         });
-        // 当出现竖向滚动条时处理滚动条
-        if (this.$refs.tbodyContent.$el.offsetHeight > this.maxHeight) {
-          this.$refs.tbody.style.overflowY = 'hidden';
-          this.$nextTick(() => {
-            const colgroup = this.$refs.theaderContent.$el.querySelector('colgroup');
-            const tr = this.$refs.theaderContent.$el.querySelector('tr');
-
-            // 如果已存在Col，删除组中重新在末尾添加
-            for (let i = 0; i < colgroup.children.length; i += 1) {
-              if (colgroup.children[i].width === states.scrollBarWidth) {
-                colgroup.removeChild(colgroup.children[i]);
-                tr.removeChild(tr.children[i]);
-              }
-            }
-            const col = document.createElement('col');
-            col.width = states.scrollBarWidth;
-            colgroup.appendChild(col);
-
-            const th = document.createElement('th');
-            th.style.width = `${states.scrollBarWidth}px`;
-            th.style.borderTop = '1px solid #d6dfe4';
-            tr.appendChild(th);
-
-            this.$refs.tbodyContent.$el.style.width = `${this.tableWidth - states.scrollBarWidth - 1}px`;
-          });
-        }
       });
+      states.mainWidth = this.$refs.wrapper.offsetWidth;
+      states.mainHeight = this.maxHeight + this.theaderHeight;
+      states.tableHeight = states.showData.length * this.rowHeight + this.theaderHeight;
+      this.store.initScrollBarLength();
     },
     clickoutside() {
       const { states } = this.store;
@@ -617,7 +636,7 @@ export default {
         curLeftShould = scrollLeftArr[states.editor.editorXIndex];
         curRightShould = scrollLeftArr[states.editor.editorXIndex + 1] - this.wrapperWidth + states.scrollBarWidth + 2;
       }
-      if (this.tableWidth > this.wrapperWidth) {
+      if (states.tableWidth > this.wrapperWidth) {
         if (states.tableBodyLeft > curLeftShould) {
           this.$refs.theader.scrollLeft = curLeftShould;
           this.$refs.tbody.scrollLeft = curLeftShould;
@@ -690,57 +709,29 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.km-willtable {
+<style lang="scss">
+.ww-willtable {
   position: relative;
-}
-
-div,
-section,
-ul {
-  &::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
-  &::-webkit-scrollbar-track {
-    background-color: #e9eaec;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: #bbbec4;
-    border-radius: 10px;
-    transition: all 1s;
-  }
-  &::-webkit-scrollbar-thumb:hover {
-    background-color: #80848f;
+  .el-checkbox {
+    font-size: 12px;
   }
 }
 
-.km-table-wrapper {
+.ww-table-wrapper {
   position: relative;
   overflow: hidden;
   &.scrollX {
-    border-right: 1px solid #d6dfe4;
-    border-left: 1px solid #d6dfe4;
-    /deep/ th,
-    /deep/ td {
-      &:first-child {
-        border-left: 0;
-      }
-      &:last-child {
-        border-right: 0;
-      }
-    }
-    .km-table-body {
-      // overflow-x: auto;
-      overflow-x: hidden;
-    }
+    padding-bottom: 8px;
   }
-  /deep/ table {
+  &.scrollY {
+    padding-right: 8px;
+  }
+  table {
     border-spacing: 0;
     border-collapse: collapse;
     font-size: 12px;
     table-layout: fixed;
-    .km-cell-content {
+    .ww-cell-content {
       width: 100%;
       overflow: hidden;
       white-space: nowrap;
@@ -749,19 +740,19 @@ ul {
   }
 }
 
-.km-table-header {
+.ww-table-header {
   overflow: hidden;
-  /deep/ table {
+  table {
     border-bottom: 1px solid #d6dfe4;
   }
 }
 
-.km-table-body {
+.ww-table-body {
   overflow: hidden;
   user-select: none;
   border-bottom: 1px solid #d6dfe4;
 
-  /deep/ tbody {
+  tbody {
     tr:first-child {
       td {
         border-top: none;
@@ -771,7 +762,7 @@ ul {
 }
 
 // 左侧固定
-.km-table-fixed {
+.ww-table-fixed {
   position: absolute;
   top: 0;
   left: 0;
@@ -780,23 +771,26 @@ ul {
   background: #fff;
   user-select: none;
   z-index: 2;
-  .km-table-fixed-header {
+  .ww-table-fixed-header {
     position: absolute;
     top: 0;
     left: 0;
     z-index: 3;
-    /deep/ table {
+    table {
       border-bottom: 1px solid #d6dfe4;
     }
   }
-  .km-table-fixed-body {
+  .ww-table-fixed-body {
     position: absolute;
     top: 30px;
     left: 0;
     z-index: 3;
     overflow: hidden;
     border-bottom: 1px solid #d6dfe4;
-    /deep/ tbody {
+    &.scrollY {
+      padding-bottom: 10px;
+    }
+    tbody {
       tr:first-child {
         td {
           border-top: 2px solid transparent;
@@ -807,7 +801,7 @@ ul {
 }
 
 // 数据为空
-.empty-block {
+.ww-empty-block {
   position: relative;
   z-index: 9;
   font-size: 14px;
@@ -818,18 +812,14 @@ ul {
   color: #909399;
 }
 
-.empty-columns {
+.ww-empty-columns {
   text-align: center;
   border: 1px solid #DCDFE6;
   padding: 10px 20px;
   color: #909399;
 }
 
-.el-checkbox {
-  font-size: 12px;
-}
-
-.km-adjustLine {
+.ww-adjustLine {
   position: absolute;
   top: 0;
   left: 0;

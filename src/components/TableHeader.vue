@@ -5,7 +5,7 @@
         v-for="(columnWidth, index) in columnsWidth" :width="columnWidth"
         :key="index">
     </colgroup>
-    <thead class="km-thead">
+    <thead class="ww-thead">
       <tr ref="tr">
         <th
           v-for="(th, index) in columns"
@@ -23,7 +23,7 @@
             @change="selectAll">
           </el-checkbox>
           <p
-            class="km-cell-content"
+            class="ww-cell-content"
             :style="{width: `${columnsWidth[index] - 20}px`}"
             :class="{active: isActive(columnsStatusList[index])}"
             v-else>
@@ -164,8 +164,8 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.km-thead {
+<style lang="scss">
+.ww-thead {
   position: relative;
   user-select: none;
   tr {

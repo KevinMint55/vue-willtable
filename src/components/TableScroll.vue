@@ -15,6 +15,10 @@ const tableLength = {
   x: 'tableWidth',
   y: 'tableHeight',
 };
+const mainLength = {
+  x: 'mainWidth',
+  y: 'mainHeight',
+};
 const pagePos = {
   x: 'pageX',
   y: 'pageY',
@@ -26,6 +30,10 @@ const barLength = {
 const barPos = {
   x: 'posX',
   y: 'posY',
+};
+const scrollDir = {
+  x: 'scrollLeft',
+  y: 'scrollTop',
 };
 
 export default {
@@ -73,15 +81,17 @@ export default {
     },
     handleMove(e) {
       const { states } = this.store;
+      const { barType } = this;
       if (this.canScroll) {
-        const scrollBarPos = e[pagePos[this.barType]] - this.oriMousePos;
+        const scrollBarPos = e[pagePos[barType]] - this.oriMousePos;
         if (scrollBarPos <= 0) {
-          states.scrollbar[barPos[this.barType]] = 0;
-        } else if (scrollBarPos >= states[tableLength[this.barType]] - states.scrollbar[barLength[this.barType]]) {
-          states.scrollbar[barPos[this.barType]] = states[tableLength[this.barType]] - states.scrollbar[barLength[this.barType]];
+          states.scrollbar[barPos[barType]] = 0;
+        } else if (scrollBarPos >= states[mainLength[barType]] - states.scrollbar[barLength[barType]]) {
+          states.scrollbar[barPos[barType]] = states[mainLength[barType]] - states.scrollbar[barLength[barType]];
         } else {
-          states.scrollbar[barPos[this.barType]] = scrollBarPos;
+          states.scrollbar[barPos[barType]] = scrollBarPos;
         }
+        states.tableBody[scrollDir[barType]] = this.scrollbar[barPos[barType]] / (states[mainLength[barType]] - this.scrollbar[barLength[barType]]) * (states[tableLength[barType]] - states[mainLength[barType]]);
       }
     },
     handleUp() {
@@ -93,10 +103,11 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .ww_scroll_wrap {
   position: absolute;
   z-index: 20;
+  background-color: #f8f8f9;
   &.x {
     bottom: 0;
     left: 0;

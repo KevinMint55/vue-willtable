@@ -5,7 +5,7 @@
         v-for="(columnWidth, index) in columnsWidth" :width="columnWidth"
         :key="index">
     </colgroup>
-    <tbody class="km-tbody">
+    <tbody class="ww-tbody">
       <tr
         v-for="(tr, yIndex) in showData" :key="yIndex">
         <td
@@ -26,7 +26,7 @@
           </el-checkbox>
           <div
             v-else
-            class="km-cell-content"
+            class="ww-cell-content"
             :style="{'max-width':  `${columnsWidth[xIndex]}px`}">
             {{ format(tr[th.key], th.type, th.format) }}
           </div>
@@ -134,8 +134,8 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.km-tbody {
+<style lang="scss">
+.ww-tbody {
   td {
     position: relative;
     border: none;
