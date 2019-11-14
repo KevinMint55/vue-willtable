@@ -9,7 +9,8 @@
         scrollY: tableHeight > maxHeight
       }"
       :style="{ maxWidth: `${tableWidth}px` }"
-      v-clickoutside="clickoutside">
+      v-clickoutside="clickoutside"
+    >
       <div class="ww-table-header" ref="theader">
         <table-header
           ref="theaderContent"
@@ -17,7 +18,8 @@
           :columnsWidth="columnsWidth"
           :fixedCount="fixedCount"
           :all-show="true"
-          :store="store" />
+          :store="store"
+        />
       </div>
       <div ref="tbody" class="ww-table-body" :style="{maxHeight: `${maxHeight}px`}">
         <table-body
@@ -27,50 +29,49 @@
           :cellStyle="cellStyle"
           :cellClassName="cellClassName"
           :rowHeight="rowHeight"
-          :store="store">
+          :store="store"
+        >
           <!-- 编辑器 -->
           <editor
             ref="editor"
             :columnsWidth="columnsWidth"
             :fixedCount="fixedCount"
             :rowHeight="rowHeight"
-            :store="store" />
+            :store="store"
+          />
         </table-body>
         <div
           v-if="store.states.showData.length == 0"
           class="ww-empty-block"
-          :style="{width: `${tableWidth}px`}">
-            暂无数据
-        </div>
+          :style="{width: `${tableWidth}px`}"
+        >暂无数据</div>
       </div>
       <!-- 左侧固定- -->
-      <div
-        ref="fixedWrapper"
-        class="ww-table-fixed"
-        :style="{width: `${fixedWidth}px`}">
-        <div
-          ref="fixedTheader"
-          class="ww-table-fixed-header">
+      <div ref="fixedWrapper" class="ww-table-fixed" :style="{width: `${fixedWidth}px`}">
+        <div ref="fixedTheader" class="ww-table-fixed-header">
           <table-header
             ref="fixedTheaderContent"
             :showIcon="showIcon"
             :columnsWidth="columnsWidth"
             :fixedCount="fixedCount"
-            :store="store" />
+            :store="store"
+          />
         </div>
         <div
           ref="fixedTbody"
           class="ww-table-fixed-body"
           :class="{
             scrollY: tableHeight > maxHeight
-          }">
+          }"
+        >
           <table-body
             ref="fixedTbodyContent"
             :columnsWidth="columnsWidth"
             :cellStyle="cellStyle"
             :cellClassName="cellClassName"
             :rowHeight="rowHeight"
-            :store="store" />
+            :store="store"
+          />
         </div>
       </div>
     </div>
@@ -80,23 +81,16 @@
       </div>
       <div ref="tbody">
         <div ref="tbodyContent"></div>
-      </div>
-      暂无表头
+      </div>暂无表头
     </div>
-    <dropdown
-      :columnsWidth="columnsWidth"
-      :fixedCount="fixedCount"
-      :store="store"
-    ></dropdown>
-    <div class="ww-adjustLine" :style="{ left: `${store.states.adjustLineLeft}px` }" v-show="store.states.adjustLineShow"></div>
-    <scroll
-      :store="store"
-      barType="x">
-    </scroll>
-    <scroll
-      :store="store"
-      barType="y">
-    </scroll>
+    <dropdown :columnsWidth="columnsWidth" :fixedCount="fixedCount" :store="store"></dropdown>
+    <div
+      class="ww-adjustLine"
+      :style="{ left: `${store.states.adjustLineLeft}px` }"
+      v-show="store.states.adjustLineShow"
+    ></div>
+    <scroll :store="store" barType="x"></scroll>
+    <scroll :store="store" barType="y"></scroll>
   </div>
 </template>
 
@@ -148,11 +142,11 @@ export default {
     },
     cellStyle: {
       type: [Object, Function],
-      default: () => () => {},
+      default: () => () => { },
     },
     cellClassName: {
       type: [Object, Function],
-      default: () => () => {},
+      default: () => () => { },
     },
   },
   data() {
@@ -247,20 +241,44 @@ export default {
     handleMousewheel() {
       const { states } = this.store;
       const mainWrapperWheel = (e) => {
-        let scrollBarY;
+        let scrollBarPos;
+        let scrollType;
         if (e.wheelDelta) {
-          scrollBarY = states.scrollbar.posY - e.wheelDelta;
+          if (e.wheelDeltaY) {
+            scrollBarPos = states.scrollbar.posY - e.wheelDelta;
+            scrollType = 'y';
+          } else {
+            scrollBarPos = states.scrollbar.posX - e.wheelDelta;
+            scrollType = 'x';
+          }
         } else {
-          scrollBarY = states.scrollbar.posY + e.detail;
+          if (e.axis === 2) {
+            scrollBarPos = states.scrollbar.posY + e.detail;
+            scrollType = 'y';
+          } else {
+            scrollBarPos = states.scrollbar.posX + e.detail;
+            scrollType = 'x';
+          }
         }
-        if (scrollBarY <= 0) {
-          states.scrollbar.posY = 0;
-        } else if (scrollBarY >= states.mainHeight - states.scrollbar.yHeight) {
-          states.scrollbar.posY = states.mainHeight - states.scrollbar.yHeight;
+        if (scrollType === 'y') {
+          if (scrollBarPos <= 0) {
+            states.scrollbar.posY = 0;
+          } else if (scrollBarPos >= states.mainHeight - states.scrollbar.yHeight) {
+            states.scrollbar.posY = states.mainHeight - states.scrollbar.yHeight;
+          } else {
+            states.scrollbar.posY = scrollBarPos;
+          }
+          states.tableBody.scrollTop = (states.scrollbar.posY / states.mainHeight) * states.tableHeight;
         } else {
-          states.scrollbar.posY = scrollBarY;
+          if (scrollBarPos <= 0) {
+            states.scrollbar.posX = 0;
+          } else if (scrollBarPos >= states.mainWidth - states.scrollbar.xWidth) {
+            states.scrollbar.posX = states.mainWidth - states.scrollbar.xWidth;
+          } else {
+            states.scrollbar.posX = scrollBarPos;
+          }
+          states.tableBody.scrollLeft = (states.scrollbar.posX / states.mainWidth) * states.tableWidth;
         }
-        states.tableBody.scrollTop = (states.scrollbar.posY / states.mainHeight) * states.tableHeight;
       };
       states.tableBody.addEventListener('mousewheel', mainWrapperWheel);
       states.tableBody.addEventListener('DOMMouseScroll', mainWrapperWheel);
@@ -814,7 +832,7 @@ export default {
 
 .ww-empty-columns {
   text-align: center;
-  border: 1px solid #DCDFE6;
+  border: 1px solid #dcdfe6;
   padding: 10px 20px;
   color: #909399;
 }
