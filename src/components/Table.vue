@@ -661,6 +661,7 @@ export default {
           this.$refs.theader.scrollLeft = curRightShould + 2;
           this.$refs.tbody.scrollLeft = curRightShould + 2;
         }
+        states.scrollbar.posX = this.$refs.tbody.scrollLeft / (states.tableWidth - states.mainWidth) * (states.mainWidth - states.scrollbar.xWidth);
       }
       // 上下调整
       if (this.maxHeight) {
@@ -674,6 +675,7 @@ export default {
           this.$refs.tbody.scrollTop = curBottomShould;
           this.$refs.fixedTbody.scrollTop = curBottomShould;
         }
+        states.scrollbar.posY = this.$refs.tbody.scrollTop / (states.tableHeight - states.mainHeight) * (states.mainHeight - states.scrollbar.yHeight);
       }
     },
     multiSelectAdjustPostion(e) {
