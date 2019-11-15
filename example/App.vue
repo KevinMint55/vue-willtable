@@ -181,7 +181,7 @@ export default {
         {
           title: '工作岗位',
           key: 'email',
-          width: 300,
+          // width: 300,
           type: 'select',
           options: [
             {
@@ -202,52 +202,52 @@ export default {
             },
           ],
         },
-        {
-          title: '月份',
-          key: 'month',
-          type: 'month',
-          width: 100,
-        },
-        {
-          title: '地址',
-          key: 'address',
-          width: 200,
-        },
-        {
-          title: '标题',
-          key: 'title',
-          width: 300,
-        },
-        {
-          title: '内容',
-          key: 'paragraph',
-          width: 300,
-        },
-        {
-          title: '链接',
-          key: 'url',
-          width: 200,
-        },
-        {
-          title: 'ip',
-          key: 'ip',
-          width: 200,
-        },
-        {
-          title: '总金额',
-          key: 'sum',
-          width: 200,
-        },
-        {
-          title: 'ID',
-          key: 'id',
-          width: 200,
-        },
-        {
-          title: '色值',
-          key: 'color',
-          width: 200,
-        },
+        // {
+        //   title: '月份',
+        //   key: 'month',
+        //   type: 'month',
+        //   width: 100,
+        // },
+        // {
+        //   title: '地址',
+        //   key: 'address',
+        //   width: 200,
+        // },
+        // {
+        //   title: '标题',
+        //   key: 'title',
+        //   width: 300,
+        // },
+        // {
+        //   title: '内容',
+        //   key: 'paragraph',
+        //   width: 300,
+        // },
+        // {
+        //   title: '链接',
+        //   key: 'url',
+        //   width: 200,
+        // },
+        // {
+        //   title: 'ip',
+        //   key: 'ip',
+        //   width: 200,
+        // },
+        // {
+        //   title: '总金额',
+        //   key: 'sum',
+        //   width: 200,
+        // },
+        // {
+        //   title: 'ID',
+        //   key: 'id',
+        //   width: 200,
+        // },
+        // {
+        //   title: '色值',
+        //   key: 'color',
+        //   width: 200,
+        // },
       ],
       data: [],
       showIcon: true,

@@ -8,7 +8,6 @@
         scrollX: tableWidth > wrapperWidth,
         scrollY: tableHeight > maxHeight
       }"
-      :style="{ maxWidth: `${tableWidth}px` }"
       v-clickoutside="clickoutside"
     >
       <div class="ww-table-header" ref="theader">
@@ -89,8 +88,8 @@
       :style="{ left: `${store.states.adjustLineLeft}px` }"
       v-show="store.states.adjustLineShow"
     ></div>
-    <scroll :store="store" barType="x"></scroll>
-    <scroll :store="store" barType="y"></scroll>
+    <scroll v-if="tableWidth > wrapperWidth" :store="store" barType="x"></scroll>
+    <scroll v-if="tableHeight > maxHeight" :store="store" barType="y"></scroll>
   </div>
 </template>
 
@@ -403,7 +402,6 @@ export default {
             states.tableWidth = this.wrapperWidth;
           }
         }
-
         this.$refs.theaderContent.$el.style.width = `${states.tableWidth}px`;
         this.$refs.tbodyContent.$el.style.width = `${states.tableWidth}px`;
 
@@ -760,6 +758,7 @@ export default {
 
 .ww-table-header {
   overflow: hidden;
+  border-right: 1px solid #d6dfe4;
   table {
     border-bottom: 1px solid #d6dfe4;
   }
@@ -769,7 +768,7 @@ export default {
   overflow: hidden;
   user-select: none;
   border-bottom: 1px solid #d6dfe4;
-
+  border-right: 1px solid #d6dfe4;
   tbody {
     tr:first-child {
       td {
