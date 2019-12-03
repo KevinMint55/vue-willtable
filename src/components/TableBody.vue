@@ -1,15 +1,12 @@
 <template>
-  <table cellspacing="0" cellpadding="0" style="position: relative;">
-    <colgroup>
-      <col
-        v-for="(columnWidth, index) in columnsWidth" :width="columnWidth"
-        :key="index">
-    </colgroup>
-    <tbody class="ww-tbody">
-      <tr
+  <div class="ww-table">
+    <div class="ww-tbody">
+      <div
+        class="ww-tr"
         v-for="(tr, yIndex) in showData" :key="yIndex">
-        <td
+        <div
           v-for="(th, xIndex) in columns"
+          class="ww-td"
           :key="xIndex"
           :title="tr[th.key]"
           :style="styleObj(tr, th, yIndex, xIndex, columnsWidth)"
@@ -30,11 +27,11 @@
             :style="{'max-width':  `${columnsWidth[xIndex]}px`}">
             {{ format(tr[th.key], th.type, th.format) }}
           </div>
-        </td>
-      </tr>
-    </tbody>
+        </div>
+      </div>
+    </div>
     <slot></slot>
-  </table>
+  </div>
 </template>
 
 <script>
@@ -45,19 +42,15 @@ export default {
     allShow: Boolean,
     columnsWidth: {
       type: Array,
-      default: () => [],
+      default: () => ([]),
     },
     cellStyle: {
       type: [Object, Function],
-      default: () => () => {},
+      default: () => () => ({}),
     },
     cellClassName: {
       type: [Object, Function],
-      default: () => () => {},
-    },
-    rowHeight: {
-      type: [String, Number],
-      default: 28,
+      default: () => () => ({}),
     },
     store: {
       required: true,
@@ -71,6 +64,9 @@ export default {
     };
   },
   computed: {
+    rowHeight() {
+      return this.store.states.rowHeight;
+    },
     columns() {
       return this.store.states.columns;
     },
@@ -124,6 +120,7 @@ export default {
     classObj(row, column, rowIndex, columnIndex) {
       return {
         disabled: column.disabled,
+        selection: column.type === 'selection',
         error: !this.store.verify(column, row[column.key], rowIndex),
         ...this.cellClassName({
           row, column, rowIndex, columnIndex,
@@ -135,21 +132,47 @@ export default {
 </script>
 
 <style lang="scss">
+.ww-table {
+  position: relative;
+  font-size: 12px;
+}
+
 .ww-tbody {
-  td {
+  border-right: 1px solid #d6dfe4;
+  .ww-tr {
+    display: flex;
+    &:first-child {
+      .ww-td {
+        border-top: none;
+      }
+    }
+  }
+  .ww-td {
     position: relative;
-    border: none;
-    border: 1px solid #d6dfe4;
+    display: flex;
+    align-items: center;
+    border-top: 1px solid #d6dfe4;
+    border-left: 1px solid #d6dfe4;
     min-width: 0;
-    text-indent: 4px;
-  }
+    &.selection {
+      justify-content: center;
+    }
 
-  .disabled {
-    color: #c5c5c5;
-  }
+    &.disabled {
+      color: #c5c5c5;
+    }
 
-  .error {
-    background-color: #ff4c42 !important;
+    &.error {
+      background-color: #ff4c42 !important;
+    }
   }
+}
+
+.ww-cell-content {
+  width: 100%;
+  text-indent: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 </style>

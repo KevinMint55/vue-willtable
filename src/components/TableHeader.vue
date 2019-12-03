@@ -1,50 +1,49 @@
 <template>
-  <table cellspacing="0" cellpadding="0" style="position: relative;">
-    <colgroup>
-      <col
-        v-for="(columnWidth, index) in columnsWidth" :width="columnWidth"
-        :key="index">
-    </colgroup>
-    <thead class="ww-thead">
-      <tr ref="tr">
-        <th
-          v-for="(th, index) in columns"
-          :key="index"
-          :style="{
-              width: `${columnsWidth[index]}px`,
-              'text-align': th.align
-          }"
-          :title="th.title"
-          v-show="th.fixed || allShow">
-          <el-checkbox
-            v-if="th.type === 'selection'"
-            size="mini"
-            v-model="checkedAll"
-            @change="selectAll">
-          </el-checkbox>
-          <p
-            class="ww-cell-content"
-            :style="{width: `${columnsWidth[index] - 20}px`}"
-            :class="{active: isActive(columnsStatusList[index])}"
-            v-else>
-            <span class="icon" :class="iconClass(th.type)" v-if="showIcon"></span>
-            <span class="content">{{ th.title }}</span>
-          </p>
-          <div
-            v-if="th.type != 'selection'"
-            class="dropdown"
-            :class="{active: dropdown.index === index}">
-            <i v-if="th.action" @click.stop="openDropdown(index)"></i>
-          </div>
-          <div
-            v-if="th.type != 'selection'"
-            class="handler"
-            @mousedown="handlerDown(index)">
-          </div>
-        </th>
-      </tr>
-    </thead>
-  </table>
+  <div class="ww-thead">
+    <div
+      ref="tr"
+      class="ww-tr">
+      <div
+        v-for="(th, index) in columns"
+        :key="index"
+        class="ww-th"
+        :style="{
+            width: `${columnsWidth[index]}px`,
+            'text-align': th.align
+        }"
+        :class="{
+          selection: th.type === 'selection'
+        }"
+        :title="th.title"
+        v-show="th.fixed || allShow">
+        <el-checkbox
+          v-if="th.type === 'selection'"
+          size="mini"
+          v-model="checkedAll"
+          @change="selectAll">
+        </el-checkbox>
+        <p
+          class="ww-title"
+          :style="{ width: `${columnsWidth[index] - 20}px` }"
+          :class="{ active: isActive(columnsStatusList[index]) }"
+          v-else>
+          <span v-if="showIcon" class="icon" :class="iconClass(th.type)"></span>
+          {{ th.title }}
+        </p>
+        <div
+          v-if="th.type !== 'selection'"
+          class="dropdown"
+          :class="{active: dropdown.index === index}">
+          <i v-if="th.action" @click.stop="openDropdown(index)"></i>
+        </div>
+        <div
+          v-if="th.type !== 'selection'"
+          class="handler"
+          @mousedown="handlerDown(index)">
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -62,7 +61,7 @@ export default {
     allShow: Boolean,
     columnsWidth: {
       type: Array,
-      default: () => [],
+      default: () => ([]),
     },
     fixedCount: [String, Number],
     store: {
@@ -167,17 +166,24 @@ export default {
 <style lang="scss">
 .ww-thead {
   position: relative;
+  font-size: 12px;
   user-select: none;
-  tr {
+  border-right: 1px solid #d6dfe4;
+  .ww-tr {
+    display: flex;
     background-color: #eef1f6;
+    border-bottom: 1px solid #d6dfe4;
   }
-  th {
+  .ww-th {
     position: relative;
-    text-align: left;
-    text-indent: 4px;
-    border: 1px solid #d6dfe4;
-    border-bottom: none;
+    display: flex;
+    align-items: center;
+    border-top: 1px solid #d6dfe4;
+    border-left: 1px solid #d6dfe4;
     height: 30px;
+    &.selection {
+      justify-content: center;
+    }
   }
   .dropdown {
     position: absolute;
@@ -213,8 +219,13 @@ export default {
     color: #2d8cf0;
   }
 
-  .content {
-    vertical-align: middle;
+  .ww-title {
+    height: 30px;
+    line-height: 30px;
+    text-indent: 4px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .icon {
@@ -224,7 +235,8 @@ export default {
     background-position: center;
     background-repeat: no-repeat;
     background-size: contain;
-    vertical-align: middle;
+    vertical-align: text-bottom;
+    margin-bottom: 1px;
     &.text {
       background-image: url("../assets/text.png");
     }

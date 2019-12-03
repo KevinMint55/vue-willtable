@@ -32,7 +32,8 @@
         :disabled="disabled"
         :showIcon="showIcon"
         :cellStyle="cellStyle"
-        :cellClassName="cellClassName" />
+        :cellClassName="cellClassName"
+        :rowHeight="28" />
       </div>
     </div>
   </div>
@@ -181,7 +182,7 @@ export default {
         {
           title: '工作岗位',
           key: 'email',
-          // width: 300,
+          width: 300,
           type: 'select',
           options: [
             {

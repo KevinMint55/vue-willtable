@@ -43,7 +43,7 @@ export default {
   props: {
     columnsWidth: {
       type: Array,
-      default: () => [],
+      default: () => ([]),
     },
     fixedCount: [String, Number],
     value: {
@@ -133,7 +133,7 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 10;
+  z-index: 30;
   min-width: 100px;
   opacity: 0;
   transform: rotateX(90deg);

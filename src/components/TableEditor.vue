@@ -94,13 +94,9 @@ export default {
   props: {
     columnsWidth: {
       type: Array,
-      default: () => [],
+      default: () => ([]),
     },
     fixedCount: [String, Number],
-    rowHeight: {
-      type: [String, Number],
-      default: 28,
-    },
     store: {
       required: true,
     },
@@ -176,6 +172,9 @@ export default {
         width: `${this.columnsWidth.filter((item, index) => (index <= this.selector.selectedXArr[1]) && (index >= this.selector.selectedXArr[0]) && this.columns[index].fixed).reduce((sum, item) => sum + item, 0)}px`,
         height: `${this.autofill.autofillYArr.length > 0 ? (this.autofill.autofillYArr[1] - this.autofill.autofillYArr[0] + 1) * this.rowHeight : 0}px`,
       };
+    },
+    rowHeight() {
+      return this.store.states.rowHeight;
     },
     columns() {
       return this.store.states.columns;

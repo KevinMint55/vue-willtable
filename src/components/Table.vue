@@ -27,7 +27,6 @@
           :all-show="true"
           :cellStyle="cellStyle"
           :cellClassName="cellClassName"
-          :rowHeight="rowHeight"
           :store="store"
         >
           <!-- 编辑器 -->
@@ -35,7 +34,6 @@
             ref="editor"
             :columnsWidth="columnsWidth"
             :fixedCount="fixedCount"
-            :rowHeight="rowHeight"
             :store="store"
           />
         </table-body>
@@ -68,7 +66,6 @@
             :columnsWidth="columnsWidth"
             :cellStyle="cellStyle"
             :cellClassName="cellClassName"
-            :rowHeight="rowHeight"
             :store="store"
           />
         </div>
@@ -118,11 +115,11 @@ export default {
   props: {
     columns: {
       type: Array,
-      default: () => [],
+      default: () => ([]),
     },
     value: {
       type: Array,
-      default: () => [],
+      default: () => ([]),
     },
     maxHeight: {
       type: [String, Number],
@@ -141,11 +138,11 @@ export default {
     },
     cellStyle: {
       type: [Object, Function],
-      default: () => () => { },
+      default: () => () => ({}),
     },
     cellClassName: {
       type: [Object, Function],
-      default: () => () => { },
+      default: () => () => ({}),
     },
   },
   data() {
@@ -222,6 +219,7 @@ export default {
         this.data = this.value;
       }
       this.store.states.tableBody = this.$refs.tbody;
+      this.store.states.rowHeight = this.rowHeight;
       this.$refs.tbody.addEventListener('scroll', () => {
         this.$refs.theader.scrollLeft = this.$refs.tbody.scrollLeft;
         this.$refs.fixedTbody.scrollTop = this.$refs.tbody.scrollTop;
@@ -414,7 +412,7 @@ export default {
           this.$refs.fixedTbody.style.height = `${this.$refs.wrapper.offsetHeight - this.theaderHeight}px`;
         });
       });
-      states.mainWidth = this.$refs.wrapper.offsetWidth;
+      states.mainWidth = this.$refs.wrapper.offsetWidth - states.scrollBarWidth;
       states.mainHeight = this.maxHeight + this.theaderHeight;
       states.tableHeight = states.showData.length * this.rowHeight + this.theaderHeight;
       this.store.initScrollBarLength();
@@ -709,6 +707,8 @@ export default {
           this.$refs.theader.scrollLeft += 20;
           this.$refs.tbody.scrollLeft += 20;
         }
+        states.scrollbar.posX = this.$refs.tbody.scrollLeft / (states.tableWidth - states.mainWidth) * (states.mainWidth - states.scrollbar.xWidth);
+        states.scrollbar.posY = this.$refs.tbody.scrollTop / (states.tableHeight - states.mainHeight) * (states.mainHeight - states.scrollbar.yHeight);
       }
     },
     selectAll() {
@@ -744,26 +744,11 @@ export default {
   &.scrollY {
     padding-right: 8px;
   }
-  table {
-    border-spacing: 0;
-    border-collapse: collapse;
-    font-size: 12px;
-    table-layout: fixed;
-    .ww-cell-content {
-      width: 100%;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-  }
 }
 
 .ww-table-header {
   overflow: hidden;
   border-right: 1px solid #d6dfe4;
-  table {
-    border-bottom: 1px solid #d6dfe4;
-  }
 }
 
 .ww-table-body {
@@ -771,13 +756,6 @@ export default {
   user-select: none;
   border-bottom: 1px solid #d6dfe4;
   border-right: 1px solid #d6dfe4;
-  tbody {
-    tr:first-child {
-      td {
-        border-top: none;
-      }
-    }
-  }
 }
 
 // 左侧固定
@@ -795,9 +773,6 @@ export default {
     top: 0;
     left: 0;
     z-index: 3;
-    table {
-      border-bottom: 1px solid #d6dfe4;
-    }
   }
   .ww-table-fixed-body {
     position: absolute;
@@ -809,13 +784,6 @@ export default {
     &.scrollY {
       padding-bottom: 10px;
     }
-    tbody {
-      tr:first-child {
-        td {
-          border-top: 2px solid transparent;
-        }
-      }
-    }
   }
 }
 
@@ -826,8 +794,6 @@ export default {
   font-size: 14px;
   padding: 30px;
   text-align: center;
-  border-right: 1px solid #d6dfe4;
-  border-left: 1px solid #d6dfe4;
   color: #909399;
 }
 

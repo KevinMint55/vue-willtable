@@ -33,6 +33,7 @@ Mock.mock('https://demo.kevinmint.com/1.json', 'get', {
     email: '@email',
     // 属性 ip 是一个随机ip
     ip: '@ip',
+    sum: '@ip',
     // 属性 regexp 是一个正则表达式匹配到的值 如aA1
     regexp: /[a-z][A-Z][0-9]/,
     name: '@name()',

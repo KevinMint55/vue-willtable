@@ -1,9 +1,9 @@
 <template>
   <div
-    class="ww_scroll_wrap"
+    class="ww-scroll-wrap"
     :class="barType">
     <div
-      class="ww_scroll_box"
+      class="ww-scroll-box"
       @mousedown="handleDown"
       :style="boxStyle">
     </div>
@@ -104,7 +104,7 @@ export default {
 </script>
 
 <style lang="scss">
-.ww_scroll_wrap {
+.ww-scroll-wrap {
   position: absolute;
   z-index: 20;
   background-color: #f8f8f9;
@@ -113,7 +113,7 @@ export default {
     left: 0;
     width: 100%;
     height: 8px;
-    .ww_scroll_box {
+    .ww-scroll-box {
       height: 8px;
     }
   }
@@ -122,13 +122,13 @@ export default {
     right: 0;
     width: 8px;
     height: 100%;
-    .ww_scroll_box {
+    .ww-scroll-box {
       width: 8px;
     }
   }
 }
 
-.ww_scroll_box {
+.ww-scroll-box {
   border-radius: 4px;
   background-color: #bbbec4;
   transition: background-color 0.3s;
