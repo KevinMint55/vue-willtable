@@ -20,6 +20,7 @@ class TableStore {
       columns: [],
       data: [],
       showData: [],
+      domData: [],
       initialData: null,
       changeData: [],
       dataStatusList: [],
@@ -89,6 +90,13 @@ class TableStore {
     const { states } = this;
     states.tableBodyLeft = el.scrollLeft;
     states.tableBodyTop = el.scrollTop;
+  }
+
+  calcDomData() {
+    const { states } = this;
+    const visibleRowStartIndex = Math.floor(states.tableBodyTop / states.rowHeight);
+    const visibleRowEndIndex = visibleRowStartIndex + Math.ceil(states.mainHeight / states.rowHeight);
+    states.domData = states.showData.slice(visibleRowStartIndex, visibleRowEndIndex + 1);
   }
 
   initScrollBarLength() {

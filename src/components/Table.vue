@@ -123,6 +123,7 @@ export default {
     },
     maxHeight: {
       type: [String, Number],
+      default: () => window.innerHeight,
     },
     rowHeight: {
       type: [String, Number],
@@ -238,44 +239,21 @@ export default {
     handleMousewheel() {
       const { states } = this.store;
       const mainWrapperWheel = (e) => {
-        let scrollBarPos;
-        let scrollType;
         if (e.wheelDelta) {
           if (e.wheelDeltaY) {
-            scrollBarPos = states.scrollbar.posY - e.wheelDelta;
-            scrollType = 'y';
+            states.tableBody.scrollTop -= e.wheelDelta;
           } else {
-            scrollBarPos = states.scrollbar.posX - e.wheelDelta;
-            scrollType = 'x';
+            states.tableBody.scrollLeft -= e.wheelDelta;
           }
         } else {
           if (e.axis === 2) {
-            scrollBarPos = states.scrollbar.posY + e.detail;
-            scrollType = 'y';
+            states.tableBody.scrollTop -= e.detail;
           } else {
-            scrollBarPos = states.scrollbar.posX + e.detail;
-            scrollType = 'x';
+            states.tableBody.scrollLeft -= e.detail;
           }
         }
-        if (scrollType === 'y') {
-          if (scrollBarPos <= 0) {
-            states.scrollbar.posY = 0;
-          } else if (scrollBarPos >= states.mainHeight - states.scrollbar.yHeight) {
-            states.scrollbar.posY = states.mainHeight - states.scrollbar.yHeight;
-          } else {
-            states.scrollbar.posY = scrollBarPos;
-          }
-          states.tableBody.scrollTop = (states.scrollbar.posY / states.mainHeight) * states.tableHeight;
-        } else {
-          if (scrollBarPos <= 0) {
-            states.scrollbar.posX = 0;
-          } else if (scrollBarPos >= states.mainWidth - states.scrollbar.xWidth) {
-            states.scrollbar.posX = states.mainWidth - states.scrollbar.xWidth;
-          } else {
-            states.scrollbar.posX = scrollBarPos;
-          }
-          states.tableBody.scrollLeft = (states.scrollbar.posX / states.mainWidth) * states.tableWidth;
-        }
+        states.scrollbar.posY = states.tableBody.scrollTop / states.tableHeight * states.mainHeight;
+        states.scrollbar.posX = states.tableBody.scrollLeft / states.tableWidth * states.mainWidth;
       };
       states.tableBody.addEventListener('mousewheel', mainWrapperWheel);
       states.tableBody.addEventListener('DOMMouseScroll', mainWrapperWheel);
