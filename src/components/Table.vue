@@ -1,7 +1,7 @@
 <template>
   <div ref="willtable" class="ww-willtable">
     <div
-      v-if="store.states.columns.length > 0"
+      v-show="store.states.columns.length > 0"
       ref="wrapper"
       class="ww-table-wrapper"
       :class="{
@@ -10,83 +10,81 @@
       }"
       v-clickoutside="clickoutside"
     >
-      <div class="ww-table-header" ref="theader">
+      <table-header
+        ref="theader"
+        :showIcon="showIcon"
+        :columnsWidth="columnsWidth"
+        :fixedCount="fixedCount"
+        :all-show="true"
+        :store="store"
+      />
+      <table-body
+        ref="tbody"
+        :columnsWidth="columnsWidth"
+        :all-show="true"
+        :cellStyle="cellStyle"
+        :cellClassName="cellClassName"
+        :store="store"
+        :style="{
+          maxHeight: `${maxHeight}px`
+        }">
+      </table-body>
+      <!-- 左侧固定- -->
+      <div
+        ref="fixedWrapper"
+        class="ww-table-fixed"
+        :style="{width: `${fixedWidth}px`}">
         <table-header
-          ref="theaderContent"
+          ref="fixedTheader"
+          :fixed="true"
           :showIcon="showIcon"
           :columnsWidth="columnsWidth"
           :fixedCount="fixedCount"
-          :all-show="true"
           :store="store"
         />
-      </div>
-      <div ref="tbody" class="ww-table-body" :style="{maxHeight: `${maxHeight}px`}">
         <table-body
-          ref="tbodyContent"
+          ref="fixedTbody"
+          :fixed="true"
           :columnsWidth="columnsWidth"
-          :all-show="true"
           :cellStyle="cellStyle"
           :cellClassName="cellClassName"
           :store="store"
-        >
-          <!-- 编辑器 -->
-          <editor
-            ref="editor"
-            :columnsWidth="columnsWidth"
-            :fixedCount="fixedCount"
-            :store="store"
-          />
-        </table-body>
-        <div
-          v-if="store.states.showData.length == 0"
-          class="ww-empty-block"
-          :style="{width: `${tableWidth}px`}"
-        >暂无数据</div>
-      </div>
-      <!-- 左侧固定- -->
-      <div ref="fixedWrapper" class="ww-table-fixed" :style="{width: `${fixedWidth}px`}">
-        <div ref="fixedTheader" class="ww-table-fixed-header">
-          <table-header
-            ref="fixedTheaderContent"
-            :showIcon="showIcon"
-            :columnsWidth="columnsWidth"
-            :fixedCount="fixedCount"
-            :store="store"
-          />
-        </div>
-        <div
-          ref="fixedTbody"
-          class="ww-table-fixed-body"
-          :class="{
-            scrollY: tableHeight > maxHeight
-          }"
-        >
-          <table-body
-            ref="fixedTbodyContent"
-            :columnsWidth="columnsWidth"
-            :cellStyle="cellStyle"
-            :cellClassName="cellClassName"
-            :store="store"
-          />
-        </div>
+          :scrollY="tableHeight > maxHeight"
+        />
       </div>
     </div>
-    <div ref="wrapper" class="ww-empty-columns" v-else>
-      <div ref="theader">
-        <div ref="theaderContent"></div>
-      </div>
-      <div ref="tbody">
-        <div ref="tbodyContent"></div>
-      </div>暂无表头
+    <div
+      v-show="store.states.columns.length === 0"
+      class="ww-empty-columns">
+      暂无表头
     </div>
-    <dropdown :columnsWidth="columnsWidth" :fixedCount="fixedCount" :store="store"></dropdown>
+    <!-- 编辑器 -->
+    <editor
+      ref="editor"
+      :columnsWidth="columnsWidth"
+      :fixedCount="fixedCount"
+      :store="store"
+    />
+    <dropdown
+      :columnsWidth="columnsWidth"
+      :fixedCount="fixedCount"
+      :store="store">
+    </dropdown>
     <div
       class="ww-adjustLine"
       :style="{ left: `${store.states.adjustLineLeft}px` }"
       v-show="store.states.adjustLineShow"
     ></div>
-    <scroll v-if="tableWidth > wrapperWidth" :store="store" barType="x"></scroll>
-    <scroll v-if="tableHeight > maxHeight" :store="store" barType="y"></scroll>
+    <scroll
+      v-if="tableWidth > wrapperWidth"
+      barType="x"
+      :store="store">
+    </scroll>
+    <scroll
+      v-if="tableHeight > maxHeight"
+      barType="y"
+      :store="store">
+    </scroll>
   </div>
 </template>
 
@@ -219,12 +217,12 @@ export default {
       if (this.value.length > 0) {
         this.data = this.value;
       }
-      this.store.states.tableBody = this.$refs.tbody;
+      this.store.states.tableBody = this.$refs.tbody.$el;
       this.store.states.rowHeight = this.rowHeight;
-      this.$refs.tbody.addEventListener('scroll', () => {
-        this.$refs.theader.scrollLeft = this.$refs.tbody.scrollLeft;
-        this.$refs.fixedTbody.scrollTop = this.$refs.tbody.scrollTop;
-        this.store.tableBodyScroll(this.$refs.tbody);
+      this.$refs.tbody.$el.addEventListener('scroll', () => {
+        this.$refs.theader.$el.scrollLeft = this.$refs.tbody.$el.scrollLeft;
+        this.$refs.fixedTbody.$el.scrollTop = this.$refs.tbody.$el.scrollTop;
+        this.store.tableBodyScroll(this.$refs.tbody.$el);
         this.store.states.dropdown.index = null;
       });
       window.addEventListener('resize', () => {
@@ -247,9 +245,9 @@ export default {
           }
         } else {
           if (e.axis === 2) {
-            states.tableBody.scrollTop -= e.detail;
+            states.tableBody.scrollTop += 40 * e.detail;
           } else {
-            states.tableBody.scrollLeft -= e.detail;
+            states.tableBody.scrollLeft += 40 * e.detail;
           }
         }
         states.scrollbar.posY = states.tableBody.scrollTop / states.tableHeight * states.mainHeight;
@@ -258,8 +256,8 @@ export default {
       states.tableBody.addEventListener('mousewheel', mainWrapperWheel);
       states.tableBody.addEventListener('DOMMouseScroll', mainWrapperWheel);
       this.$nextTick(() => {
-        this.$refs.fixedTbody.addEventListener('mousewheel', mainWrapperWheel);
-        this.$refs.fixedTbody.addEventListener('DOMMouseScroll', mainWrapperWheel);
+        this.$refs.fixedTbody.$el.addEventListener('mousewheel', mainWrapperWheel);
+        this.$refs.fixedTbody.$el.addEventListener('DOMMouseScroll', mainWrapperWheel);
       });
     },
     initColumns() {
@@ -292,11 +290,11 @@ export default {
       states.initialData = JSON.parse(JSON.stringify(states.data));
       states.historyData = [JSON.stringify(states.data)];
       states.curHisory = 1;
-      if (this.$refs.theaderContent) {
-        this.$refs.theaderContent.checkedAll = false;
+      if (this.$refs.theader) {
+        this.$refs.theader.checkedAll = false;
       }
-      if (this.$refs.fixedTheaderContent) {
-        this.$refs.fixedTheaderContent.checkedAll = false;
+      if (this.$refs.fixedTheader) {
+        this.$refs.fixedTheader.checkedAll = false;
       }
       this.initColumns();
     },
@@ -318,11 +316,11 @@ export default {
         const surplusColumns = states.columns.filter((item) => !item.width);
         let surplusColumnAvg;
 
-        if (!this.$refs.tbodyContent.$el) return;
+        if (!this.$refs.tbody.$el) return;
         if (surplusColumns.length > 0) {
           const surplusWidth = this.wrapperWidth - states.columns.filter((item) => item.width).reduce((total, item) => total + item.width, 0);
           if (surplusWidth > 0) {
-            if (this.$refs.tbodyContent.$el.offsetHeight > this.maxHeight) {
+            if (this.$refs.tbody.$el.offsetHeight > this.maxHeight) {
               surplusColumnAvg = (surplusWidth - 1 - states.scrollBarWidth) / surplusColumns.length;
             } else {
               surplusColumnAvg = (surplusWidth - 1) / surplusColumns.length;
@@ -378,16 +376,14 @@ export default {
             states.tableWidth = this.wrapperWidth;
           }
         }
-        this.$refs.theaderContent.$el.style.width = `${states.tableWidth}px`;
-        this.$refs.tbodyContent.$el.style.width = `${states.tableWidth}px`;
 
         // 设置左侧theader高度与tbody距离顶部距离
-        this.theaderHeight = this.$refs.theaderContent.$el.offsetHeight;
+        this.theaderHeight = this.$refs.theader.$el.offsetHeight;
 
         // 设置左侧定位高度
         this.$nextTick(() => {
           this.$refs.fixedWrapper.style.height = `${this.$refs.wrapper.offsetHeight}px`;
-          this.$refs.fixedTbody.style.height = `${this.$refs.wrapper.offsetHeight - this.theaderHeight}px`;
+          this.$refs.fixedTbody.$el.style.height = `${this.$refs.wrapper.offsetHeight - this.theaderHeight}px`;
         });
       });
       states.mainWidth = this.$refs.wrapper.offsetWidth - states.scrollBarWidth;
@@ -630,28 +626,28 @@ export default {
       }
       if (states.tableWidth > this.wrapperWidth) {
         if (states.tableBodyLeft > curLeftShould) {
-          this.$refs.theader.scrollLeft = curLeftShould;
-          this.$refs.tbody.scrollLeft = curLeftShould;
+          this.$refs.theader.$el.scrollLeft = curLeftShould;
+          this.$refs.tbody.$el.scrollLeft = curLeftShould;
         }
         if (states.tableBodyLeft < curRightShould) {
-          this.$refs.theader.scrollLeft = curRightShould + 2;
-          this.$refs.tbody.scrollLeft = curRightShould + 2;
+          this.$refs.theader.$el.scrollLeft = curRightShould + 2;
+          this.$refs.tbody.$el.scrollLeft = curRightShould + 2;
         }
-        states.scrollbar.posX = this.$refs.tbody.scrollLeft / (states.tableWidth - states.mainWidth) * (states.mainWidth - states.scrollbar.xWidth);
+        states.scrollbar.posX = this.$refs.tbody.$el.scrollLeft / (states.tableWidth - states.mainWidth) * (states.mainWidth - states.scrollbar.xWidth);
       }
       // 上下调整
       if (this.maxHeight) {
         const curTopShould = this.scrollTopArr[states.editor.editorYIndex];
         if (states.tableBodyTop > curTopShould) {
-          this.$refs.tbody.scrollTop = curTopShould;
-          this.$refs.fixedTbody.scrollTop = curTopShould;
+          this.$refs.tbody.$el.scrollTop = curTopShould;
+          this.$refs.fixedTbody.$el.scrollTop = curTopShould;
         }
         const curBottomShould = this.scrollTopArr[states.editor.editorYIndex + 1] - this.maxHeight + states.scrollBarWidth + 2;
         if (states.tableBodyTop < curBottomShould) {
-          this.$refs.tbody.scrollTop = curBottomShould;
-          this.$refs.fixedTbody.scrollTop = curBottomShould;
+          this.$refs.tbody.$el.scrollTop = curBottomShould;
+          this.$refs.fixedTbody.$el.scrollTop = curBottomShould;
         }
-        states.scrollbar.posY = this.$refs.tbody.scrollTop / (states.tableHeight - states.mainHeight) * (states.mainHeight - states.scrollbar.yHeight);
+        states.scrollbar.posY = this.$refs.tbody.$el.scrollTop / (states.tableHeight - states.mainHeight) * (states.mainHeight - states.scrollbar.yHeight);
       }
     },
     multiSelectAdjustPostion(e) {
@@ -670,23 +666,19 @@ export default {
         const sBottom = this.$refs.willtable.offsetTop + this.$refs.willtable.offsetHeight - 10;
         const sRight = this.excelPos.left + this.$refs.willtable.offsetWidth - 10;
         if (this.mouseY < sTop) {
-          this.$refs.tbody.scrollTop -= 20;
-          this.$refs.fixedTbody.scrollTop -= 20;
+          this.$refs.tbody.$el.scrollTop -= 20;
         }
         if (this.mouseY > sBottom) {
-          this.$refs.tbody.scrollTop += 20;
-          this.$refs.fixedTbody.scrollTop += 20;
+          this.$refs.tbody.$el.scrollTop += 20;
         }
         if (this.mouseX < sLeft) {
-          this.$refs.theader.scrollLeft -= 20;
-          this.$refs.tbody.scrollLeft -= 20;
+          this.$refs.tbody.$el.scrollLeft -= 20;
         }
         if (this.mouseX > sRight) {
-          this.$refs.theader.scrollLeft += 20;
-          this.$refs.tbody.scrollLeft += 20;
+          this.$refs.tbody.$el.scrollLeft += 20;
         }
-        states.scrollbar.posX = this.$refs.tbody.scrollLeft / (states.tableWidth - states.mainWidth) * (states.mainWidth - states.scrollbar.xWidth);
-        states.scrollbar.posY = this.$refs.tbody.scrollTop / (states.tableHeight - states.mainHeight) * (states.mainHeight - states.scrollbar.yHeight);
+        states.scrollbar.posX = this.$refs.tbody.$el.scrollLeft / (states.tableWidth - states.mainWidth) * (states.mainWidth - states.scrollbar.xWidth);
+        states.scrollbar.posY = this.$refs.tbody.$el.scrollTop / (states.tableHeight - states.mainHeight) * (states.mainHeight - states.scrollbar.yHeight);
       }
     },
     selectAll() {
@@ -724,18 +716,6 @@ export default {
   }
 }
 
-.ww-table-header {
-  overflow: hidden;
-  border-right: 1px solid #d6dfe4;
-}
-
-.ww-table-body {
-  overflow: hidden;
-  user-select: none;
-  border-bottom: 1px solid #d6dfe4;
-  border-right: 1px solid #d6dfe4;
-}
-
 // 左侧固定
 .ww-table-fixed {
   position: absolute;
@@ -746,33 +726,6 @@ export default {
   background: #fff;
   user-select: none;
   z-index: 2;
-  .ww-table-fixed-header {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 3;
-  }
-  .ww-table-fixed-body {
-    position: absolute;
-    top: 30px;
-    left: 0;
-    z-index: 3;
-    overflow: hidden;
-    border-bottom: 1px solid #d6dfe4;
-    &.scrollY {
-      padding-bottom: 10px;
-    }
-  }
-}
-
-// 数据为空
-.ww-empty-block {
-  position: relative;
-  z-index: 9;
-  font-size: 14px;
-  padding: 30px;
-  text-align: center;
-  color: #909399;
 }
 
 .ww-empty-columns {

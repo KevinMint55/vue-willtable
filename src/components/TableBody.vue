@@ -1,36 +1,45 @@
 <template>
-  <div class="ww-table">
-    <div class="ww-tbody">
+  <div
+    class="ww-tbody"
+    :class="{
+      fixed,
+      scrollY,
+    }">
+    <div
+      class="ww-tr"
+      v-for="(tr, yIndex) in showData" :key="yIndex"
+      :style="{
+        width: `${store.states.tableWidth}px`,
+      }">
       <div
-        class="ww-tr"
-        v-for="(tr, yIndex) in showData" :key="yIndex">
+        v-for="(th, xIndex) in columns"
+        class="ww-td"
+        :key="xIndex"
+        :title="tr[th.key]"
+        :style="styleObj(tr, th, yIndex, xIndex, columnsWidth)"
+        :class="classObj(tr, th, yIndex, xIndex)"
+        :data-key="th.key"
+        @mouseenter="multiSelect($event, xIndex, yIndex, th.type)"
+        @mousedown.prevent="selectCell($event, xIndex, yIndex, th.type)"
+        v-show="th.fixed || allShow">
+        <el-checkbox
+          v-if="th.type === 'selection' && dataStatusList[yIndex]"
+          size="mini"
+          v-model="dataStatusList[yIndex].checked"
+          @change="selectionChange">
+        </el-checkbox>
         <div
-          v-for="(th, xIndex) in columns"
-          class="ww-td"
-          :key="xIndex"
-          :title="tr[th.key]"
-          :style="styleObj(tr, th, yIndex, xIndex, columnsWidth)"
-          :class="classObj(tr, th, yIndex, xIndex)"
-          :data-key="th.key"
-          @mouseenter="multiSelect($event, xIndex, yIndex, th.type)"
-          @mousedown.prevent="selectCell($event, xIndex, yIndex, th.type)"
-          v-show="th.fixed || allShow">
-          <el-checkbox
-            v-if="th.type === 'selection' && dataStatusList[yIndex]"
-            size="mini"
-            v-model="dataStatusList[yIndex].checked"
-            @change="selectionChange">
-          </el-checkbox>
-          <div
-            v-else
-            class="ww-cell-content"
-            :style="{'max-width':  `${columnsWidth[xIndex]}px`}">
-            {{ format(tr[th.key], th.type, th.format) }}
-          </div>
+          v-else
+          class="ww-cell-content"
+          :style="{'max-width':  `${columnsWidth[xIndex]}px`}">
+          {{ format(tr[th.key], th.type, th.format) }}
         </div>
       </div>
     </div>
-    <slot></slot>
+    <div
+      v-if="showData.length == 0"
+      class="ww-empty-block"
+    >暂无数据</div>
   </div>
 </template>
 
@@ -39,6 +48,10 @@ import { checkbox } from 'element-ui';
 
 export default {
   props: {
+    fixed: {
+      type: Boolean,
+      default: false,
+    },
     allShow: Boolean,
     columnsWidth: {
       type: Array,
@@ -54,6 +67,10 @@ export default {
     },
     store: {
       required: true,
+    },
+    scrollY: {
+      type: Boolean,
+      default: false,
     },
   },
   components: {
@@ -132,13 +149,22 @@ export default {
 </script>
 
 <style lang="scss">
-.ww-table {
+.ww-tbody {
   position: relative;
   font-size: 12px;
-}
-
-.ww-tbody {
+  overflow: hidden;
+  user-select: none;
+  border-bottom: 1px solid #d6dfe4;
   border-right: 1px solid #d6dfe4;
+  &.fixed {
+    position: absolute;
+    top: 31px;
+    left: 0;
+    z-index: 3;
+  }
+  &.scrollY {
+    padding-bottom: 8px;
+  }
   .ww-tr {
     display: flex;
     &:first-child {
@@ -174,5 +200,15 @@ export default {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+// 数据为空
+.ww-empty-block {
+  position: relative;
+  z-index: 9;
+  font-size: 14px;
+  padding: 30px;
+  text-align: center;
+  color: #909399;
 }
 </style>

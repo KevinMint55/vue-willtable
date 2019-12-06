@@ -1,8 +1,15 @@
 <template>
-  <div class="ww-thead">
+  <div
+    class="ww-theader"
+    :class="{
+      fixed
+    }">
     <div
       ref="tr"
-      class="ww-tr">
+      class="ww-tr"
+      :style="{
+        width: `${store.states.tableWidth}px`,
+      }">
       <div
         v-for="(th, index) in columns"
         :key="index"
@@ -54,6 +61,10 @@ export default {
     'el-checkbox': checkbox,
   },
   props: {
+    fixed: {
+      type: Boolean,
+      default: false,
+    },
     showIcon: {
       type: Boolean,
       default: false,
@@ -164,11 +175,18 @@ export default {
 </script>
 
 <style lang="scss">
-.ww-thead {
+.ww-theader {
   position: relative;
   font-size: 12px;
   user-select: none;
+  overflow: hidden;
   border-right: 1px solid #d6dfe4;
+  &.fixed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 3;
+  }
   .ww-tr {
     display: flex;
     background-color: #eef1f6;
