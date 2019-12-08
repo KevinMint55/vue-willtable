@@ -6,40 +6,44 @@
       scrollY,
     }">
     <div
-      class="ww-tr"
-      v-for="(tr, yIndex) in showData" :key="yIndex"
       :style="{
         width: `${store.states.tableWidth}px`,
       }">
       <div
-        v-for="(th, xIndex) in columns"
-        class="ww-td"
-        :key="xIndex"
-        :title="tr[th.key]"
-        :style="styleObj(tr, th, yIndex, xIndex, columnsWidth)"
-        :class="classObj(tr, th, yIndex, xIndex)"
-        :data-key="th.key"
-        @mouseenter="multiSelect($event, xIndex, yIndex, th.type)"
-        @mousedown.prevent="selectCell($event, xIndex, yIndex, th.type)"
-        v-show="th.fixed || allShow">
-        <el-checkbox
-          v-if="th.type === 'selection' && dataStatusList[yIndex]"
-          size="mini"
-          v-model="dataStatusList[yIndex].checked"
-          @change="selectionChange">
-        </el-checkbox>
+        class="ww-tr"
+        v-for="(tr, yIndex) in showData" :key="yIndex">
         <div
-          v-else
-          class="ww-cell-content"
-          :style="{'max-width':  `${columnsWidth[xIndex]}px`}">
-          {{ format(tr[th.key], th.type, th.format) }}
+          v-for="(th, xIndex) in columns"
+          class="ww-td"
+          :key="xIndex"
+          :title="tr[th.key]"
+          :style="styleObj(tr, th, yIndex, xIndex, columnsWidth)"
+          :class="classObj(tr, th, yIndex, xIndex)"
+          :data-key="th.key"
+          @mouseenter="multiSelect($event, xIndex, yIndex, th.type)"
+          @mousedown.prevent="selectCell($event, xIndex, yIndex, th.type)"
+          v-show="th.fixed || allShow">
+          <el-checkbox
+            v-if="th.type === 'selection' && dataStatusList[yIndex]"
+            size="mini"
+            v-model="dataStatusList[yIndex].checked"
+            @change="selectionChange">
+          </el-checkbox>
+          <div
+            v-else
+            class="ww-cell-content"
+            :style="{'max-width':  `${columnsWidth[xIndex]}px`}">
+            {{ format(tr[th.key], th.type, th.format) }}
+          </div>
         </div>
       </div>
+      <div
+        v-if="showData.length === 0 && !fixed"
+        class="ww-empty-block">
+        暂无数据
+      </div>
+      <slot></slot>
     </div>
-    <div
-      v-if="showData.length == 0"
-      class="ww-empty-block"
-    >暂无数据</div>
   </div>
 </template>
 

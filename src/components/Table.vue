@@ -28,6 +28,13 @@
         :style="{
           maxHeight: `${maxHeight}px`
         }">
+        <!-- 编辑器 -->
+        <editor
+          ref="editor"
+          :columnsWidth="columnsWidth"
+          :fixedCount="fixedCount"
+          :store="store"
+        />
       </table-body>
       <!-- 左侧固定- -->
       <div
@@ -58,13 +65,6 @@
       class="ww-empty-columns">
       暂无表头
     </div>
-    <!-- 编辑器 -->
-    <editor
-      ref="editor"
-      :columnsWidth="columnsWidth"
-      :fixedCount="fixedCount"
-      :store="store"
-    />
     <dropdown
       :columnsWidth="columnsWidth"
       :fixedCount="fixedCount"
@@ -618,11 +618,11 @@ export default {
         const unFixedLeftArr = this.scrollLeftArr.slice(this.fixedCount - 1, -1).map((item) => item - this.fixedWidth);
         const unFixedRightArr = this.scrollLeftArr.slice(this.fixedCount).map((item) => item - this.fixedWidth);
         curLeftShould = unFixedLeftArr[states.editor.editorXIndex - this.fixedCount];
-        curRightShould = unFixedRightArr[states.editor.editorXIndex - this.fixedCount] + this.fixedWidth - this.wrapperWidth + states.scrollBarWidth + 2;
+        curRightShould = unFixedRightArr[states.editor.editorXIndex - this.fixedCount] + this.fixedWidth - this.wrapperWidth + states.scrollBarWidth + 1;
       } else {
         const scrollLeftArr = [0, ...this.scrollLeftArr];
         curLeftShould = scrollLeftArr[states.editor.editorXIndex];
-        curRightShould = scrollLeftArr[states.editor.editorXIndex + 1] - this.wrapperWidth + states.scrollBarWidth + 2;
+        curRightShould = scrollLeftArr[states.editor.editorXIndex + 1] - this.wrapperWidth + states.scrollBarWidth + 1;
       }
       if (states.tableWidth > this.wrapperWidth) {
         if (states.tableBodyLeft > curLeftShould) {
@@ -630,19 +630,19 @@ export default {
           this.$refs.tbody.$el.scrollLeft = curLeftShould;
         }
         if (states.tableBodyLeft < curRightShould) {
-          this.$refs.theader.$el.scrollLeft = curRightShould + 2;
-          this.$refs.tbody.$el.scrollLeft = curRightShould + 2;
+          this.$refs.theader.$el.scrollLeft = curRightShould + 1;
+          this.$refs.tbody.$el.scrollLeft = curRightShould + 1;
         }
         states.scrollbar.posX = this.$refs.tbody.$el.scrollLeft / (states.tableWidth - states.mainWidth) * (states.mainWidth - states.scrollbar.xWidth);
       }
       // 上下调整
       if (this.maxHeight) {
-        const curTopShould = this.scrollTopArr[states.editor.editorYIndex];
+        const curTopShould = this.scrollTopArr[states.editor.editorYIndex] + 1;
         if (states.tableBodyTop > curTopShould) {
           this.$refs.tbody.$el.scrollTop = curTopShould;
           this.$refs.fixedTbody.$el.scrollTop = curTopShould;
         }
-        const curBottomShould = this.scrollTopArr[states.editor.editorYIndex + 1] - this.maxHeight + states.scrollBarWidth + 2;
+        const curBottomShould = this.scrollTopArr[states.editor.editorYIndex + 1] - this.maxHeight + 1;
         if (states.tableBodyTop < curBottomShould) {
           this.$refs.tbody.$el.scrollTop = curBottomShould;
           this.$refs.fixedTbody.$el.scrollTop = curBottomShould;
