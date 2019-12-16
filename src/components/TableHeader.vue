@@ -9,6 +9,11 @@
       class="ww-tr"
       :style="{
         width: `${store.states.tableWidth}px`,
+        transform: `translate3d(
+          -${fixed ? 0 : store.states.tableBodyLeft}px,
+          0,
+          0
+        )`
       }">
       <div
         v-for="(th, index) in columns"

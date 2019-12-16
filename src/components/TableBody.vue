@@ -8,25 +8,38 @@
     <div
       :style="{
         width: `${store.states.tableWidth}px`,
+        height: `${showData.length * store.states.rowHeight}px`,
+        transform: `translate3d(
+          -${fixed ? 0 : store.states.tableBodyLeft}px,
+          -${store.states.tableBodyTop}px,
+          0
+        )`
       }">
       <div
         class="ww-tr"
-        v-for="(tr, yIndex) in showData" :key="yIndex">
+        v-for="(tr, yIndex) in domData" :key="yIndex"
+        :style="{
+          transform: `translate3d(
+            0,
+            ${(yIndex + store.states.visibleRowStartIndex) * store.states.rowHeight}px,
+            0
+          )`,
+        }">
         <div
           v-for="(th, xIndex) in columns"
           class="ww-td"
           :key="xIndex"
           :title="tr[th.key]"
-          :style="styleObj(tr, th, yIndex, xIndex, columnsWidth)"
-          :class="classObj(tr, th, yIndex, xIndex)"
+          :style="styleObj(tr, th, yIndex + store.states.visibleRowStartIndex, xIndex, columnsWidth)"
+          :class="classObj(tr, th, yIndex + store.states.visibleRowStartIndex, xIndex)"
           :data-key="th.key"
-          @mouseenter="multiSelect($event, xIndex, yIndex, th.type)"
-          @mousedown.prevent="selectCell($event, xIndex, yIndex, th.type)"
+          @mouseenter="multiSelect($event, xIndex, yIndex + store.states.visibleRowStartIndex, th.type)"
+          @mousedown.prevent="selectCell($event, xIndex, yIndex + store.states.visibleRowStartIndex, th.type)"
           v-show="th.fixed || allShow">
           <el-checkbox
-            v-if="th.type === 'selection' && dataStatusList[yIndex]"
+            v-if="th.type === 'selection' && dataStatusList[yIndex + store.states.visibleRowStartIndex]"
             size="mini"
-            v-model="dataStatusList[yIndex].checked"
+            v-model="dataStatusList[yIndex + store.states.visibleRowStartIndex].checked"
             @change="selectionChange">
           </el-checkbox>
           <div
@@ -97,6 +110,9 @@ export default {
     showData() {
       return this.store.states.showData;
     },
+    domData() {
+      return this.store.states.domData;
+    },
     editor() {
       return this.store.states.editor;
     },
@@ -160,6 +176,9 @@ export default {
   user-select: none;
   border-bottom: 1px solid #d6dfe4;
   border-right: 1px solid #d6dfe4;
+  > div {
+    position: relative;
+  }
   &.fixed {
     position: absolute;
     top: 31px;
@@ -170,6 +189,9 @@ export default {
     padding-bottom: 8px;
   }
   .ww-tr {
+    position: absolute;
+    top: 0;
+    left: 0;
     display: flex;
     &:first-child {
       .ww-td {

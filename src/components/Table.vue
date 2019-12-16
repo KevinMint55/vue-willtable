@@ -173,6 +173,9 @@ export default {
     tableHeight() {
       return this.store.states.tableHeight;
     },
+    tableBodyTop() {
+      return this.store.states.tableBodyTop;
+    },
   },
   watch: {
     value(val) {
@@ -207,6 +210,9 @@ export default {
       },
       deep: true,
     },
+    tableBodyTop() {
+      this.store.calcDomData();
+    },
   },
   mounted() {
     this.init();
@@ -219,12 +225,12 @@ export default {
       }
       this.store.states.tableBody = this.$refs.tbody.$el;
       this.store.states.rowHeight = this.rowHeight;
-      this.$refs.tbody.$el.addEventListener('scroll', () => {
-        this.$refs.theader.$el.scrollLeft = this.$refs.tbody.$el.scrollLeft;
-        this.$refs.fixedTbody.$el.scrollTop = this.$refs.tbody.$el.scrollTop;
-        this.store.tableBodyScroll(this.$refs.tbody.$el);
-        this.store.states.dropdown.index = null;
-      });
+      // this.$refs.tbody.$el.addEventListener('scroll', () => {
+      //   this.$refs.theader.$el.scrollLeft = states.tableBodyLeft;
+      //   this.$refs.fixedTbody.$el.scrollTop = states.tableBodyTop;
+      //   this.store.tableBodyScroll(this.$refs.tbody.$el);
+      //   this.store.states.dropdown.index = null;
+      // });
       window.addEventListener('resize', () => {
         this.handleResize();
       });
@@ -237,21 +243,37 @@ export default {
     handleMousewheel() {
       const { states } = this.store;
       const mainWrapperWheel = (e) => {
+        let { tableBodyTop } = states;
+        let { tableBodyLeft } = states;
         if (e.wheelDelta) {
           if (e.wheelDeltaY) {
-            states.tableBody.scrollTop -= e.wheelDelta;
+            tableBodyTop -= e.wheelDelta;
           } else {
-            states.tableBody.scrollLeft -= e.wheelDelta;
+            tableBodyLeft -= e.wheelDelta;
           }
         } else {
           if (e.axis === 2) {
-            states.tableBody.scrollTop += 40 * e.detail;
+            tableBodyTop += 40 * e.detail;
           } else {
-            states.tableBody.scrollLeft += 40 * e.detail;
+            tableBodyLeft += 40 * e.detail;
           }
         }
-        states.scrollbar.posY = states.tableBody.scrollTop / states.tableHeight * states.mainHeight;
-        states.scrollbar.posX = states.tableBody.scrollLeft / states.tableWidth * states.mainWidth;
+        if (tableBodyTop <= 0) {
+          states.tableBodyTop = 0;
+        } else if (tableBodyTop > states.tableHeight - states.mainHeight) {
+          states.tableBodyTop = states.tableHeight - states.mainHeight;
+        } else {
+          states.tableBodyTop = tableBodyTop;
+        }
+        if (tableBodyLeft <= 0) {
+          states.tableBodyLeft = 0;
+        } else if (tableBodyLeft > states.tableWidth - states.mainWidth) {
+          states.tableBodyLeft = states.tableWidth - states.mainWidth;
+        } else {
+          states.tableBodyLeft = tableBodyLeft;
+        }
+        states.scrollbar.posY = states.tableBodyTop / states.tableHeight * states.mainHeight;
+        states.scrollbar.posX = states.tableBodyLeft / states.tableWidth * states.mainWidth;
       };
       states.tableBody.addEventListener('mousewheel', mainWrapperWheel);
       states.tableBody.addEventListener('DOMMouseScroll', mainWrapperWheel);
@@ -390,6 +412,7 @@ export default {
       states.mainHeight = this.maxHeight + this.theaderHeight;
       states.tableHeight = states.showData.length * this.rowHeight + this.theaderHeight;
       this.store.initScrollBarLength();
+      this.store.calcDomData();
     },
     clickoutside() {
       const { states } = this.store;
@@ -627,27 +650,27 @@ export default {
       if (states.tableWidth > this.wrapperWidth) {
         if (states.tableBodyLeft > curLeftShould) {
           this.$refs.theader.$el.scrollLeft = curLeftShould;
-          this.$refs.tbody.$el.scrollLeft = curLeftShould;
+          states.tableBodyLeft = curLeftShould;
         }
         if (states.tableBodyLeft < curRightShould) {
           this.$refs.theader.$el.scrollLeft = curRightShould + 1;
-          this.$refs.tbody.$el.scrollLeft = curRightShould + 1;
+          states.tableBodyLeft = curRightShould + 1;
         }
-        states.scrollbar.posX = this.$refs.tbody.$el.scrollLeft / (states.tableWidth - states.mainWidth) * (states.mainWidth - states.scrollbar.xWidth);
+        states.scrollbar.posX = states.tableBodyLeft / (states.tableWidth - states.mainWidth) * (states.mainWidth - states.scrollbar.xWidth);
       }
       // 上下调整
       if (this.maxHeight) {
         const curTopShould = this.scrollTopArr[states.editor.editorYIndex] + 1;
         if (states.tableBodyTop > curTopShould) {
-          this.$refs.tbody.$el.scrollTop = curTopShould;
-          this.$refs.fixedTbody.$el.scrollTop = curTopShould;
+          states.tableBodyTop = curTopShould;
+          // this.$refs.fixedTbody.$el.scrollTop = curTopShould;
         }
         const curBottomShould = this.scrollTopArr[states.editor.editorYIndex + 1] - this.maxHeight + 1;
         if (states.tableBodyTop < curBottomShould) {
-          this.$refs.tbody.$el.scrollTop = curBottomShould;
-          this.$refs.fixedTbody.$el.scrollTop = curBottomShould;
+          states.tableBodyTop = curBottomShould;
+          // this.$refs.fixedTbody.$el.scrollTop = curBottomShould;
         }
-        states.scrollbar.posY = this.$refs.tbody.$el.scrollTop / (states.tableHeight - states.mainHeight) * (states.mainHeight - states.scrollbar.yHeight);
+        states.scrollbar.posY = states.tableBodyTop / (states.tableHeight - states.mainHeight) * (states.mainHeight - states.scrollbar.yHeight);
       }
     },
     multiSelectAdjustPostion(e) {
@@ -666,19 +689,19 @@ export default {
         const sBottom = this.$refs.willtable.offsetTop + this.$refs.willtable.offsetHeight - 10;
         const sRight = this.excelPos.left + this.$refs.willtable.offsetWidth - 10;
         if (this.mouseY < sTop) {
-          this.$refs.tbody.$el.scrollTop -= 20;
+          states.tableBodyTop -= 20;
         }
         if (this.mouseY > sBottom) {
-          this.$refs.tbody.$el.scrollTop += 20;
+          states.tableBodyTop += 20;
         }
         if (this.mouseX < sLeft) {
-          this.$refs.tbody.$el.scrollLeft -= 20;
+          states.tableBodyLeft -= 20;
         }
         if (this.mouseX > sRight) {
-          this.$refs.tbody.$el.scrollLeft += 20;
+          states.tableBodyLeft += 20;
         }
-        states.scrollbar.posX = this.$refs.tbody.$el.scrollLeft / (states.tableWidth - states.mainWidth) * (states.mainWidth - states.scrollbar.xWidth);
-        states.scrollbar.posY = this.$refs.tbody.$el.scrollTop / (states.tableHeight - states.mainHeight) * (states.mainHeight - states.scrollbar.yHeight);
+        states.scrollbar.posX = states.tableBodyLeft / (states.tableWidth - states.mainWidth) * (states.mainWidth - states.scrollbar.xWidth);
+        states.scrollbar.posY = states.tableBodyTop / (states.tableHeight - states.mainHeight) * (states.mainHeight - states.scrollbar.yHeight);
       }
     },
     selectAll() {

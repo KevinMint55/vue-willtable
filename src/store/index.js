@@ -83,6 +83,9 @@ class TableStore {
         xWidth: 0,
         yHeight: 0,
       },
+
+      visibleRowStartIndex: 0,
+      visibleRowEndIndex: 0,
     };
   }
 
@@ -94,9 +97,9 @@ class TableStore {
 
   calcDomData() {
     const { states } = this;
-    const visibleRowStartIndex = Math.floor(states.tableBodyTop / states.rowHeight);
-    const visibleRowEndIndex = visibleRowStartIndex + Math.ceil(states.mainHeight / states.rowHeight);
-    states.domData = states.showData.slice(visibleRowStartIndex, visibleRowEndIndex + 1);
+    states.visibleRowStartIndex = Math.floor(states.tableBodyTop / states.rowHeight);
+    states.visibleRowEndIndex = states.visibleRowStartIndex + Math.ceil(states.mainHeight / states.rowHeight);
+    states.domData = states.showData.slice(states.visibleRowStartIndex, states.visibleRowEndIndex + 1);
   }
 
   initScrollBarLength() {

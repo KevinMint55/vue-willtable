@@ -32,8 +32,8 @@ const barPos = {
   y: 'posY',
 };
 const scrollDir = {
-  x: 'scrollLeft',
-  y: 'scrollTop',
+  x: 'tableBodyLeft',
+  y: 'tableBodyTop',
 };
 
 export default {
@@ -91,7 +91,7 @@ export default {
         } else {
           states.scrollbar[barPos[barType]] = scrollBarPos;
         }
-        states.tableBody[scrollDir[barType]] = this.scrollbar[barPos[barType]] / (states[mainLength[barType]] - this.scrollbar[barLength[barType]]) * (states[tableLength[barType]] - states[mainLength[barType]]);
+        states[scrollDir[barType]] = this.scrollbar[barPos[barType]] / (states[mainLength[barType]] - this.scrollbar[barLength[barType]]) * (states[tableLength[barType]] - states[mainLength[barType]]);
       }
     },
     handleUp() {
