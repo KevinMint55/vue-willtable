@@ -2,7 +2,7 @@
   <div class="ww-dropdown-wrapper"
     :class="{ active: parseInt(dropdown.index) >= 0 }"
     :style="{
-      'top': `${$parent.$refs.wrapper.offsetTop + 30}px`,
+      'top': `${$parent.$refs.wrapper.offsetTop + store.states.theaderHeight}px`,
       'left': left
     }"
     ref="dropdown"

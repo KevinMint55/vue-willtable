@@ -127,6 +127,10 @@ export default {
       type: [String, Number],
       default: 28,
     },
+    theaderHeight: {
+      type: [String, Number],
+      default: 50,
+    },
     disabled: {
       type: Boolean,
       default: false,
@@ -149,7 +153,6 @@ export default {
     return {
       store,
       wrapperWidth: null,
-      theaderHeight: null,
       columnsWidth: [],
 
       data: [],
@@ -175,6 +178,9 @@ export default {
     },
     tableBodyTop() {
       return this.store.states.tableBodyTop;
+    },
+    tableBodyLeft() {
+      return this.store.states.tableBodyLeft;
     },
   },
   watch: {
@@ -213,6 +219,9 @@ export default {
     tableBodyTop() {
       this.store.calcDomData();
     },
+    tableBodyLeft() {
+      this.store.states.dropdown.index = null;
+    },
   },
   mounted() {
     this.init();
@@ -223,14 +232,7 @@ export default {
       if (this.value.length > 0) {
         this.data = this.value;
       }
-      this.store.states.tableBody = this.$refs.tbody.$el;
       this.store.states.rowHeight = this.rowHeight;
-      // this.$refs.tbody.$el.addEventListener('scroll', () => {
-      //   this.$refs.theader.$el.scrollLeft = states.tableBodyLeft;
-      //   this.$refs.fixedTbody.$el.scrollTop = states.tableBodyTop;
-      //   this.store.tableBodyScroll(this.$refs.tbody.$el);
-      //   this.store.states.dropdown.index = null;
-      // });
       window.addEventListener('resize', () => {
         this.handleResize();
       });
@@ -258,25 +260,10 @@ export default {
             tableBodyLeft += 40 * e.detail;
           }
         }
-        if (tableBodyTop <= 0) {
-          states.tableBodyTop = 0;
-        } else if (tableBodyTop > states.tableHeight - states.mainHeight) {
-          states.tableBodyTop = states.tableHeight - states.mainHeight;
-        } else {
-          states.tableBodyTop = tableBodyTop;
-        }
-        if (tableBodyLeft <= 0) {
-          states.tableBodyLeft = 0;
-        } else if (tableBodyLeft > states.tableWidth - states.mainWidth) {
-          states.tableBodyLeft = states.tableWidth - states.mainWidth;
-        } else {
-          states.tableBodyLeft = tableBodyLeft;
-        }
-        states.scrollbar.posY = states.tableBodyTop / states.tableHeight * states.mainHeight;
-        states.scrollbar.posX = states.tableBodyLeft / states.tableWidth * states.mainWidth;
+        this.store.setScrollStatus(tableBodyTop, tableBodyLeft);
       };
-      states.tableBody.addEventListener('mousewheel', mainWrapperWheel);
-      states.tableBody.addEventListener('DOMMouseScroll', mainWrapperWheel);
+      this.$refs.tbody.$el.addEventListener('mousewheel', mainWrapperWheel);
+      this.$refs.tbody.$el.addEventListener('DOMMouseScroll', mainWrapperWheel);
       this.$nextTick(() => {
         this.$refs.fixedTbody.$el.addEventListener('mousewheel', mainWrapperWheel);
         this.$refs.fixedTbody.$el.addEventListener('DOMMouseScroll', mainWrapperWheel);
@@ -399,15 +386,13 @@ export default {
           }
         }
 
-        // 设置左侧theader高度与tbody距离顶部距离
-        this.theaderHeight = this.$refs.theader.$el.offsetHeight;
-
         // 设置左侧定位高度
         this.$nextTick(() => {
           this.$refs.fixedWrapper.style.height = `${this.$refs.wrapper.offsetHeight}px`;
           this.$refs.fixedTbody.$el.style.height = `${this.$refs.wrapper.offsetHeight - this.theaderHeight}px`;
         });
       });
+      states.theaderHeight = this.theaderHeight;
       states.mainWidth = this.$refs.wrapper.offsetWidth - states.scrollBarWidth;
       states.mainHeight = this.maxHeight + this.theaderHeight;
       states.tableHeight = states.showData.length * this.rowHeight + this.theaderHeight;
@@ -649,12 +634,10 @@ export default {
       }
       if (states.tableWidth > this.wrapperWidth) {
         if (states.tableBodyLeft > curLeftShould) {
-          this.$refs.theader.$el.scrollLeft = curLeftShould;
           states.tableBodyLeft = curLeftShould;
         }
         if (states.tableBodyLeft < curRightShould) {
-          this.$refs.theader.$el.scrollLeft = curRightShould + 1;
-          states.tableBodyLeft = curRightShould + 1;
+          states.tableBodyLeft = curRightShould;
         }
         states.scrollbar.posX = states.tableBodyLeft / (states.tableWidth - states.mainWidth) * (states.mainWidth - states.scrollbar.xWidth);
       }
@@ -663,12 +646,10 @@ export default {
         const curTopShould = this.scrollTopArr[states.editor.editorYIndex] + 1;
         if (states.tableBodyTop > curTopShould) {
           states.tableBodyTop = curTopShould;
-          // this.$refs.fixedTbody.$el.scrollTop = curTopShould;
         }
         const curBottomShould = this.scrollTopArr[states.editor.editorYIndex + 1] - this.maxHeight + 1;
         if (states.tableBodyTop < curBottomShould) {
           states.tableBodyTop = curBottomShould;
-          // this.$refs.fixedTbody.$el.scrollTop = curBottomShould;
         }
         states.scrollbar.posY = states.tableBodyTop / (states.tableHeight - states.mainHeight) * (states.mainHeight - states.scrollbar.yHeight);
       }
@@ -684,24 +665,25 @@ export default {
         if (states.selector.selectedYArr[0] === states.selector.selectedYArr[1] && states.selector.selectedXArr[0] === states.selector.selectedXArr[1]) {
           return;
         }
-        const sTop = this.$refs.willtable.offsetTop + 30;
+        const sTop = this.$refs.willtable.offsetTop + this.theaderHeight;
         const sLeft = this.excelPos.left + this.fixedWidth;
         const sBottom = this.$refs.willtable.offsetTop + this.$refs.willtable.offsetHeight - 10;
         const sRight = this.excelPos.left + this.$refs.willtable.offsetWidth - 10;
+        let { tableBodyTop } = states;
+        let { tableBodyLeft } = states;
         if (this.mouseY < sTop) {
-          states.tableBodyTop -= 20;
+          tableBodyTop -= 20;
         }
         if (this.mouseY > sBottom) {
-          states.tableBodyTop += 20;
+          tableBodyTop += 20;
         }
         if (this.mouseX < sLeft) {
-          states.tableBodyLeft -= 20;
+          tableBodyLeft -= 20;
         }
         if (this.mouseX > sRight) {
-          states.tableBodyLeft += 20;
+          tableBodyLeft += 20;
         }
-        states.scrollbar.posX = states.tableBodyLeft / (states.tableWidth - states.mainWidth) * (states.mainWidth - states.scrollbar.xWidth);
-        states.scrollbar.posY = states.tableBodyTop / (states.tableHeight - states.mainHeight) * (states.mainHeight - states.scrollbar.yHeight);
+        this.store.setScrollStatus(tableBodyTop, tableBodyLeft);
       }
     },
     selectAll() {

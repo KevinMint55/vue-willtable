@@ -9,6 +9,7 @@
       class="ww-tr"
       :style="{
         width: `${store.states.tableWidth}px`,
+        height: `${store.states.theaderHeight}px`,
         transform: `translate3d(
           -${fixed ? 0 : store.states.tableBodyLeft}px,
           0,
@@ -45,7 +46,10 @@
         <div
           v-if="th.type !== 'selection'"
           class="dropdown"
-          :class="{active: dropdown.index === index}">
+          :class="{active: dropdown.index === index}"
+          :style="{
+            top: `${(store.states.theaderHeight - 14) / 2}px`
+          }">
           <i v-if="th.action" @click.stop="openDropdown(index)"></i>
         </div>
         <div
@@ -203,14 +207,12 @@ export default {
     align-items: center;
     border-top: 1px solid #d6dfe4;
     border-left: 1px solid #d6dfe4;
-    height: 30px;
     &.selection {
       justify-content: center;
     }
   }
   .dropdown {
     position: absolute;
-    top: 10px;
     right: 10px;
     z-index: 1;
     display: flex;

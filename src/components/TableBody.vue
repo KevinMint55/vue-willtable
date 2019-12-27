@@ -4,6 +4,9 @@
     :class="{
       fixed,
       scrollY,
+    }"
+    :style="{
+      top: fixed ? `${store.states.theaderHeight}px` : ''
     }">
     <div
       :style="{
@@ -181,7 +184,6 @@ export default {
   }
   &.fixed {
     position: absolute;
-    top: 31px;
     left: 0;
     z-index: 3;
   }

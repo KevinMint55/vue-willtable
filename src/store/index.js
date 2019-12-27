@@ -13,8 +13,8 @@ class TableStore {
       mainWidth: null,
       mainHeight: null,
       rowHeight: 28,
+      theaderHeight: 30,
       scrollBarWidth: 8,
-      tableBody: null,
       tableBodyLeft: 0,
       tableBodyTop: 0,
       columns: [],
@@ -89,12 +89,6 @@ class TableStore {
     };
   }
 
-  tableBodyScroll(el) {
-    const { states } = this;
-    states.tableBodyLeft = el.scrollLeft;
-    states.tableBodyTop = el.scrollTop;
-  }
-
   calcDomData() {
     const { states } = this;
     states.visibleRowStartIndex = Math.floor(states.tableBodyTop / states.rowHeight);
@@ -120,6 +114,26 @@ class TableStore {
     } else {
       states.scrollbar.yHeight = barHeight;
     }
+  }
+
+  setScrollStatus(tableBodyTop, tableBodyLeft) {
+    const { states } = this;
+    if (tableBodyTop <= 0) {
+      states.tableBodyTop = 0;
+    } else if (tableBodyTop > states.tableHeight - states.mainHeight) {
+      states.tableBodyTop = states.tableHeight - states.mainHeight;
+    } else {
+      states.tableBodyTop = tableBodyTop;
+    }
+    if (tableBodyLeft <= 0) {
+      states.tableBodyLeft = 0;
+    } else if (tableBodyLeft > states.tableWidth - states.mainWidth) {
+      states.tableBodyLeft = states.tableWidth - states.mainWidth;
+    } else {
+      states.tableBodyLeft = tableBodyLeft;
+    }
+    states.scrollbar.posX = states.tableBodyLeft / (states.tableWidth - states.mainWidth) * (states.mainWidth - states.scrollbar.xWidth);
+    states.scrollbar.posY = states.tableBodyTop / (states.tableHeight - states.mainHeight) * (states.mainHeight - states.scrollbar.yHeight);
   }
 
   handleIsMac() {
