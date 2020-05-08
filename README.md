@@ -2,13 +2,13 @@
 
 适用于Vue的可编辑的表格组件，支持多种快捷键操作，模拟Excel的操作体验
 
-Demo here: https://demo.kevinmint.com/willtable/
+Demo here: https://demo.willwuwei.com/willtable/
 
-基于该组件实现的多人实时在线编辑表格系统: https://castle.kevinmint.com
+基于该组件实现的多人实时在线编辑表格系统: https://castle.willwuwei.com
 
-![image](https://qiniu.kevinmint.com/willtable1.gif)
+![image](https://qiniu.willwuwei.com/willtable1.gif)
 
-![image](https://qiniu.kevinmint.com/willtable2.gif)
+![image](https://qiniu.willwuwei.com/willtable2.gif)
 
 ## Features
 
@@ -69,7 +69,6 @@ export default {
   <willtable
     ref="willtable"
     :columns="columns"
-    v-model="data"
     maxHeight="800" />
 </template>
 
@@ -173,7 +172,6 @@ export default {
           width: 200,
         },
       ],
-      data: [],
     },
   },
   mounted() {
@@ -191,9 +189,7 @@ export default {
 
 ### Value-Binding
 
-`v-model`进行值的绑定
-
-调用setData方法来更新整表数据
+this.$refs.willtable调用setData方法来更新整表数据，并会重置历史数据记录
 
 ### Attributes
 
@@ -251,4 +247,4 @@ Enter | 单元格编辑/完成单元格编辑
 
 ## Author
 
-[KevinMint](https://www.kevinmint.com)
+[WillWu](https://www.willwuwei.com)

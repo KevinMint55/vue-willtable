@@ -115,10 +115,6 @@ export default {
       type: Array,
       default: () => ([]),
     },
-    value: {
-      type: Array,
-      default: () => ([]),
-    },
     maxHeight: {
       type: [String, Number],
       default: () => window.innerHeight,
@@ -184,9 +180,6 @@ export default {
     },
   },
   watch: {
-    value(val) {
-      this.data = val;
-    },
     data: {
       handler(val) {
         const { states } = this.store;
@@ -229,9 +222,6 @@ export default {
   mixins: [methods, events],
   methods: {
     init() {
-      if (this.value.length > 0) {
-        this.data = this.value;
-      }
       this.store.states.rowHeight = this.rowHeight;
       window.addEventListener('resize', () => {
         this.handleResize();
