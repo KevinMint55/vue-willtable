@@ -160,7 +160,6 @@ export default {
       // 鼠标
       mouseX: 0,
       mouseY: 0,
-      timer: null,
 
       excelPos: {},
     };
@@ -190,7 +189,6 @@ export default {
           states.historyData.push(JSON.stringify(val));
           states.curHisory += 1;
         }
-        this.$emit('input', val);
         if (!states.initialData) {
           this.initData();
         }
@@ -407,7 +405,6 @@ export default {
       window.addEventListener('keydown', this.keySubmit);
       window.addEventListener('mousemove', this.multiSelectAdjustPostion);
       if (type === 'selection') return;
-      this.timer = setInterval(this.multiSelectAdjustPostion, 16);
       window.addEventListener('mouseup', this.selectUp);
       states.editor.editing = false;
       states.editor.editType = 'text';
@@ -499,7 +496,7 @@ export default {
           }
           this.adjustPosition();
           break;
-        case keyCode === 8:
+        case keyCode === 8 || keyCode === 46:
           // 删除
           this.store.clearSelected();
           break;
@@ -541,9 +538,10 @@ export default {
     },
     clipboardToContent(e) {
       setTimeout(() => {
+        const { states } = this.store;
         const arr = [];
         e.target.value.split('\n').forEach((item, index, curArr) => {
-          if (this.store.states.isMac) {
+          if (states.isMac) {
             arr.push(item.split('\t'));
           } else {
             if (index < curArr.length - 1) {
@@ -551,11 +549,23 @@ export default {
             }
           }
         });
-        for (let i = 0; i <= arr.length - 1; i += 1) {
-          for (let j = 0; j <= arr[i].length - 1; j += 1) {
-            if (this.store.states.showData[i + this.store.states.selector.selectedYArr[0]] && this.store.states.columns[j + this.store.states.selector.selectedXArr[0]]) {
-              if (!this.store.states.columns[j + this.store.states.selector.selectedXArr[0]].disabled) {
-                this.store.states.showData[i + this.store.states.selector.selectedYArr[0]][this.store.states.columns[j + this.store.states.selector.selectedXArr[0]].key] = arr[i][j];
+        const selectorXLength = states.selector.selectedXArr[1] - states.selector.selectedXArr[0] + 1;
+        const selectorYLength = states.selector.selectedYArr[1] - states.selector.selectedYArr[0] + 1;
+        if (selectorYLength % arr.length === 0 && selectorXLength % arr[0].length === 0) {
+          for (let i = 0; i <= selectorYLength - 1; i += 1) {
+            for (let j = 0; j <= selectorXLength - 1; j += 1) {
+              if (!states.columns[j + states.selector.selectedXArr[0]].disabled) {
+                states.showData[i + states.selector.selectedYArr[0]][states.columns[j + states.selector.selectedXArr[0]].key] = arr[i % arr.length][j % arr[0].length];
+              }
+            }
+          }
+        } else {
+          for (let i = 0; i <= arr.length - 1; i += 1) {
+            for (let j = 0; j <= arr[i].length - 1; j += 1) {
+              if (states.showData[i + states.selector.selectedYArr[0]] && states.columns[j + states.selector.selectedXArr[0]]) {
+                if (!states.columns[j + states.selector.selectedXArr[0]].disabled) {
+                  states.showData[i + states.selector.selectedYArr[0]][states.columns[j + states.selector.selectedXArr[0]].key] = arr[i][j];
+                }
               }
             }
           }
@@ -593,7 +603,6 @@ export default {
       });
     },
     selectUp() {
-      clearInterval(this.timer);
       setTimeout(() => {
         this.store.states.selector.isSelected = false;
       }, 0);
@@ -646,7 +655,7 @@ export default {
     },
     multiSelectAdjustPostion(e) {
       const { states } = this.store;
-      if (states.selector.isSelected) {
+      if (states.selector.isSelected || states.autofill.isAutofill) {
         if (e) {
           e = e || window.event;
           this.mouseX = e.pageX;
@@ -674,6 +683,11 @@ export default {
           tableBodyLeft += 20;
         }
         this.store.setScrollStatus(tableBodyTop, tableBodyLeft);
+        setTimeout(() => {
+          this.multiSelectAdjustPostion();
+        }, 16);
+      } else {
+        window.removeEventListener('mousemove', this.multiSelectAdjustPostion);
       }
     },
     selectAll() {

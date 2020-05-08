@@ -227,6 +227,7 @@ export default {
     },
     handleAutofill() {
       this.store.handleAutofill();
+      window.addEventListener('mousemove', this.$parent.$parent.multiSelectAdjustPostion);
     },
     resetEditor() {
       this.store.resetEditor();
