@@ -303,25 +303,29 @@ class TableStore {
   }
 
   verify(column, value) {
-    if (!value) {
+    if (!value || column.noVerify) {
       return true;
     }
     let correct;
-    switch (column.type) {
-      case 'date':
-        correct = verifyDate(value);
-        break;
-      case 'month':
-        correct = verifyMonth(value);
-        break;
-      case 'select':
-        correct = verifySelect(value, column.options);
-        break;
-      case 'number':
-        correct = verifyNumber(value);
-        break;
-      default:
-        correct = true;
+    if (column.validate) {
+      correct = column.validate(value);
+    } else {
+      switch (column.type) {
+        case 'date':
+          correct = verifyDate(value);
+          break;
+        case 'month':
+          correct = verifyMonth(value);
+          break;
+        case 'select':
+          correct = verifySelect(value, column.options);
+          break;
+        case 'number':
+          correct = verifyNumber(value);
+          break;
+        default:
+          correct = true;
+      }
     }
     return correct;
   }

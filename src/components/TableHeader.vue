@@ -15,7 +15,8 @@
           0,
           0
         )`
-      }">
+      }"
+    >
       <div
         v-for="(th, index) in columns"
         :key="index"
@@ -28,18 +29,20 @@
           selection: th.type === 'selection'
         }"
         :title="th.title"
-        v-show="th.fixed || allShow">
+        v-show="th.fixed || allShow"
+      >
         <el-checkbox
           v-if="th.type === 'selection'"
           size="mini"
           v-model="checkedAll"
-          @change="selectAll">
-        </el-checkbox>
+          @change="selectAll"
+        ></el-checkbox>
         <p
           class="ww-title"
           :style="{ width: `${columnsWidth[index] - 20}px` }"
           :class="{ active: isActive(columnsStatusList[index]) }"
-          v-else>
+          v-else
+        >
           <span v-if="showIcon" class="icon" :class="iconClass(th.type)"></span>
           {{ th.title }}
         </p>
@@ -49,14 +52,11 @@
           :class="{active: dropdown.index === index}"
           :style="{
             top: `${(store.states.theaderHeight - 14) / 2}px`
-          }">
+          }"
+        >
           <i v-if="th.action" @click.stop="openDropdown(index)"></i>
         </div>
-        <div
-          v-if="th.type !== 'selection'"
-          class="handler"
-          @mousedown="handlerDown(index)">
-        </div>
+        <div v-if="th.type !== 'selection'" class="handler" @mousedown="handlerDown(index)"></div>
       </div>
     </div>
   </div>
@@ -190,11 +190,13 @@ export default {
   user-select: none;
   overflow: hidden;
   border-right: 1px solid #d6dfe4;
+  z-index: 5;
   &.fixed {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 3;
+    box-shadow: 1px 0 8px #d3d4d6;
+    z-index: 6;
   }
   .ww-tr {
     display: flex;

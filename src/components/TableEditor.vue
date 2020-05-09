@@ -112,66 +112,75 @@ export default {
     };
   },
   computed: {
+    // 编辑框
     cellEditorStyle() {
       let left;
       if (this.editor.editorIsFixed) {
-        left = this.store.states.tableBodyLeft + this.columnsWidth.filter((item, index) => index < this.editor.editorXIndex).reduce((sum, item) => sum + item, 0);
-      } else {
         left = this.columnsWidth.filter((item, index) => index < this.editor.editorXIndex).reduce((sum, item) => sum + item, 0);
+      } else {
+        left = this.columnsWidth.filter((item, index) => index < this.editor.editorXIndex).reduce((sum, item) => sum + item, 0) - this.store.states.tableBodyLeft;
       }
       return {
-        top: `${this.editor.editorYIndex * this.rowHeight}px`,
+        top: `${this.editor.editorYIndex * this.rowHeight - this.store.states.tableBodyTop + this.theaderHeight}px`,
         left: `${left}px`,
         width: `${this.columnsWidth[this.editor.editorXIndex]}px`,
         height: `${this.rowHeight}px`,
         'z-index': this.editor.editorIsFixed ? 4 : 1,
       };
     },
+    // 自动填充按钮
     autofillHandlerStyle() {
       let left;
       if (this.editor.editorIsFixed && this.selector.selectedYArr[0] === this.selector.selectedYArr[1]) {
-        left = this.store.states.tableBodyLeft + this.columnsWidth.filter((item, index) => index < this.autofill.autofillXIndex).reduce((sum, item) => sum + item, 0);
-      } else {
         left = this.columnsWidth.filter((item, index) => index < this.autofill.autofillXIndex).reduce((sum, item) => sum + item, 0);
+      } else {
+        left = this.columnsWidth.filter((item, index) => index < this.autofill.autofillXIndex).reduce((sum, item) => sum + item, 0) - this.store.states.tableBodyLeft;
       }
       left = left + this.columnsWidth[this.autofill.autofillXIndex] - 5;
       return {
-        top: `${(this.autofill.autofillYIndex + 1) * this.rowHeight - 4}px`,
+        top: `${(this.autofill.autofillYIndex + 1) * this.rowHeight - 4 - this.store.states.tableBodyTop + this.theaderHeight}px`,
         left: `${left}px`,
         'z-index': this.fixedCount > this.autofill.autofillXIndex ? 4 : 1,
       };
     },
+    // 选中区域
     selectedStyle() {
       return {
-        top: `${this.selector.selectedYArr[0] * this.rowHeight}px`,
-        left: `${this.columnsWidth.filter((item, index) => index < this.selector.selectedXArr[0]).reduce((sum, item) => sum + item, 0)}px`,
+        top: `${this.selector.selectedYArr[0] * this.rowHeight - this.store.states.tableBodyTop + this.theaderHeight}px`,
+        left: `${this.columnsWidth.filter((item, index) => index < this.selector.selectedXArr[0]).reduce((sum, item) => sum + item, 0) - this.store.states.tableBodyLeft}px`,
         width: `${this.columnsWidth.filter((item, index) => (index <= this.selector.selectedXArr[1]) && (index >= this.selector.selectedXArr[0])).reduce((sum, item) => sum + item, 0)}px`,
         height: `${(this.selector.selectedYArr[1] - this.selector.selectedYArr[0] + 1) * this.rowHeight}px`,
       };
     },
+    // 固定列选中区域
     fixedSelectedStyle() {
       return {
-        top: `${this.selector.selectedYArr[0] * this.rowHeight}px`,
-        left: `${this.store.states.tableBodyLeft + this.columnsWidth.filter((item, index) => index < this.selector.selectedXArr[0]).reduce((sum, item) => sum + item, 0)}px`,
+        top: `${this.selector.selectedYArr[0] * this.rowHeight - this.store.states.tableBodyTop + this.theaderHeight}px`,
+        left: `${this.columnsWidth.filter((item, index) => index < this.selector.selectedXArr[0]).reduce((sum, item) => sum + item, 0)}px`,
         width: `${this.columnsWidth.filter((item, index) => (index <= this.selector.selectedXArr[1]) && (index >= this.selector.selectedXArr[0]) && this.columns[index].fixed).reduce((sum, item) => sum + item, 0)}px`,
         height: `${(this.selector.selectedYArr[1] - this.selector.selectedYArr[0] + 1) * this.rowHeight}px`,
       };
     },
+    // 自动填充区域
     autofillStyle() {
       return {
-        top: `${this.autofill.autofillYArr[0] * this.rowHeight}px`,
-        left: `${this.columnsWidth.filter((item, index) => index < this.selector.selectedXArr[0]).reduce((sum, item) => sum + item, 0)}px`,
+        top: `${this.autofill.autofillYArr[0] * this.rowHeight - this.store.states.tableBodyTop + this.theaderHeight}px`,
+        left: `${this.columnsWidth.filter((item, index) => index < this.selector.selectedXArr[0]).reduce((sum, item) => sum + item, 0) - this.store.states.tableBodyLeft}px`,
         width: `${this.columnsWidth.filter((item, index) => (index <= this.selector.selectedXArr[1]) && (index >= this.selector.selectedXArr[0])).reduce((sum, item) => sum + item, 0)}px`,
         height: `${this.autofill.autofillYArr.length > 0 ? (this.autofill.autofillYArr[1] - this.autofill.autofillYArr[0] + 1) * this.rowHeight : 0}px`,
       };
     },
+    // 固定列自动填充区域
     fixedAutofillStyle() {
       return {
-        top: `${this.autofill.autofillYArr[0] * this.rowHeight}px`,
-        left: `${this.store.states.tableBodyLeft + this.columnsWidth.filter((item, index) => index < this.selector.selectedXArr[0]).reduce((sum, item) => sum + item, 0)}px`,
+        top: `${this.autofill.autofillYArr[0] * this.rowHeight - this.store.states.tableBodyTop + this.theaderHeight}px`,
+        left: `${this.columnsWidth.filter((item, index) => index < this.selector.selectedXArr[0]).reduce((sum, item) => sum + item, 0)}px`,
         width: `${this.columnsWidth.filter((item, index) => (index <= this.selector.selectedXArr[1]) && (index >= this.selector.selectedXArr[0]) && this.columns[index].fixed).reduce((sum, item) => sum + item, 0)}px`,
         height: `${this.autofill.autofillYArr.length > 0 ? (this.autofill.autofillYArr[1] - this.autofill.autofillYArr[0] + 1) * this.rowHeight : 0}px`,
       };
+    },
+    theaderHeight() {
+      return this.store.states.theaderHeight;
     },
     rowHeight() {
       return this.store.states.rowHeight;
@@ -220,14 +229,14 @@ export default {
       this.editContent = nVal;
     },
     setEditing() {
-      this.$parent.$parent.setEditing();
+      this.$parent.setEditing();
     },
     clipboardToContent(e) {
-      this.$parent.$parent.clipboardToContent(e);
+      this.$parent.clipboardToContent(e);
     },
     handleAutofill() {
       this.store.handleAutofill();
-      window.addEventListener('mousemove', this.$parent.$parent.multiSelectAdjustPostion);
+      window.addEventListener('mousemove', this.$parent.multiSelectAdjustPostion);
     },
     resetEditor() {
       this.store.resetEditor();

@@ -15,17 +15,18 @@ Demo here: https://demo.willwuwei.com/willtable/
 - 表格宽度调整
 - 表格列固定
 - 数据过滤与筛选
-- 选择多行数据时使用Checkbox
+- 行多选
 - 批量框选删除与复制粘贴
 - 可与Excel互相复制粘贴
-- 框选单元格拖动超过表格区域时自动滚动
 - 数据下拉复制
+- 下拉复制与框选单元格拖动超过表格区域时自动滚动
 - 获取改变的数据行
-- 按需使用[element-ui](https://github.com/ElemeFE/element)组件作为部分数据类型选择器
 - 多种数据类型校验
+- 支持自定义数据校验
 - 获取校验非法的数据行
 - 支持撤销与重做
 - 可自定义每个单元格样式与类名
+- 采用局部渲染，支持更大量数据的展示
 
 ## Installation
 
@@ -232,6 +233,8 @@ options | select下拉选项 | Array | { value: '值', label: '显示文字' } |
 fixed | 是否固定在左侧 | Boolean | —— | false
 action | 是否启用过滤和筛选 | Boolean | —— | false
 disabled | 是否禁止编辑 | Boolean | —— | false
+noVerify | 是否禁用校验 | Boolean | —— | false
+validate | 自定义校验 | Function(value) | —— | ——
 
 ### Shortcut
 
@@ -244,6 +247,7 @@ Ctrl + A | 单元格全选
 Ctrl + Z | 撤销
 Ctrl + Y | 重做
 Enter | 单元格编辑/完成单元格编辑
+Delete、Backspace | 删除
 
 ## Author
 

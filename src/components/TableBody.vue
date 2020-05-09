@@ -4,30 +4,35 @@
     :class="{
       fixed,
       scrollY,
+      empty: showData.length === 0,
     }"
     :style="{
-      top: fixed ? `${store.states.theaderHeight}px` : ''
-    }">
+      top: fixed ? `${store.states.theaderHeight}px` : '',
+    }"
+  >
     <div
       :style="{
         width: `${store.states.tableWidth}px`,
-        height: `${showData.length * store.states.rowHeight}px`,
+        height: `${showData.length ? showData.length * store.states.rowHeight : 80}px`,
         transform: `translate3d(
           -${fixed ? 0 : store.states.tableBodyLeft}px,
           -${store.states.tableBodyTop}px,
           0
         )`
-      }">
+      }"
+    >
       <div
         class="ww-tr"
-        v-for="(tr, yIndex) in domData" :key="yIndex"
+        v-for="(tr, yIndex) in domData"
+        :key="yIndex"
         :style="{
           transform: `translate3d(
             0,
             ${(yIndex + store.states.visibleRowStartIndex) * store.states.rowHeight}px,
             0
           )`,
-        }">
+        }"
+      >
         <div
           v-for="(th, xIndex) in columns"
           class="ww-td"
@@ -38,27 +43,22 @@
           :data-key="th.key"
           @mouseenter="multiSelect($event, xIndex, yIndex + store.states.visibleRowStartIndex, th.type)"
           @mousedown.prevent="selectCell($event, xIndex, yIndex + store.states.visibleRowStartIndex, th.type)"
-          v-show="th.fixed || allShow">
+          v-show="th.fixed || allShow"
+        >
           <el-checkbox
             v-if="th.type === 'selection' && dataStatusList[yIndex + store.states.visibleRowStartIndex]"
             size="mini"
             v-model="dataStatusList[yIndex + store.states.visibleRowStartIndex].checked"
-            @change="selectionChange">
-          </el-checkbox>
+            @change="selectionChange"
+          ></el-checkbox>
           <div
             v-else
             class="ww-cell-content"
-            :style="{'max-width':  `${columnsWidth[xIndex]}px`}">
-            {{ format(tr[th.key], th.type, th.format) }}
-          </div>
+            :style="{'max-width':  `${columnsWidth[xIndex]}px`}"
+          >{{ format(tr[th.key], th.type, th.format) }}</div>
         </div>
       </div>
-      <div
-        v-if="showData.length === 0 && !fixed"
-        class="ww-empty-block">
-        暂无数据
-      </div>
-      <slot></slot>
+      <div v-if="showData.length === 0 && !fixed" class="ww-empty-block">暂无数据</div>
     </div>
   </div>
 </template>
@@ -182,10 +182,17 @@ export default {
   > div {
     position: relative;
   }
+  &.empty {
+    border-left: 1px solid #d6dfe4;
+  }
   &.fixed {
     position: absolute;
     left: 0;
-    z-index: 3;
+    box-shadow: 1px 0 8px #d3d4d6;
+    overflow-x: hidden;
+    background: #fff;
+    user-select: none;
+    z-index: 2;
   }
   &.scrollY {
     padding-bottom: 8px;

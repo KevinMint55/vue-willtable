@@ -1,5 +1,10 @@
 <template>
-  <div ref="willtable" class="ww-willtable">
+  <div
+    ref="willtable"
+    class="ww-willtable"
+    :style="{
+      width: allSetWidth && (tableWidth <= wrapperWidth) ? `${tableWidth}px` : ''
+    }">
     <div
       v-show="store.states.columns.length > 0"
       ref="wrapper"
@@ -28,38 +33,34 @@
         :style="{
           maxHeight: `${maxHeight}px`
         }">
-        <!-- 编辑器 -->
-        <editor
-          ref="editor"
-          :columnsWidth="columnsWidth"
-          :fixedCount="fixedCount"
-          :store="store"
-        />
       </table-body>
-      <!-- 左侧固定- -->
-      <div
-        ref="fixedWrapper"
-        class="ww-table-fixed"
-        :style="{width: `${fixedWidth}px`}">
-        <table-header
-          ref="fixedTheader"
-          :fixed="true"
-          :showIcon="showIcon"
-          :columnsWidth="columnsWidth"
-          :fixedCount="fixedCount"
-          :store="store"
-        />
-        <table-body
-          ref="fixedTbody"
-          :fixed="true"
-          :columnsWidth="columnsWidth"
-          :cellStyle="cellStyle"
-          :cellClassName="cellClassName"
-          :store="store"
-          :scrollY="tableHeight > maxHeight"
-        />
+      <!-- 编辑器 -->
+      <editor
+        ref="editor"
+        :columnsWidth="columnsWidth"
+        :fixedCount="fixedCount"
+        :store="store"
+      />
+      <table-header
+        ref="fixedTheader"
+        :style="{width: `${fixedWidth}px`}"
+        :fixed="true"
+        :showIcon="showIcon"
+        :columnsWidth="columnsWidth"
+        :fixedCount="fixedCount"
+        :store="store"
+      />
+      <table-body
+        ref="fixedTbody"
+        :style="{width: `${fixedWidth}px`}"
+        :fixed="true"
+        :columnsWidth="columnsWidth"
+        :cellStyle="cellStyle"
+        :cellClassName="cellClassName"
+        :store="store"
+        :scrollY="tableHeight > maxHeight"
+      />
       </div>
-    </div>
     <div
       v-show="store.states.columns.length === 0"
       class="ww-empty-columns">
@@ -81,7 +82,6 @@
       :store="store">
     </scroll>
     <scroll
-      v-if="tableHeight > maxHeight"
       barType="y"
       :store="store">
     </scroll>
@@ -125,7 +125,7 @@ export default {
     },
     theaderHeight: {
       type: [String, Number],
-      default: 50,
+      default: 30,
     },
     disabled: {
       type: Boolean,
@@ -150,6 +150,7 @@ export default {
       store,
       wrapperWidth: null,
       columnsWidth: [],
+      allSetWidth: false,
 
       data: [],
       scrollLeftArr: [],
@@ -233,6 +234,7 @@ export default {
     handleMousewheel() {
       const { states } = this.store;
       const mainWrapperWheel = (e) => {
+        if (this.tableHeight <= this.maxHeight) return;
         let { tableBodyTop } = states;
         let { tableBodyLeft } = states;
         if (e.wheelDelta) {
@@ -364,8 +366,8 @@ export default {
         this.fixedWidth = this.scrollLeftArr[this.fixedCount - 1] || 0;
 
         // 如果每列均设置了宽度
-        const allWidth = states.columns.every((cell) => cell.width);
-        if (allWidth) {
+        this.allSetWidth = states.columns.every((cell) => cell.width);
+        if (this.allSetWidth) {
           states.tableWidth = states.columns.map((cell) => cell.width).reduce((a, b) => a + b, 0);
         } else {
           states.tableWidth = this.columnsWidth.reduce((total, cur) => total + cur, 0);
@@ -373,12 +375,6 @@ export default {
             states.tableWidth = this.wrapperWidth;
           }
         }
-
-        // 设置左侧定位高度
-        this.$nextTick(() => {
-          this.$refs.fixedWrapper.style.height = `${this.$refs.wrapper.offsetHeight}px`;
-          this.$refs.fixedTbody.$el.style.height = `${this.$refs.wrapper.offsetHeight - this.theaderHeight}px`;
-        });
       });
       states.theaderHeight = this.theaderHeight;
       states.mainWidth = this.$refs.wrapper.offsetWidth - states.scrollBarWidth;
@@ -670,11 +666,13 @@ export default {
         const sRight = this.excelPos.left + this.$refs.willtable.offsetWidth - 10;
         let { tableBodyTop } = states;
         let { tableBodyLeft } = states;
-        if (this.mouseY < sTop) {
-          tableBodyTop -= 20;
-        }
-        if (this.mouseY > sBottom) {
-          tableBodyTop += 20;
+        if (this.tableHeight > this.maxHeight) {
+          if (this.mouseY < sTop) {
+            tableBodyTop -= 20;
+          }
+          if (this.mouseY > sBottom) {
+            tableBodyTop += 20;
+          }
         }
         if (this.mouseX < sLeft) {
           tableBodyLeft -= 20;
@@ -723,18 +721,6 @@ export default {
   &.scrollY {
     padding-right: 8px;
   }
-}
-
-// 左侧固定
-.ww-table-fixed {
-  position: absolute;
-  top: 0;
-  left: 0;
-  box-shadow: 1px 0 8px #d3d4d6;
-  overflow-x: hidden;
-  background: #fff;
-  user-select: none;
-  z-index: 2;
 }
 
 .ww-empty-columns {
