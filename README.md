@@ -22,11 +22,11 @@ Demo here: https://demo.willwuwei.com/willtable/
 - 下拉复制与框选单元格拖动超过表格区域时自动滚动
 - 获取改变的数据行
 - 多种数据类型校验
-- 支持自定义数据校验
+- 支持自定义规则数据校验
 - 获取校验非法的数据行
 - 支持撤销与重做
 - 可自定义每个单元格样式与类名
-- 采用局部渲染，支持更大量数据的展示
+- 使用局部渲染，支持更大量数据的展示
 
 ## Installation
 
@@ -156,6 +156,10 @@ export default {
           title: 'ip',
           key: 'ip',
           width: 200,
+          validate: (value) => {
+            const pattern = /((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}/g;
+            return pattern.test(value);
+          },
         },
         {
           title: '总金额',
