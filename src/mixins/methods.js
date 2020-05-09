@@ -1,5 +1,8 @@
 export default {
   methods: {
+    getData() {
+      return this.data;
+    },
     setData(data) {
       this.data = data;
       this.$nextTick(() => {

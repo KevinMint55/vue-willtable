@@ -218,6 +218,7 @@ selection-change | 当选择项发生变化时会触发该事件 | selection
 
 方法名 | 说明 | 参数
 ---|---|---
+getData | 用来获取数据，返回当前表格数据 | ——
 setData | 用来设置数据，更新初始数据来判断改变数据 | data 
 getChangeData | 获取变化的数据行 | ——
 getErrorRows | 获取校验错误的数据和索引 | ——
