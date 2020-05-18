@@ -1,6 +1,6 @@
 # vue-willtable Editable table component
 
-[中文文档](https://github.com/KevinMint55/vue-willtable/blob/dev/README.md)
+[中文文档](https://github.com/KevinMint55/vue-willtable/blob/master/README.md)
 
 An editable table component for vue，support mutiple shortcut keys，mimic the similar operations in Excel
 

@@ -1,6 +1,6 @@
 # vue-willtable可编辑的表格组件
 
-[English document](https://github.com/KevinMint55/vue-willtable/blob/dev/READNE-EN.md)
+[English document](https://github.com/KevinMint55/vue-willtable/blob/master/READNE-EN.md)
 
 适用于Vue的可编辑的表格组件，支持多种快捷键操作，模拟Excel的操作体验
 
