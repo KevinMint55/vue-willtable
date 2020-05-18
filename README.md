@@ -14,12 +14,12 @@ Demo here: https://demo.willwuwei.com/willtable/
 
 - 表格宽度调整
 - 表格列固定
-- 数据过滤与筛选
+- 数据筛选与排序
 - 行多选
-- 批量框选删除与复制粘贴
+- 批量删除与复制粘贴
 - 可与Excel互相复制粘贴
 - 数据下拉复制
-- 下拉复制与框选单元格拖动超过表格区域时自动滚动
+- 下拉复制与多选单元格时候表格可自动滚动
 - 获取改变的数据行
 - 多种数据类型校验
 - 支持自定义规则数据校验
@@ -28,15 +28,15 @@ Demo here: https://demo.willwuwei.com/willtable/
 - 可自定义每个单元格样式与类名
 - 使用局部渲染，支持更大量数据的展示
 
-## Installation
+## 安装
 
 ```
 npm install vue-willtable --save
 ```
 
-## Mount
+## 挂载
 
-### mount with global
+### 挂载在全局
 
 ``` javascript
 import Vue from 'vue'
@@ -48,7 +48,7 @@ import 'vue-willtable/dist/vue-willtable.min.css'
 Vue.component('VueWilltable', VueWilltable)
 ```
 
-### mount with component
+### 挂载在组件
 
 ``` javascript
 import VueWilltable from 'vue-willtable'
@@ -63,7 +63,7 @@ export default {
 }
 ```
 
-## Usage
+## 使用例子
 
 ```vue
 <template>
@@ -192,11 +192,13 @@ export default {
 </script>
 ```
 
-### Value-Binding
+### 数据
 
-this.$refs.willtable调用setData方法来更新整表数据，并会重置历史数据记录
+this.$refs.willtable调用setData方法来更新整表数据，并会重置历史数据记录.
 
-### Attributes
+this.$refs.willtable调用getData方法来获取整表数据.
+
+### 属性
 
 参数 | 说明 | 类型 | 可选值 | 默认值
 ---|---|---|---|---
@@ -208,24 +210,24 @@ showIcon | 是否显示表头类型图标 | Boolean  | —— | false
 cellStyle | 单元格的 style 的回调方法 | Function({row, column, rowIndex, columnIndex}) | —— | ——
 cellClassName | 单元格的 className 的回调方法 | Function({row, column, rowIndex, columnIndex})  | —— | ——
 
-### Events
+### 事件
 
 事件名称 | 说明 | 回调参数
 ---|---|---
 selection-change | 当选择项发生变化时会触发该事件 | selection
 
-### Methods
+### 方法
 
 方法名 | 说明 | 参数
 ---|---|---
 getData | 用来获取数据，返回当前表格数据 | ——
-setData | 用来设置数据，更新初始数据来判断改变数据 | data 
+setData | 用来设置数据，并重置历史记录 | data 
 getChangeData | 获取变化的数据行 | ——
 getErrorRows | 获取校验错误的数据和索引 | ——
 addItem | 底部添加一行数据 | item
 removeItems | 批量删除，参数key为每行的唯一标识属性如id，values为该标识属性的数组 | key, values
 
-### Columns-Attributes
+### 列属性
 
 参数 | 说明 | 类型 | 可选值 | 默认值
 ---|---|---|---|---
@@ -233,19 +235,19 @@ key | 对应列内容的字段名 | String | —— | ——
 title | 列头显示文字 | String | —— | ——
 width | 列宽度 | String / Number | —— | ——
 type | 列类型 | String | selection/number/date/select/month | ——
-format | number类型是否格式化千分号 | Boolean | —— | true
+format | 千分号格式（用于number类型） | Boolean | —— | true
 options | select下拉选项 | Array | { value: '值', label: '显示文字' } | ——
 fixed | 是否固定在左侧 | Boolean | —— | false
-action | 是否启用过滤和筛选 | Boolean | —— | false
+action | 是否启用筛选和排序 | Boolean | —— | false
 disabled | 是否禁止编辑 | Boolean | —— | false
 noVerify | 是否禁用校验 | Boolean | —— | false
 validate | 自定义校验 | Function(value) | —— | ——
 
-### Shortcut
+### 快捷键
 
 快捷键 | 说明
 ---|---
-方向键 | 编辑框上下左右移动
+方向键 | 移动编辑框
 Ctrl + C | 粘贴
 Ctrl + V | 复制
 Ctrl + A | 单元格全选
@@ -254,6 +256,6 @@ Ctrl + Y | 重做
 Enter | 单元格编辑/完成单元格编辑
 Delete、Backspace | 删除
 
-## Author
+## 作者
 
 [WillWu](https://www.willwuwei.com)
