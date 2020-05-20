@@ -33,7 +33,7 @@ const webpackConfig = {
         collapseWhitespace: true,
         removeAttributeQuotes: true,
       },
-      chunksSortMode: 'dependency',
+      chunksSortMode: 'auto',
     }),
   ],
 };

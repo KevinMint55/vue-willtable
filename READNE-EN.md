@@ -72,6 +72,7 @@ export default {
   <willtable
     ref="willtable"
     :columns="columns"
+    v-model="data"
     maxHeight="800" />
 </template>
 
@@ -179,6 +180,7 @@ export default {
           width: 200,
         },
       ],
+      data: [],
     },
   },
   mounted() {
@@ -199,6 +201,8 @@ export default {
 this.$refs.willtable call the setData method to update the entire table data, and will reset the historical data records.
 
 this.$refs.willtable call the getData method to get the entire table data.
+
+`v-model`Value-Binding
 
 ### Attributes
 

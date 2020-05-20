@@ -42,7 +42,7 @@
 <script>
 import axios from 'axios';
 import { checkbox } from 'element-ui';
-import Willtable from '../src/components/Table';
+import Willtable from '../src/components/Table.vue';
 // import Willtable from '../dist/vue-willtable.min';
 // import '../dist/vue-willtable.min.css';
 
@@ -154,7 +154,8 @@ export default {
           },
         },
       ],
-      columns: [
+      columns: [],
+      columnsData: [
         {
           type: 'selection',
           width: 40,
@@ -269,6 +270,7 @@ export default {
   methods: {
     getList() {
       axios.get('https://demo.kevinmint.com/1.json').then((res) => {
+        this.columns = this.columnsData;
         this.$refs.willtable.setData(res.data.list);
       }).catch(() => {});
     },

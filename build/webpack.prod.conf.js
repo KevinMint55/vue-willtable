@@ -48,7 +48,7 @@ const webpackConfig = {
         collapseWhitespace: true,
         removeAttributeQuotes: true,
       },
-      chunksSortMode: 'dependency',
+      chunksSortMode: 'auto',
     }),
     new MiniCssExtractPlugin({
       filename: 'css/[name].[hash].css',
