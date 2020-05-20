@@ -72,6 +72,7 @@ export default {
   <willtable
     ref="willtable"
     :columns="columns"
+    v-model="data"
     maxHeight="800" />
 </template>
 
@@ -179,6 +180,7 @@ export default {
           width: 200,
         },
       ],
+      data: [],
     },
   },
   mounted() {
@@ -199,6 +201,8 @@ export default {
 this.$refs.willtable调用setData方法来更新整表数据，并会重置历史数据记录.
 
 this.$refs.willtable调用getData方法来获取整表数据.
+
+`v-model`进行值的绑定
 
 ### 属性
 

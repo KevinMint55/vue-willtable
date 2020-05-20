@@ -60,7 +60,7 @@
         :store="store"
         :scrollY="tableHeight > maxHeight"
       />
-      </div>
+    </div>
     <div
       v-show="store.states.columns.length === 0"
       class="ww-empty-columns">
@@ -111,6 +111,10 @@ export default {
     Scroll,
   },
   props: {
+    value: {
+      type: Array,
+      default: () => ([]),
+    },
     columns: {
       type: Array,
       default: () => ([]),
@@ -180,6 +184,9 @@ export default {
     },
   },
   watch: {
+    value(val) {
+      this.data = val;
+    },
     data: {
       handler(val) {
         const { states } = this.store;
@@ -190,6 +197,7 @@ export default {
           states.historyData.push(JSON.stringify(val));
           states.curHisory += 1;
         }
+        this.$emit('input', val);
         if (!states.initialData) {
           this.initData();
         }
@@ -204,7 +212,9 @@ export default {
       handler() {
         this.initColumns();
         this.store.handleFilters();
-        this.handleResize();
+        setTimeout(() => {
+          this.handleResize();
+        }, 0);
       },
       deep: true,
     },
@@ -221,6 +231,9 @@ export default {
   mixins: [methods, events],
   methods: {
     init() {
+      if (this.value.length > 0) {
+        this.data = this.value;
+      }
       this.store.states.rowHeight = this.rowHeight;
       window.addEventListener('resize', () => {
         this.handleResize();
