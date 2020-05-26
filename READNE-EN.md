@@ -6,7 +6,15 @@ An editable table component for vue，support mutiple shortcut keys，mimic the 
 
 Demo here: https://demo.willwuwei.com/willtable/
 
-Multi-person real-time online editing table system based on this component: https://castle.willwuwei.com
+Multi-person real-time online editing table system based on this component: 
+
+[website URL](https://castle.willwuwei.com)
+
+[Front-end project URL](https://github.com/KevinMint55/vue-castle)
+
+[Back-end project URL](https://github.com/KevinMint55/node-castle)
+
+## ScreenShot
 
 ![image](https://qiniu.willwuwei.com/willtable1.gif)
 

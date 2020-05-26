@@ -6,13 +6,21 @@
 
 Demo here: https://demo.willwuwei.com/willtable/
 
-基于该组件实现的多人实时在线编辑表格系统: https://castle.willwuwei.com
+基于该组件实现的多人实时共享编辑表格系统: 
+
+[访问网址](https://castle.willwuwei.com)
+
+[前端项目地址](https://github.com/KevinMint55/vue-castle)
+
+[后端项目地址](https://github.com/KevinMint55/node-castle)
+
+## 截图
 
 ![image](https://qiniu.willwuwei.com/willtable1.gif)
 
 ![image](https://qiniu.willwuwei.com/willtable2.gif)
 
-## Features
+## 特性
 
 - 表格宽度调整
 - 表格列固定
