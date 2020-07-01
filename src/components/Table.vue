@@ -4,7 +4,8 @@
     class="ww-willtable"
     :style="{
       width: allSetWidth && (tableWidth <= wrapperWidth) ? `${tableWidth}px` : ''
-    }">
+    }"
+  >
     <div
       v-show="store.states.columns.length > 0"
       ref="wrapper"
@@ -32,7 +33,8 @@
         :store="store"
         :style="{
           maxHeight: `${maxHeight}px`
-        }">
+        }"
+      >
       </table-body>
       <!-- 编辑器 -->
       <editor
@@ -63,13 +65,15 @@
     </div>
     <div
       v-show="store.states.columns.length === 0"
-      class="ww-empty-columns">
+      class="ww-empty-columns"
+    >
       暂无表头
     </div>
     <dropdown
       :columnsWidth="columnsWidth"
       :fixedCount="fixedCount"
-      :store="store">
+      :store="store"
+    >
     </dropdown>
     <div
       class="ww-adjustLine"
@@ -79,11 +83,13 @@
     <scroll
       v-if="tableWidth > wrapperWidth"
       barType="x"
-      :store="store">
+      :store="store"
+    >
     </scroll>
     <scroll
       barType="y"
-      :store="store">
+      :store="store"
+    >
     </scroll>
   </div>
 </template>
@@ -247,6 +253,7 @@ export default {
     handleMousewheel() {
       const { states } = this.store;
       const mainWrapperWheel = (e) => {
+        e.preventDefault();
         if (this.tableHeight <= this.maxHeight) return;
         let { tableBodyTop } = states;
         let { tableBodyLeft } = states;
@@ -265,12 +272,8 @@ export default {
         }
         this.store.setScrollStatus(tableBodyTop, tableBodyLeft);
       };
-      this.$refs.tbody.$el.addEventListener('mousewheel', mainWrapperWheel);
-      this.$refs.tbody.$el.addEventListener('DOMMouseScroll', mainWrapperWheel);
-      this.$nextTick(() => {
-        this.$refs.fixedTbody.$el.addEventListener('mousewheel', mainWrapperWheel);
-        this.$refs.fixedTbody.$el.addEventListener('DOMMouseScroll', mainWrapperWheel);
-      });
+      this.$refs.willtable.addEventListener('mousewheel', mainWrapperWheel);
+      this.$refs.willtable.addEventListener('DOMMouseScroll', mainWrapperWheel);
     },
     initColumns() {
       const { states } = this.store;
