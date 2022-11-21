@@ -26,6 +26,8 @@
       />
       <table-body
         ref="tbody"
+        :disabled="disabled"
+        :disabledCell="disabledCell"
         :columnsWidth="columnsWidth"
         :all-show="true"
         :cellStyle="cellStyle"
@@ -54,6 +56,8 @@
       />
       <table-body
         ref="fixedTbody"
+        :disabled="disabled"
+        :disabledCell="disabledCell"
         :style="{width: `${fixedWidth}px`}"
         :fixed="true"
         :columnsWidth="columnsWidth"
@@ -152,6 +156,10 @@ export default {
     cellClassName: {
       type: [Object, Function],
       default: () => () => ({}),
+    },
+    disabledCell: {
+      type: [Object, Function],
+      default: () => () => false,
     },
   },
   data() {
@@ -411,7 +419,6 @@ export default {
     },
     // 选择单元格
     selectCell(e, x, y, type) {
-      if (this.disabled) return;
       if (e.button !== 0) return;
       const { states } = this.store;
       window.addEventListener('keydown', this.keySubmit);
@@ -510,7 +517,8 @@ export default {
           break;
         case keyCode === 8 || keyCode === 46:
           // 删除
-          this.store.clearSelected();
+          if (this.disabled) return;
+          this.store.clearSelected(this.disabledCell);
           break;
         case keyCode === 13:
           this.setEditing();
@@ -548,7 +556,9 @@ export default {
       }
       document.body.removeChild(textArea);
     },
+    // 粘贴
     clipboardToContent(e) {
+      if (this.disabled) return;
       setTimeout(() => {
         const { states } = this.store;
         const arr = [];
@@ -588,7 +598,13 @@ export default {
     // 设置启用编辑
     setEditing(key) {
       const { states } = this.store;
-      if (states.columns[states.editor.editorXIndex].disabled) {
+      if (this.disabledCell({
+        row: states.showData[states.editor.editorYIndex],
+        column: states.columns[states.editor.editorXIndex],
+        rowIndex: states.editor.editorYIndex,
+        columnIndex: states.editor.editorXIndex,
+      })) return;
+      if (this.disabled || states.columns[states.editor.editorXIndex].disabled) {
         return;
       }
       states.editor.editType = states.columns[states.editor.editorXIndex].type ? states.columns[states.editor.editorXIndex].type : 'text';

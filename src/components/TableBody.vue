@@ -92,6 +92,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    disabledCell: {
+      type: [Object, Function],
+      default: () => () => false,
+    },
   },
   components: {
     'el-checkbox': checkbox,
@@ -159,7 +167,12 @@ export default {
     },
     classObj(row, column, rowIndex, columnIndex) {
       return {
-        disabled: column.disabled,
+        disabled: column.disabled || this.disabled || this.disabledCell({
+          row,
+          column,
+          rowIndex,
+          columnIndex,
+        }),
         selection: column.type === 'selection',
         error: !this.store.verify(column, row[column.key], rowIndex),
         ...this.cellClassName({
