@@ -221,8 +221,9 @@ maxHeight | Max height of column | string / number  | —— | ——
 rowHeight | Height per row | string / number | —— | ——
 disabled | Whether to prohibit editing | Boolean  | —— | true
 showIcon | Whether to display the header icon | Boolean  | —— | false
-cellStyle | callback method of cell's style | Function({row, column, rowIndex, columnIndex}) | —— | ——
-cellClassName | callback method of cell's classname | Function({row, column, rowIndex, columnIndex})  | —— | ——
+cellStyle | Callback method of cell's style | Function({row, column, rowIndex, columnIndex}) | —— | ——
+cellClassName | Callback method of cell's classname | Function({row, column, rowIndex, columnIndex})  | —— | ——
+disabledCell | Disable Cells　| Function({row, column, rowIndex, columnIndex}) => Boolean  | —— | () => false
 
 ### Events
 
@@ -240,6 +241,7 @@ getChangeData | Get changed rows | ——
 getErrorRows | Get data and its index that doesn't pass the verification | ——
 addItem | Add a row of data to the bottom | item
 removeItems | delete, the key is the unique identification attribute of each row, such as id, and the values are the array of the identification attribute | key, values
+setCellData  | Set the cell data | rowIndex, columnIndex, value
 
 ### Columns-Attributes
 
@@ -256,6 +258,7 @@ action | Whether to enable filtering and sorting | Boolean | —— | false
 disabled | Whether to disable editing | Boolean | —— | false
 noVerify | Whether to disable verification | Boolean | —— | false
 validate | self-defined verification | Function(value) | —— | ——
+customInput | Custom input | Function({ row, column, rowIndex, columnIndex, value }) | —— | ——
 
 ### Shortcut
 

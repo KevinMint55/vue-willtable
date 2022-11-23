@@ -30,7 +30,7 @@ Mock.mock('https://demo.kevinmint.com/1.json', 'get', {
     // 属性 url 是一个随机的url
     url: '@url',
     // 属性 email 是一个随机email
-    email: '@email',
+    work: '@email',
     // 属性 ip 是一个随机ip
     ip: '@ip',
     sum: '@ip',

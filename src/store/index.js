@@ -410,15 +410,33 @@ class TableStore {
   }
 
   // delete the selected data
-  clearSelected() {
+  clearSelected(disabledCell) {
     const { states } = this;
     for (let i = 0; i <= states.selector.selectedYArr[1] - states.selector.selectedYArr[0]; i += 1) {
       for (let j = 0; j <= states.selector.selectedXArr[1] - states.selector.selectedXArr[0]; j += 1) {
-        if (!states.columns[j + states.selector.selectedXArr[0]].disabled) {
+        if (!states.columns[j + states.selector.selectedXArr[0]].disabled && !disabledCell({
+          row: states.showData[i + states.selector.selectedYArr[0]], column: states.columns[j + states.selector.selectedXArr[0]], rowIndex: i + states.selector.selectedYArr[0], columnIndex: j + states.selector.selectedXArr[0],
+        })) {
           states.showData[i + states.selector.selectedYArr[0]][states.columns[j + states.selector.selectedXArr[0]].key] = '';
         }
       }
     }
+  }
+
+  // add row
+  addRow(rowIndex) {
+    const { states } = this;
+    const data = {};
+    states.columns.forEach((column) => {
+      if (column.key) {
+        data[column.key] = '';
+      }
+    });
+    states.data.splice(rowIndex, 0, data);
+    states.dataStatusList.splice(rowIndex, 0, {
+      checked: false,
+      errors: [],
+    });
   }
 }
 

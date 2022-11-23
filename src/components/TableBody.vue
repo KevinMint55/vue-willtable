@@ -57,6 +57,10 @@
             :style="{'max-width':  `${columnsWidth[xIndex]}px`}"
           >{{ format(tr[th.key], th.type, th.format) }}</div>
         </div>
+        <template v-if="editor.editorShow && !disabled && showAddRow">
+          <div class="ww-tr-add prev" v-if="yIndex + store.states.visibleRowStartIndex === 0"  @click="addRow(yIndex + store.states.visibleRowStartIndex)"></div>
+          <div class="ww-tr-add next" @click="addRow(yIndex + store.states.visibleRowStartIndex + 1)"></div>
+        </template>
       </div>
       <div v-if="showData.length === 0 && !fixed" class="ww-empty-block">暂无数据</div>
     </div>
@@ -89,6 +93,18 @@ export default {
       required: true,
     },
     scrollY: {
+      type: Boolean,
+      default: false,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    disabledCell: {
+      type: [Object, Function],
+      default: () => () => false,
+    },
+    showAddRow: {
       type: Boolean,
       default: false,
     },
@@ -159,13 +175,21 @@ export default {
     },
     classObj(row, column, rowIndex, columnIndex) {
       return {
-        disabled: column.disabled,
+        disabled: column.disabled || this.disabled || this.disabledCell({
+          row,
+          column,
+          rowIndex,
+          columnIndex,
+        }),
         selection: column.type === 'selection',
         error: !this.store.verify(column, row[column.key], rowIndex),
         ...this.cellClassName({
           row, column, rowIndex, columnIndex,
         }),
       };
+    },
+    addRow(rowIndex) {
+      this.store.addRow(rowIndex);
     },
   },
 };
@@ -245,5 +269,40 @@ export default {
   padding: 30px;
   text-align: center;
   color: #909399;
+}
+
+// 添加行
+.ww-tr-add {
+  position: absolute;
+  left: -16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  z-index: 10;
+  &.prev {
+    top: -16px;
+  }
+  &.next {
+    bottom: -16px;
+  }
+  &::before {
+    content: "";
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #d6dfe4;
+    transition: all 0.3s;
+  }
+  &:hover {
+    &::before {
+      width: 16px;
+      height: 16px;
+      background-color: #57a3f3;
+    }
+  }
 }
 </style>

@@ -33,15 +33,30 @@
         :showIcon="showIcon"
         :cellStyle="cellStyle"
         :cellClassName="cellClassName"
-        :rowHeight="28" />
+        :rowHeight="28"
+        :disabledCell="disabledCell"
+        :showAddRow="showAddRow" />
       </div>
     </div>
+    <el-dialog :visible.sync="selectUserVisible">
+      <el-radio-group v-model="username">
+        <el-radio label="Will">Will</el-radio>
+        <el-radio label="Tom">Tom</el-radio>
+        <el-radio label="Jack">Jack</el-radio>
+      </el-radio-group>
+      <span slot="footer">
+        <el-button @click="selectUserVisible = false">取 消</el-button>
+        <el-button type="primary" @click="confirmUser">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
-import { checkbox } from 'element-ui';
+import {
+  checkbox, Dialog, Button, Radio, RadioGroup,
+} from 'element-ui';
 import Willtable from '../src/components/Table.vue';
 // import Willtable from '../dist/vue-willtable.min';
 // import '../dist/vue-willtable.min.css';
@@ -51,6 +66,10 @@ export default {
   components: {
     Willtable,
     'el-checkbox': checkbox,
+    'el-dialog': Dialog,
+    'el-button': Button,
+    'el-radio': Radio,
+    'el-radio-group': RadioGroup,
   },
   data() {
     return {
@@ -75,6 +94,13 @@ export default {
             } else {
               this.columns.shift();
             }
+          },
+        },
+        {
+          label: '显示添加行',
+          checked: false,
+          handleChange: (checked) => {
+            this.showAddRow = checked;
           },
         },
         {
@@ -120,6 +146,24 @@ export default {
           },
         },
         {
+          label: '禁止部分单元格操作(当工作岗位为Web前端开发，禁止编辑地址)',
+          checked: false,
+          handleChange: (checked) => {
+            if (checked) {
+              this.disabledCell = ({
+                row, column,
+              }) => {
+                if (column.key === 'address' && row.work === 'Web前端开发') {
+                  return true;
+                }
+                return false;
+              };
+            } else {
+              this.disabledCell = () => false;
+            }
+          },
+        },
+        {
           label: '自定义单元格样式',
           checked: false,
           handleChange: (checked) => {
@@ -132,7 +176,7 @@ export default {
                 }
               };
             } else {
-              this.cellStyle = () => {};
+              this.cellStyle = () => { };
             }
           },
         },
@@ -149,7 +193,7 @@ export default {
                 }
               };
             } else {
-              this.cellClassName = () => {};
+              this.cellClassName = () => { };
             }
           },
         },
@@ -173,6 +217,11 @@ export default {
           key: 'name',
           fixed: true,
           width: 120,
+          customInput: ({ rowIndex, columnIndex }) => {
+            this.curEditRowIndex = rowIndex;
+            this.curEditColumnIndex = columnIndex;
+            this.selectUserVisible = true;
+          },
         },
         {
           title: '日期',
@@ -182,7 +231,7 @@ export default {
         },
         {
           title: '工作岗位',
-          key: 'email',
+          key: 'work',
           width: 300,
           type: 'select',
           options: [
@@ -256,11 +305,17 @@ export default {
         },
       ],
       data: [],
+      disabledCell: () => false,
       showIcon: true,
+      showAddRow: false,
       disabled: false,
       maxHeight: 800,
-      cellStyle: () => {},
-      cellClassName: () => {},
+      cellStyle: () => { },
+      cellClassName: () => { },
+      selectUserVisible: false,
+      username: 'Will',
+      curEditRowIndex: null,
+      curEditColumnIndex: null,
     };
   },
   mounted() {
@@ -272,7 +327,7 @@ export default {
       axios.get('https://demo.kevinmint.com/1.json').then((res) => {
         this.columns = this.columnsData;
         this.$refs.willtable.setData(res.data.list);
-      }).catch(() => {});
+      }).catch(() => { });
     },
     getErrorRows() {
       console.log(this.$refs.willtable.getErrorRows());
@@ -308,17 +363,23 @@ export default {
     linkGithub() {
       window.open('https://github.com/KevinMint55/vue-willtable', '_blank');
     },
+    confirmUser() {
+      this.$refs.willtable.setCellData(this.curEditRowIndex, this.curEditColumnIndex, this.username);
+      this.selectUserVisible = false;
+    },
   },
 };
 </script>
 
 <style lang="scss" module="s">
 :global {
-  html, body, #app {
+  html,
+  body,
+  #app {
     height: 100%;
   }
   .customChanged {
-    background-color: rgba(247,181,0,0.1);
+    background-color: rgba(247, 181, 0, 0.1);
   }
 }
 
@@ -389,7 +450,7 @@ export default {
   display: inline-block;
   width: 24px;
   height: 24px;
-  background-image: url('./github.jpg');
+  background-image: url("./github.jpg");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;

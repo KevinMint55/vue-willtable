@@ -10,6 +10,13 @@ export default {
         this.store.handleFilters();
       });
     },
+    setCellData(rowIndex, columnIndex, value) {
+      const { states } = this.store;
+      this.data[rowIndex][states.columns[columnIndex].key] = value;
+      this.$nextTick(() => {
+        this.store.handleFilters();
+      });
+    },
     getChangeData() {
       return this.store.states.changeData;
     },

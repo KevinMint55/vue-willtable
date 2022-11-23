@@ -26,6 +26,8 @@
       />
       <table-body
         ref="tbody"
+        :disabled="disabled"
+        :disabledCell="disabledCell"
         :columnsWidth="columnsWidth"
         :all-show="true"
         :cellStyle="cellStyle"
@@ -34,6 +36,7 @@
         :style="{
           maxHeight: `${maxHeight}px`
         }"
+        :showAddRow="showAddRow"
       >
       </table-body>
       <!-- 编辑器 -->
@@ -54,6 +57,8 @@
       />
       <table-body
         ref="fixedTbody"
+        :disabled="disabled"
+        :disabledCell="disabledCell"
         :style="{width: `${fixedWidth}px`}"
         :fixed="true"
         :columnsWidth="columnsWidth"
@@ -61,6 +66,7 @@
         :cellClassName="cellClassName"
         :store="store"
         :scrollY="tableHeight > maxHeight"
+        :showAddRow="showAddRow"
       />
     </div>
     <div
@@ -152,6 +158,14 @@ export default {
     cellClassName: {
       type: [Object, Function],
       default: () => () => ({}),
+    },
+    disabledCell: {
+      type: [Object, Function],
+      default: () => () => false,
+    },
+    showAddRow: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -411,7 +425,6 @@ export default {
     },
     // 选择单元格
     selectCell(e, x, y, type) {
-      if (this.disabled) return;
       if (e.button !== 0) return;
       const { states } = this.store;
       window.addEventListener('keydown', this.keySubmit);
@@ -510,7 +523,8 @@ export default {
           break;
         case keyCode === 8 || keyCode === 46:
           // 删除
-          this.store.clearSelected();
+          if (this.disabled) return;
+          this.store.clearSelected(this.disabledCell);
           break;
         case keyCode === 13:
           this.setEditing();
@@ -548,7 +562,9 @@ export default {
       }
       document.body.removeChild(textArea);
     },
+    // 粘贴
     clipboardToContent(e) {
+      if (this.disabled) return;
       setTimeout(() => {
         const { states } = this.store;
         const arr = [];
@@ -566,7 +582,9 @@ export default {
         if (selectorYLength % arr.length === 0 && selectorXLength % arr[0].length === 0) {
           for (let i = 0; i <= selectorYLength - 1; i += 1) {
             for (let j = 0; j <= selectorXLength - 1; j += 1) {
-              if (!states.columns[j + states.selector.selectedXArr[0]].disabled) {
+              if (!states.columns[j + states.selector.selectedXArr[0]].disabled && !this.disabledCell({
+                row: states.showData[i + states.selector.selectedYArr[0]], column: states.columns[j + states.selector.selectedXArr[0]], rowIndex: i + states.selector.selectedYArr[0], columnIndex: j + states.selector.selectedXArr[0],
+              })) {
                 states.showData[i + states.selector.selectedYArr[0]][states.columns[j + states.selector.selectedXArr[0]].key] = arr[i % arr.length][j % arr[0].length];
               }
             }
@@ -575,7 +593,9 @@ export default {
           for (let i = 0; i <= arr.length - 1; i += 1) {
             for (let j = 0; j <= arr[i].length - 1; j += 1) {
               if (states.showData[i + states.selector.selectedYArr[0]] && states.columns[j + states.selector.selectedXArr[0]]) {
-                if (!states.columns[j + states.selector.selectedXArr[0]].disabled) {
+                if (!states.columns[j + states.selector.selectedXArr[0]].disabled && !this.disabledCell({
+                  row: states.showData[i + states.selector.selectedYArr[0]], column: states.columns[j + states.selector.selectedXArr[0]], rowIndex: i + states.selector.selectedYArr[0], columnIndex: j + states.selector.selectedXArr[0],
+                })) {
                   states.showData[i + states.selector.selectedYArr[0]][states.columns[j + states.selector.selectedXArr[0]].key] = arr[i][j];
                 }
               }
@@ -588,7 +608,19 @@ export default {
     // 设置启用编辑
     setEditing(key) {
       const { states } = this.store;
-      if (states.columns[states.editor.editorXIndex].disabled) {
+      const commonArgs = {
+        row: states.showData[states.editor.editorYIndex],
+        column: states.columns[states.editor.editorXIndex],
+        rowIndex: states.editor.editorYIndex,
+        columnIndex: states.editor.editorXIndex,
+      };
+      if (this.disabledCell(commonArgs)) return;
+      if (this.disabled || states.columns[states.editor.editorXIndex].disabled) {
+        return;
+      }
+      const curValue = states.showData[states.editor.editorYIndex][states.columns[states.editor.editorXIndex].key];
+      if (states.columns[states.editor.editorXIndex].customInput) {
+        states.columns[states.editor.editorXIndex].customInput({ ...commonArgs, value: curValue });
         return;
       }
       states.editor.editType = states.columns[states.editor.editorXIndex].type ? states.columns[states.editor.editorXIndex].type : 'text';
@@ -604,7 +636,7 @@ export default {
           this.$refs.editor.editContent = key;
         }
       } else {
-        this.$refs.editor.editContent = states.showData[states.editor.editorYIndex][states.columns[states.editor.editorXIndex].key];
+        this.$refs.editor.editContent = curValue;
       }
       states.editor.editing = true;
       if (states.editor.editType === 'select') {
