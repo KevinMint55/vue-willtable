@@ -422,6 +422,22 @@ class TableStore {
       }
     }
   }
+
+  // add row
+  addRow(rowIndex) {
+    const { states } = this;
+    const data = {};
+    states.columns.forEach((column) => {
+      if (column.key) {
+        data[column.key] = '';
+      }
+    });
+    states.data.splice(rowIndex, 0, data);
+    states.dataStatusList.splice(rowIndex, 0, {
+      checked: false,
+      errors: [],
+    });
+  }
 }
 
 export default TableStore;

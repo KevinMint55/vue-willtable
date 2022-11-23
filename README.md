@@ -223,6 +223,7 @@ disabled | 是否禁止编辑 | Boolean  | —— | true
 showIcon | 是否显示表头类型图标 | Boolean  | —— | false
 cellStyle | 单元格的 style 的回调方法 | Function({row, column, rowIndex, columnIndex}) | —— | ——
 cellClassName | 单元格的 className 的回调方法 | Function({row, column, rowIndex, columnIndex})  | —— | ——
+disabledCell | 禁用单元格　| Function({row, column, rowIndex, columnIndex}) => Boolean  | —— | () => false
 
 ### 事件
 
@@ -240,6 +241,7 @@ getChangeData | 获取变化的数据行 | ——
 getErrorRows | 获取校验错误的数据和索引 | ——
 addItem | 底部添加一行数据 | item
 removeItems | 批量删除，参数key为每行的唯一标识属性如id，values为该标识属性的数组 | key, values
+setCellData  | 设置单元格数据 | rowIndex, columnIndex, value
 
 ### 列属性
 
@@ -256,6 +258,7 @@ action | 是否启用筛选和排序 | Boolean | —— | false
 disabled | 是否禁止编辑 | Boolean | —— | false
 noVerify | 是否禁用校验 | Boolean | —— | false
 validate | 自定义校验 | Function(value) | —— | ——
+customInput | 自定义输入 | Function({ row, column, rowIndex, columnIndex, value }) | —— | ——
 
 ### 快捷键
 

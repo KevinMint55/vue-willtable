@@ -34,15 +34,29 @@
         :cellStyle="cellStyle"
         :cellClassName="cellClassName"
         :rowHeight="28"
-        :disabledCell="disabledCell" />
+        :disabledCell="disabledCell"
+        :showAddRow="showAddRow" />
       </div>
     </div>
+    <el-dialog :visible.sync="selectUserVisible">
+      <el-radio-group v-model="username">
+        <el-radio label="Will">Will</el-radio>
+        <el-radio label="Tom">Tom</el-radio>
+        <el-radio label="Jack">Jack</el-radio>
+      </el-radio-group>
+      <span slot="footer">
+        <el-button @click="selectUserVisible = false">取 消</el-button>
+        <el-button type="primary" @click="confirmUser">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
-import { checkbox } from 'element-ui';
+import {
+  checkbox, Dialog, Button, Radio, RadioGroup,
+} from 'element-ui';
 import Willtable from '../src/components/Table.vue';
 // import Willtable from '../dist/vue-willtable.min';
 // import '../dist/vue-willtable.min.css';
@@ -52,6 +66,10 @@ export default {
   components: {
     Willtable,
     'el-checkbox': checkbox,
+    'el-dialog': Dialog,
+    'el-button': Button,
+    'el-radio': Radio,
+    'el-radio-group': RadioGroup,
   },
   data() {
     return {
@@ -76,6 +94,13 @@ export default {
             } else {
               this.columns.shift();
             }
+          },
+        },
+        {
+          label: '显示添加行',
+          checked: false,
+          handleChange: (checked) => {
+            this.showAddRow = checked;
           },
         },
         {
@@ -192,6 +217,11 @@ export default {
           key: 'name',
           fixed: true,
           width: 120,
+          customInput: ({ rowIndex, columnIndex }) => {
+            this.curEditRowIndex = rowIndex;
+            this.curEditColumnIndex = columnIndex;
+            this.selectUserVisible = true;
+          },
         },
         {
           title: '日期',
@@ -277,10 +307,15 @@ export default {
       data: [],
       disabledCell: () => false,
       showIcon: true,
+      showAddRow: false,
       disabled: false,
       maxHeight: 800,
       cellStyle: () => { },
       cellClassName: () => { },
+      selectUserVisible: false,
+      username: 'Will',
+      curEditRowIndex: null,
+      curEditColumnIndex: null,
     };
   },
   mounted() {
@@ -327,6 +362,10 @@ export default {
     },
     linkGithub() {
       window.open('https://github.com/KevinMint55/vue-willtable', '_blank');
+    },
+    confirmUser() {
+      this.$refs.willtable.setCellData(this.curEditRowIndex, this.curEditColumnIndex, this.username);
+      this.selectUserVisible = false;
     },
   },
 };
