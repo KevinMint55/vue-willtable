@@ -108,6 +108,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    addRowAndCopy: {
+      type: Boolean,
+      default: false,
+    },
   },
   components: {
     'el-checkbox': checkbox,
@@ -189,7 +193,7 @@ export default {
       };
     },
     addRow(rowIndex) {
-      this.store.addRow(rowIndex);
+      this.store.addRow(rowIndex, this.addRowAndCopy);
     },
   },
 };

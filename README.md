@@ -219,11 +219,13 @@ this.$refs.willtable调用getData方法来获取整表数据.
 columns | 表格列的配置描述 | Array | —— | []
 maxHeight | 表格最大高度 | string / number  | —— | ——
 rowHeight | 每行高度 | string / number | —— | ——
-disabled | 是否禁止编辑 | Boolean  | —— | true
-showIcon | 是否显示表头类型图标 | Boolean  | —— | false
+disabled | 禁止编辑 | Boolean  | —— | true
+showIcon | 显示表头类型图标 | Boolean  | —— | false
 cellStyle | 单元格的 style 的回调方法 | Function({row, column, rowIndex, columnIndex}) | —— | ——
 cellClassName | 单元格的 className 的回调方法 | Function({row, column, rowIndex, columnIndex})  | —— | ——
 disabledCell | 禁用单元格　| Function({row, column, rowIndex, columnIndex}) => Boolean  | —— | () => false
+showAddRow | 显示添加行功能 | Boolean  | —— | false
+addRowAndCopy | 添加行时复制上一行数据 | Boolean  | —— | false
 
 ### 事件
 
@@ -240,8 +242,11 @@ setData | 用来设置数据，并重置历史记录 | data
 getChangeData | 获取变化的数据行 | ——
 getErrorRows | 获取校验错误的数据和索引 | ——
 addItem | 底部添加一行数据 | item
+addRow | 添加行 | rowIndex, copyRow, customData
 removeItems | 批量删除，参数key为每行的唯一标识属性如id，values为该标识属性的数组 | key, values
 setCellData  | 设置单元格数据 | rowIndex, columnIndex, value
+fullscreen | 全屏展示 | ——
+exitFullscreen | 退出全屏 | ——
 
 ### 列属性
 

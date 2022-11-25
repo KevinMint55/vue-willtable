@@ -28,7 +28,8 @@
           :style="{width:`${editor.curEditorWidth > 140 ? editor.curEditorWidth : 140}px`}"
           @blur="resetEditor"
           v-else-if="editor.editType === 'date'"
-          ref="date">
+          ref="date"
+          :append-to-body="false">
         </el-date-picker>
         <el-date-picker
           size="mini"
@@ -38,7 +39,8 @@
           :style="{width:`${editor.curEditorWidth > 140 ? editor.curEditorWidth : 140}px`}"
           @blur="resetEditor"
           v-else-if="editor.editType === 'month'"
-          ref="month">
+          ref="month"
+          :append-to-body="false">
         </el-date-picker>
         <el-select
           size="mini"
@@ -48,7 +50,8 @@
           v-else-if="editor.editType === 'select'"
           placeholder="请选择"
           clearable
-          ref="select">
+          ref="select"
+          :popper-append-to-body="false">
           <el-option
             v-for="item in editor.options"
             :value="item.value"
@@ -297,10 +300,10 @@ export default {
   left: 0;
   pointer-events: none;
   &.selected {
-    background-color: rgba(74, 149, 235, 0.2) ;
+    background-color: rgba(74, 149, 235, 0.2);
   }
   &.autofill {
-    background-color: rgba(127, 127, 127, 0.2) ;
+    background-color: rgba(127, 127, 127, 0.2);
   }
   &.fixed {
     z-index: 3;
