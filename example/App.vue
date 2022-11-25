@@ -21,7 +21,7 @@
             <el-checkbox v-model="item.checked" @change="item.handleChange"></el-checkbox>
           </li>
         </ul>
-        <div :class="s.more">...</div>
+        <div :class="s.more" @click="fullscreen">全屏</div>
       </div>
       <div :class="s.willtable_wrapper">
         <willtable
@@ -35,20 +35,22 @@
         :cellClassName="cellClassName"
         :rowHeight="28"
         :disabledCell="disabledCell"
-        :showAddRow="showAddRow" />
+        :showAddRow="showAddRow"
+        :addRowAndCopy="true">
+          <el-dialog :visible.sync="selectUserVisible">
+            <el-radio-group v-model="username">
+              <el-radio label="Will">Will</el-radio>
+              <el-radio label="Tom">Tom</el-radio>
+              <el-radio label="Jack">Jack</el-radio>
+            </el-radio-group>
+            <span slot="footer">
+              <el-button @click="selectUserVisible = false">取 消</el-button>
+              <el-button type="primary" @click="confirmUser">确 定</el-button>
+            </span>
+          </el-dialog>
+        </willtable>
       </div>
     </div>
-    <el-dialog :visible.sync="selectUserVisible">
-      <el-radio-group v-model="username">
-        <el-radio label="Will">Will</el-radio>
-        <el-radio label="Tom">Tom</el-radio>
-        <el-radio label="Jack">Jack</el-radio>
-      </el-radio-group>
-      <span slot="footer">
-        <el-button @click="selectUserVisible = false">取 消</el-button>
-        <el-button type="primary" @click="confirmUser">确 定</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
@@ -335,6 +337,12 @@ export default {
     getChangeData() {
       console.log(this.$refs.willtable.getChangeData());
     },
+    addRow() {
+      this.$refs.willtable.addRow(1, true);
+    },
+    fullscreen() {
+      this.$refs.willtable.fullscreen();
+    },
     // cellStyle({ rowIndex, columnIndex }) {
     //   if (rowIndex === 1) {
     //     return {
@@ -464,7 +472,8 @@ export default {
 }
 
 .more {
-  font-size: 32px;
+  font-size: 14px;
   text-align: right;
+  margin-top: 12px;
 }
 </style>

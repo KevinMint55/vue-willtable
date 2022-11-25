@@ -12,7 +12,7 @@
       class="ww-table-wrapper"
       :class="{
         scrollX: tableWidth > wrapperWidth,
-        scrollY: tableHeight > maxHeight
+        scrollY: tableHeight > curMaxHeight
       }"
       v-clickoutside="clickoutside"
     >
@@ -34,9 +34,10 @@
         :cellClassName="cellClassName"
         :store="store"
         :style="{
-          maxHeight: `${maxHeight}px`
+          maxHeight: `${curMaxHeight}px`
         }"
         :showAddRow="showAddRow"
+        :addRowAndCopy="addRowAndCopy"
       >
       </table-body>
       <!-- 编辑器 -->
@@ -65,8 +66,9 @@
         :cellStyle="cellStyle"
         :cellClassName="cellClassName"
         :store="store"
-        :scrollY="tableHeight > maxHeight"
+        :scrollY="tableHeight > curMaxHeight"
         :showAddRow="showAddRow"
+        :addRowAndCopy="addRowAndCopy"
       />
     </div>
     <div
@@ -97,6 +99,7 @@
       :store="store"
     >
     </scroll>
+    <slot></slot>
   </div>
 </template>
 
@@ -167,6 +170,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    addRowAndCopy: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     const store = new TableStore();
@@ -187,6 +194,7 @@ export default {
       mouseY: 0,
 
       excelPos: {},
+      fullscreenHeight: null,
     };
   },
   computed: {
@@ -201,6 +209,9 @@ export default {
     },
     tableBodyLeft() {
       return this.store.states.tableBodyLeft;
+    },
+    curMaxHeight() {
+      return this.fullscreenHeight || this.maxHeight;
     },
   },
   watch: {
@@ -258,6 +269,16 @@ export default {
       window.addEventListener('resize', () => {
         this.handleResize();
       });
+      document.addEventListener('fullscreenchange', () => {
+        setTimeout(() => {
+          if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
+            this.fullscreenHeight = window.innerHeight;
+          } else {
+            this.fullscreenHeight = null;
+          }
+          this.handleResize();
+        }, 0);
+      });
       this.store.handleIsMac();
       this.initColumns();
       this.handleResize();
@@ -268,7 +289,7 @@ export default {
       const { states } = this.store;
       const mainWrapperWheel = (e) => {
         e.preventDefault();
-        if (this.tableHeight <= this.maxHeight) return;
+        if (this.tableHeight <= this.curMaxHeight) return;
         let { tableBodyTop } = states;
         let { tableBodyLeft } = states;
         if (e.wheelDelta) {
@@ -328,6 +349,7 @@ export default {
       this.initColumns();
     },
     handleResize() {
+      if (!this.$refs.willtable) return;
       const { states } = this.store;
       this.excelPos = this.$refs.willtable.getBoundingClientRect();
       // 获取编辑框可移动范围, X是横轴, Y是竖轴
@@ -349,7 +371,7 @@ export default {
         if (surplusColumns.length > 0) {
           const surplusWidth = this.wrapperWidth - states.columns.filter((item) => item.width).reduce((total, item) => total + item.width, 0);
           if (surplusWidth > 0) {
-            if (this.$refs.tbody.$el.offsetHeight > this.maxHeight) {
+            if (this.$refs.tbody.$el.offsetHeight > this.curMaxHeight) {
               surplusColumnAvg = (surplusWidth - 1 - states.scrollBarWidth) / surplusColumns.length;
             } else {
               surplusColumnAvg = (surplusWidth - 1) / surplusColumns.length;
@@ -408,7 +430,7 @@ export default {
       });
       states.theaderHeight = this.theaderHeight;
       states.mainWidth = this.$refs.wrapper.offsetWidth - states.scrollBarWidth;
-      states.mainHeight = this.maxHeight + this.theaderHeight;
+      states.mainHeight = this.curMaxHeight + this.theaderHeight;
       states.tableHeight = states.showData.length * this.rowHeight + this.theaderHeight;
       this.store.initScrollBarLength();
       this.store.calcDomData();
@@ -685,12 +707,12 @@ export default {
         states.scrollbar.posX = states.tableBodyLeft / (states.tableWidth - states.mainWidth) * (states.mainWidth - states.scrollbar.xWidth);
       }
       // 上下调整
-      if (this.maxHeight) {
+      if (this.curMaxHeight) {
         const curTopShould = this.scrollTopArr[states.editor.editorYIndex] + 1;
         if (states.tableBodyTop > curTopShould) {
           states.tableBodyTop = curTopShould;
         }
-        const curBottomShould = this.scrollTopArr[states.editor.editorYIndex + 1] - this.maxHeight + 1;
+        const curBottomShould = this.scrollTopArr[states.editor.editorYIndex + 1] - this.curMaxHeight + 1;
         if (states.tableBodyTop < curBottomShould) {
           states.tableBodyTop = curBottomShould;
         }
@@ -714,7 +736,7 @@ export default {
         const sRight = this.excelPos.left + this.$refs.willtable.offsetWidth - 10;
         let { tableBodyTop } = states;
         let { tableBodyLeft } = states;
-        if (this.tableHeight > this.maxHeight) {
+        if (this.tableHeight > this.curMaxHeight) {
           if (this.mouseY < sTop) {
             tableBodyTop -= 20;
           }
@@ -755,6 +777,7 @@ export default {
 <style lang="scss">
 .ww-willtable {
   position: relative;
+  background-color: #fff;
   .el-checkbox {
     font-size: 12px;
   }

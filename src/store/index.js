@@ -424,14 +424,22 @@ class TableStore {
   }
 
   // add row
-  addRow(rowIndex) {
+  addRow(rowIndex, copyRow, customData) {
     const { states } = this;
     const data = {};
     states.columns.forEach((column) => {
       if (column.key) {
-        data[column.key] = '';
+        if (copyRow && rowIndex > 0) {
+          data[column.key] = states.data[rowIndex - 1][column.key];
+        } else {
+          data[column.key] = '';
+        }
+        if (customData && customData[column.key]) {
+          data[column.key] = customData[column.key];
+        }
       }
     });
+    states.initialData.splice(rowIndex, 0, {});
     states.data.splice(rowIndex, 0, data);
     states.dataStatusList.splice(rowIndex, 0, {
       checked: false,

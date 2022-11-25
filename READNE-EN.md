@@ -224,6 +224,8 @@ showIcon | Whether to display the header icon | Boolean  | —— | false
 cellStyle | Callback method of cell's style | Function({row, column, rowIndex, columnIndex}) | —— | ——
 cellClassName | Callback method of cell's classname | Function({row, column, rowIndex, columnIndex})  | —— | ——
 disabledCell | Disable Cells　| Function({row, column, rowIndex, columnIndex}) => Boolean  | —— | () => false
+showAddRow | Display the Add row function | Boolean  | —— | false
+addRowAndCopy | Copy the previous row when adding a row| Boolean  | —— | false
 
 ### Events
 
@@ -240,8 +242,11 @@ setData | set the data and reset the historical data records | data
 getChangeData | Get changed rows | ——
 getErrorRows | Get data and its index that doesn't pass the verification | ——
 addItem | Add a row of data to the bottom | item
+addRow | Add a row | rowIndex, copyRow, customData
 removeItems | delete, the key is the unique identification attribute of each row, such as id, and the values are the array of the identification attribute | key, values
 setCellData  | Set the cell data | rowIndex, columnIndex, value
+fullscreen | fullscreen | ——
+exitFullscreen | Exit fullscreen | ——
 
 ### Columns-Attributes
 

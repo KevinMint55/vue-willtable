@@ -47,6 +47,9 @@ export default {
         errors: [],
       });
     },
+    addRow(rowIndex, copyRow, customData) {
+      this.store.addRow(rowIndex, copyRow, customData);
+    },
     removeItems(key, values) {
       const { states } = this.store;
       if (key && values instanceof Array) {
@@ -55,6 +58,28 @@ export default {
           states.dataStatusList.splice(dIndex, 1);
           this.data.splice(dIndex, 1);
         });
+      }
+    },
+    fullscreen() {
+      if (this.$refs.willtable.requestFullscreen) {
+        this.$refs.willtable.requestFullscreen();
+      } else if (this.$refs.willtable.webkitRequestFullScreen) {
+        this.$refs.willtable.webkitRequestFullScreen();
+      } else if (this.$refs.willtable.mozRequestFullScreen) {
+        this.$refs.willtable.mozRequestFullScreen();
+      } else if (this.$refs.willtable.msRequestFullscreen) {
+        this.$refs.willtable.msRequestFullscreen();
+      }
+    },
+    exitFullscreen() {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitCancelFullScreen) {
+        document.webkitCancelFullScreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
       }
     },
   },
