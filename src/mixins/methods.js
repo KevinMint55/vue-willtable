@@ -46,6 +46,7 @@ export default {
         checked: false,
         errors: [],
       });
+      states.initialData.push(item);
     },
     addRow(rowIndex, copyRow, customData) {
       this.store.addRow(rowIndex, copyRow, customData);
