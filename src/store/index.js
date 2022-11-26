@@ -439,7 +439,7 @@ class TableStore {
         }
       }
     });
-    states.initialData.splice(rowIndex, 0, data);
+    states.initialData.splice(rowIndex, 0, {});
     states.data.splice(rowIndex, 0, data);
     states.dataStatusList.splice(rowIndex, 0, {
       checked: false,
