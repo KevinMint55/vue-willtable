@@ -56,6 +56,7 @@ export default {
         values.forEach((value) => {
           const dIndex = this.data.findIndex((d) => d[key] === value);
           states.dataStatusList.splice(dIndex, 1);
+          states.initialData.splice(dIndex, 1);
           this.data.splice(dIndex, 1);
         });
       }
