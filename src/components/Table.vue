@@ -45,6 +45,7 @@
         ref="editor"
         :columnsWidth="columnsWidth"
         :fixedCount="fixedCount"
+        :fullscreenHeight="fullscreenHeight"
         :store="store"
       />
       <table-header
@@ -211,7 +212,7 @@ export default {
       return this.store.states.tableBodyLeft;
     },
     curMaxHeight() {
-      return this.fullscreenHeight || this.maxHeight;
+      return this.fullscreenHeight ? this.fullscreenHeight - this.theaderHeight - this.store.states.scrollBarWidth : this.maxHeight;
     },
   },
   watch: {

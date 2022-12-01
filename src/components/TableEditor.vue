@@ -29,7 +29,7 @@
           @blur="resetEditor"
           v-else-if="editor.editType === 'date'"
           ref="date"
-          :append-to-body="false">
+          :append-to-body="fullscreenHeight ? false : true">
         </el-date-picker>
         <el-date-picker
           size="mini"
@@ -40,7 +40,7 @@
           @blur="resetEditor"
           v-else-if="editor.editType === 'month'"
           ref="month"
-          :append-to-body="false">
+          :append-to-body="fullscreenHeight ? false : true">
         </el-date-picker>
         <el-select
           size="mini"
@@ -51,7 +51,7 @@
           placeholder="请选择"
           clearable
           ref="select"
-          :popper-append-to-body="false">
+          :popper-append-to-body="fullscreenHeight ? false : true">
           <el-option
             v-for="item in editor.options"
             :value="item.value"
@@ -103,6 +103,7 @@ export default {
     store: {
       required: true,
     },
+    fullscreenHeight: [Number, null],
   },
   components: {
     'el-date-picker': DatePicker,
