@@ -426,7 +426,7 @@ class TableStore {
   // add row
   addRow(rowIndex, copyRow, customData) {
     const { states } = this;
-    const data = {};
+    let data = {};
     states.columns.forEach((column) => {
       if (column.key) {
         if (copyRow && rowIndex > 0) {
@@ -434,11 +434,14 @@ class TableStore {
         } else {
           data[column.key] = '';
         }
-        if (customData && customData[column.key]) {
-          data[column.key] = customData[column.key];
-        }
       }
     });
+    if (customData) {
+      data = {
+        ...data,
+        ...customData,
+      };
+    }
     states.initialData.splice(rowIndex, 0, {});
     states.data.splice(rowIndex, 0, data);
     states.dataStatusList.splice(rowIndex, 0, {
