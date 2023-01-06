@@ -290,7 +290,7 @@ export default {
       const { states } = this.store;
       const mainWrapperWheel = (e) => {
         e.preventDefault();
-        if (this.tableHeight <= this.curMaxHeight) return;
+        if (states.scrollbar.yHeight === 0) return;
         let { tableBodyTop } = states;
         let { tableBodyLeft } = states;
         if (e.wheelDelta) {
