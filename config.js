@@ -3,7 +3,7 @@ const path = require('path');
 module.exports = {
   dev: {
     assetsPublicPath: '/',
-    port: 5000,
+    port: 5001,
     styleLint: false,
     devtool: 'cheap-module-eval-source-map',
   },

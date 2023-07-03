@@ -334,6 +334,7 @@ export default {
       const { states } = this.store;
       states.data = this.data;
       states.showData = this.data;
+      this.store.calcDomData();
       states.dataStatusList = this.data.map(() => ({
         checked: false,
         errors: [],
