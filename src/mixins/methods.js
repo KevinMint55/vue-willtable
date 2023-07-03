@@ -8,6 +8,8 @@ export default {
       this.$nextTick(() => {
         this.initData();
         this.store.handleFilters();
+        this.store.handleChangeData();
+        this.store.handleErrors();
       });
     },
     setCellData(rowIndex, columnIndex, value) {
